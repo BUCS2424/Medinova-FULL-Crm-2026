@@ -364,6 +364,7 @@ export default function PageGeneratorEditor() {
                                     <KeywordTagsInput
                                         value={form.keywords}
                                         onChange={(v) => setField("keywords", v)}
+                                        label={false}
                                     />
                                 </div>
                             </div>

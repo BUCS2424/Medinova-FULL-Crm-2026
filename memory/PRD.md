@@ -6,7 +6,7 @@
 **Project Name**: MediNova Medical Supplies CRM (rebranded from DME PROS)
 **Source**: https://github.com/BUCS2424/New-Core-Lead-vender-DME-r-us
 **Setup Date**: 2026-03-13
-**Last Updated**: 2026-05-16
+**Last Updated**: 2026-05-16 (Location Generator V2 installed)
 
 ## Architecture
 - **Backend**: FastAPI (Python) on port 8001
@@ -38,6 +38,19 @@
   - `lead-check-eligibility-button` added to LeadDetailPage.js — modal pre-fills patient name/insurance from lead record, runs real-time check and updates lead status to `verifying_insurance`
   - All Waystar endpoints secured with `Depends(verify_token)` JWT auth (previously config/status/eligibility/claims/logs were open)
   - Log endpoint URL mismatch fixed (`/activity/logs` → `/logs`)
+
+- [x] **Location Generator V2 (2026-05-16)**:
+  - Full programmatic SEO engine installed from ZIP module
+  - Creates pages for all 50 states × counties × cities (~33,000+ pages possible)
+  - New menu item "Location Generator V2 ⭐" added to Dev Settings sidebar with gold star icon
+  - DevPageGenerator, PageGeneratorEditor, CoverageAreaPage pages wired
+  - All missing backend services created: locations_data, render_overlay, theme_inheritance, seo_jsonld, state_facts, content_variation, page_catalog
+  - All missing frontend components created: GeneratorCard, GeneratorsTable, DeleteGeneratorDialog, KeywordTagsInput, StatesPicker, PagesTab, PageSelector, StatCard, PreviewSampleDialog, NamespaceContext
+  - Backend routes mounted at /api/v2/ (admin) and /coverage-areas/ (public)
+  - MongoDB collections: v2_page_generators, v2_generated_pages, v2_site_settings
+  - Template cloning via Playwright (chromium installed)
+  - AI content generation (requires OPENAI_API_KEY in .env)
+  - 100% test pass rate (23/23 backend, 12/12 frontend)
 
 
   - Fixed `/locations/michigan` (and any clean state slug) → was returning "Page Not Found" because `LocationDetailPage.js` built wrong API URL. Now normalizes to `durable-medical-equipment-in-{slug}.html` format
