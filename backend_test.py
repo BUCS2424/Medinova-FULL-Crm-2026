@@ -9,7 +9,7 @@ import sys
 from datetime import datetime
 
 # Public endpoint from frontend/.env
-API_URL = "https://strict-copy-deploy.preview.emergentagent.com"
+API_URL = "https://medinova-preview.preview.emergentagent.com"
 
 # Test credentials from /app/memory/test_credentials.md
 TEST_EMAIL = "mel@a2gdesigns.com"

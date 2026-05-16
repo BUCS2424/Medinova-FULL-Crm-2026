@@ -73,7 +73,9 @@ export default function LocationsPage() {
   
   // Helper function to get location page URL - use clean /locations/ path
   const getLocationPageUrl = (file) => {
-    return `/locations/${file}`;
+    // Clean slug for SEO - strip .html extension
+    const slug = file ? file.replace(/\.html$/, '') : '';
+    return `/locations/${slug}`;
   };
 
   useEffect(() => {
@@ -749,24 +751,7 @@ export default function LocationsPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-3" data-testid="locations-page-footer-logo-wrap">
-              {versionedLogoUrl ? (
-                <img
-                  src={versionedLogoUrl}
-                  alt="MediNova Medical Supplies logo"
-                  className="h-10 max-w-[160px] object-contain"
-                  data-testid="locations-page-footer-logo-image"
-                />
-              ) : (
-                <>
-                  <div className="w-10 h-10 bg-gradient-to-br from-lime-400 to-lime-500 rounded-xl flex items-center justify-center">
-                    <Shield className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold">MediNova Medical Supplies</h3>
-                    <p className="text-sm text-gray-400">Medicare DME Supplier</p>
-                  </div>
-                </>
-              )}
+              <img src="/images/medinova/logo.webp" alt="MediNova Medical Supplies" className="h-10 max-w-[160px] object-contain brightness-0 invert opacity-90" data-testid="locations-page-footer-logo-image" />
             </div>
             <div className="flex items-center gap-6 text-sm text-gray-400">
               <Link to="/" className="hover:text-white transition-colors">Home</Link>

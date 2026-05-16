@@ -13717,7 +13717,7 @@ async def generate_location_page_on_demand(loc_name: str, loc_type: str, state_n
             "Mobility": {"icon": "accessibility", "gradient": "from-blue-500 to-blue-600", "subtitle": "Wheelchairs, walkers, scooters"},
             "Mobility Equipment": {"icon": "accessibility", "gradient": "from-blue-500 to-blue-600", "subtitle": "Wheelchairs, walkers, scooters"},
             "Lifts / Transfer Equipment": {"icon": "arrow-up-down", "gradient": "from-green-500 to-emerald-600", "subtitle": "Patient lifts, transfer aids"},
-            "Orthopedic / Orthotics": {"icon": "bone", "gradient": "from-lime-500 to-lime-600", "subtitle": "Braces for back, knee, ankle, wrist"},
+            "Orthopedic / Orthotics": {"icon": "bone", "gradient": "from-blue-500 to-blue-600", "subtitle": "Braces for back, knee, ankle, wrist"},
             "Respiratory / Oxygen": {"icon": "wind", "gradient": "from-sky-500 to-sky-600", "subtitle": "CPAP, oxygen concentrators"},
             "Hospital Beds / Bedroom": {"icon": "bed", "gradient": "from-rose-500 to-rose-600", "subtitle": "Hospital beds, mattresses"},
             "Hospital Beds & Accessories": {"icon": "bed", "gradient": "from-rose-500 to-rose-600", "subtitle": "Hospital beds, mattresses"},
@@ -13749,7 +13749,7 @@ async def generate_location_page_on_demand(loc_name: str, loc_type: str, state_n
             for prod in sorted(cat_products, key=lambda x: x.get("sort_order", 999)):
                 pname = prod.get("name", "")
                 pdesc = prod.get("short_description", "Medicare-covered medical equipment")
-                items_html += f'<div class="p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-lime-50 hover:border-lime-200 border border-transparent transition-colors product-item" data-product="{pname}" data-category="{cat_name}"><p class="font-medium text-gray-800 text-sm">{pname}</p><p class="text-xs text-gray-500 mt-1">{pdesc}</p></div>'
+                items_html += f'<div class="p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-blue-50 hover:border-blue-200 border border-transparent transition-colors product-item" data-product="{pname}" data-category="{cat_name}"><p class="font-medium text-gray-800 text-sm">{pname}</p><p class="text-xs text-gray-500 mt-1">{pdesc}</p></div>'
             
             category_cards.append(
                 f'<div class="border border-gray-200 rounded-2xl overflow-hidden">'

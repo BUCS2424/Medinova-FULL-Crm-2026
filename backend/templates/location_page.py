@@ -1,6 +1,6 @@
 """
 Full location page template for on-demand generation.
-DME PROS branded template with 100% unique content per location.
+MediNova Medical Supplies branded template with 100% unique content per location.
 """
 
 import os
@@ -8,7 +8,7 @@ import hashlib
 import random
 
 # Production domain for absolute URLs
-SITE_DOMAIN = os.environ.get("SITE_DOMAIN", "https://dmepros.com")
+SITE_DOMAIN = os.environ.get("SITE_DOMAIN", "https://medinovadme.com")
 
 def generate_full_location_page_html(
     loc_name: str,
@@ -52,38 +52,38 @@ def generate_full_location_page_html(
     
     # Title variations
     title_templates = [
-        f"DME PROS | Medicare DME in {loc_name} - Free Delivery",
-        f"Medical Equipment Delivered to {loc_name} | DME PROS",
-        f"{loc_name} Medicare DME Supplier | DME PROS",
-        f"DME PROS {loc_name} - Medicare-Covered Equipment",
-        f"Free DME Delivery in {loc_name} | DME PROS"
+        f"MediNova Medical Supplies | Medicare DME in {loc_name} - Free Delivery",
+        f"Medical Equipment Delivered to {loc_name} | MediNova Medical Supplies",
+        f"{loc_name} Medicare DME Supplier | MediNova Medical Supplies",
+        f"MediNova Medical Supplies {loc_name} - Medicare-Covered Equipment",
+        f"Free DME Delivery in {loc_name} | MediNova Medical Supplies"
     ]
     
     # Meta description variations
     meta_templates = [
-        f"Get Medicare-covered medical equipment delivered to {loc_name}. Back braces, knee braces, wheelchairs & more. Free shipping. Call (727) 966-7767.",
-        f"DME PROS serves {loc_name} with free delivery of Medicare-covered braces, wheelchairs, and mobility aids. $0 out-of-pocket for most patients.",
-        f"Need a back brace or wheelchair in {loc_name}? DME PROS delivers Medicare DME directly to your door. Call (727) 966-7767 today.",
-        f"Trusted Medicare DME supplier serving {loc_name}. We handle insurance, paperwork & delivery. Get started at (727) 966-7767.",
-        f"{loc_name} residents: Get Medicare-covered medical equipment delivered free. Back braces, knee braces & more from DME PROS."
+        f"Get Medicare-covered medical equipment delivered to {loc_name}. Back braces, knee braces, wheelchairs & more. Free shipping. Call (248) 886-4-DME (4363).",
+        f"MediNova Medical Supplies serves {loc_name} with free delivery of Medicare-covered braces, wheelchairs, and mobility aids. $0 out-of-pocket for most patients.",
+        f"Need a back brace or wheelchair in {loc_name}? MediNova Medical Supplies delivers Medicare DME directly to your door. Call (248) 886-4-DME (4363) today.",
+        f"Trusted Medicare DME supplier serving {loc_name}. We handle insurance, paperwork & delivery. Get started at (248) 886-4-DME (4363).",
+        f"{loc_name} residents: Get Medicare-covered medical equipment delivered free. Back braces, knee braces & more from MediNova Medical Supplies."
     ]
     
     # Headline variations
     headline_templates = [
-        f"Medical Equipment<br><span class='text-lime-400'>Delivered to {loc_name}</span>",
-        f"Your {loc_name}<br><span class='text-lime-400'>DME Solution</span>",
-        f"Medicare DME<br><span class='text-lime-400'>for {loc_name} Residents</span>",
-        f"Quality Equipment<br><span class='text-lime-400'>Shipped to {loc_name}</span>",
-        f"DME Made Simple<br><span class='text-lime-400'>in {loc_name}</span>"
+        f"Medical Equipment<br><span class='text-blue-400'>Delivered to {loc_name}</span>",
+        f"Your {loc_name}<br><span class='text-blue-400'>DME Solution</span>",
+        f"Medicare DME<br><span class='text-blue-400'>for {loc_name} Residents</span>",
+        f"Quality Equipment<br><span class='text-blue-400'>Shipped to {loc_name}</span>",
+        f"DME Made Simple<br><span class='text-blue-400'>in {loc_name}</span>"
     ]
     
     # Intro paragraph variations
     intro_templates = [
-        f"DME PROS delivers Medicare-covered durable medical equipment directly to patients in {loc_name}. From back braces to wheelchairs, we make getting the equipment you need simple and hassle-free.",
-        f"Residents of {loc_name} trust DME PROS for their medical equipment needs. We specialize in Medicare-covered braces, mobility aids, and more—delivered straight to your door at little to no cost.",
-        f"Getting quality medical equipment in {loc_name} has never been easier. DME PROS handles everything from insurance verification to delivery, so you can focus on your health.",
-        f"DME PROS proudly serves {loc_name} with fast, free delivery of Medicare-covered medical equipment. Our team handles all the paperwork while you receive quality braces, wheelchairs, and more.",
-        f"If you're in {loc_name} and need medical equipment, DME PROS is here to help. We work with your doctor and insurance to get you the DME you need—delivered free."
+        f"MediNova Medical Supplies delivers Medicare-covered durable medical equipment directly to patients in {loc_name}. From back braces to wheelchairs, we make getting the equipment you need simple and hassle-free.",
+        f"Residents of {loc_name} trust MediNova Medical Supplies for their medical equipment needs. We specialize in Medicare-covered braces, mobility aids, and more—delivered straight to your door at little to no cost.",
+        f"Getting quality medical equipment in {loc_name} has never been easier. MediNova Medical Supplies handles everything from insurance verification to delivery, so you can focus on your health.",
+        f"MediNova Medical Supplies proudly serves {loc_name} with fast, free delivery of Medicare-covered medical equipment. Our team handles all the paperwork while you receive quality braces, wheelchairs, and more.",
+        f"If you're in {loc_name} and need medical equipment, MediNova Medical Supplies is here to help. We work with your doctor and insurance to get you the DME you need—delivered free."
     ]
     
     # CTA button variations
@@ -97,11 +97,11 @@ def generate_full_location_page_html(
     
     # About section variations
     about_templates = [
-        f"DME PROS has helped thousands of Medicare beneficiaries across the country get the equipment they need. Our {loc_name} patients benefit from fast shipping, expert support, and $0 out-of-pocket costs on most orders.",
+        f"MediNova Medical Supplies has helped thousands of Medicare beneficiaries across the country get the equipment they need. Our {loc_name} patients benefit from fast shipping, expert support, and $0 out-of-pocket costs on most orders.",
         f"We're proud to serve {loc_name} as a trusted Medicare DME supplier. Our dedicated team works directly with your physician and insurance company to ensure a smooth, hassle-free experience.",
-        f"At DME PROS, we believe everyone deserves access to quality medical equipment. That's why we've made it our mission to serve {loc_name} with reliable delivery and personalized service.",
-        f"Patients in {loc_name} choose DME PROS for our straightforward process and commitment to care. We handle the complexities of Medicare billing so you don't have to.",
-        f"DME PROS combines nationwide reach with local attention. {loc_name} residents receive the same dedicated service that's made us a trusted name in durable medical equipment."
+        f"At MediNova Medical Supplies, we believe everyone deserves access to quality medical equipment. That's why we've made it our mission to serve {loc_name} with reliable delivery and personalized service.",
+        f"Patients in {loc_name} choose MediNova Medical Supplies for our straightforward process and commitment to care. We handle the complexities of Medicare billing so you don't have to.",
+        f"MediNova Medical Supplies combines nationwide reach with local attention. {loc_name} residents receive the same dedicated service that's made us a trusted name in durable medical equipment."
     ]
     
     # Select unique content based on location seed
@@ -120,13 +120,13 @@ def generate_full_location_page_html(
         parent_link = f"{SITE_DOMAIN}/locations/"
         region_name = loc_name
     elif loc_type == "county":
-        breadcrumb = f'<a href="{SITE_DOMAIN}/locations/durable-medical-equipment-in-{state_slug}.html" class="hover:text-lime-400">{state_name}</a><span class="mx-2">/</span>'
+        breadcrumb = f'<a href="{SITE_DOMAIN}/locations/durable-medical-equipment-in-{state_slug}.html" class="hover:text-blue-400">{state_name}</a><span class="mx-2">/</span>'
         parent_link = f'{SITE_DOMAIN}/locations/durable-medical-equipment-in-{state_slug}.html'
         region_name = f"{loc_name}, {state_name}"
     else:  # city
-        breadcrumb = f'<a href="{SITE_DOMAIN}/locations/durable-medical-equipment-in-{state_slug}.html" class="hover:text-lime-400">{state_name}</a><span class="mx-2">/</span>'
+        breadcrumb = f'<a href="{SITE_DOMAIN}/locations/durable-medical-equipment-in-{state_slug}.html" class="hover:text-blue-400">{state_name}</a><span class="mx-2">/</span>'
         if county_name:
-            breadcrumb += f'<a href="{SITE_DOMAIN}/locations/durable-medical-equipment-in-{county_slug}.html" class="hover:text-lime-400">{county_name}</a><span class="mx-2">/</span>'
+            breadcrumb += f'<a href="{SITE_DOMAIN}/locations/durable-medical-equipment-in-{county_slug}.html" class="hover:text-blue-400">{county_name}</a><span class="mx-2">/</span>'
         parent_link = f'{SITE_DOMAIN}/locations/durable-medical-equipment-in-{county_slug if county_slug else state_slug}.html'
         region_name = f"{loc_name}, {state_name}"
     
@@ -139,13 +139,13 @@ def generate_full_location_page_html(
         for city in sibling_cities[:12]:  # Max 12 sibling links
             if city != loc_name:
                 city_slug = slugify(city) + "-" + state_slug
-                links.append(f'<a href="{SITE_DOMAIN}/locations/durable-medical-equipment-in-{city_slug}.html" class="text-lime-600 hover:text-lime-700 hover:underline">{city}</a>')
+                links.append(f'<a href="{SITE_DOMAIN}/locations/durable-medical-equipment-in-{city_slug}.html" class="text-blue-600 hover:text-blue-700 hover:underline">{city}</a>')
         
         if links:
             sibling_links_html = f'''<section class="py-12 bg-gray-50">
 <div class="max-w-7xl mx-auto px-4">
 <h2 class="text-xl font-bold text-navy-700 mb-4">Also Serving Nearby</h2>
-<p class="text-gray-600 mb-4">DME PROS delivers to these communities in {county_name if county_name else state_name}:</p>
+<p class="text-gray-600 mb-4">MediNova Medical Supplies delivers to these communities in {county_name if county_name else state_name}:</p>
 <div class="flex flex-wrap gap-3">
 {" ".join(links)}
 </div>
@@ -161,12 +161,12 @@ def generate_full_location_page_html(
         for i, county in enumerate(counties[:24]):
             cty_slug = slugify(county) + "-" + state_slug
             sample_cities = cities[i*6:(i+1)*6] if cities else []
-            city_links = "".join([f'<a href="{SITE_DOMAIN}/locations/durable-medical-equipment-in-{slugify(c)}-{state_slug}.html" class="text-sm text-gray-500 hover:text-lime-600">{c}</a>' for c in sample_cities[:4]])
+            city_links = "".join([f'<a href="{SITE_DOMAIN}/locations/durable-medical-equipment-in-{slugify(c)}-{state_slug}.html" class="text-sm text-gray-500 hover:text-blue-600">{c}</a>' for c in sample_cities[:4]])
             
             cards.append(f'''<a href="{SITE_DOMAIN}/locations/durable-medical-equipment-in-{cty_slug}.html" class="group block bg-white rounded-xl p-5 border border-gray-200 hover:border-lime-400 hover:shadow-md transition-all">
 <div class="flex items-center justify-between mb-2">
-<h3 class="font-semibold text-navy-700 group-hover:text-lime-600">{county}</h3>
-<svg class="w-4 h-4 text-gray-400 group-hover:text-lime-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+<h3 class="font-semibold text-navy-700 group-hover:text-blue-600">{county}</h3>
+<svg class="w-4 h-4 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
 </div>
 <div class="flex flex-wrap gap-x-3 gap-y-1">{city_links}</div>
 </a>''')
@@ -174,7 +174,7 @@ def generate_full_location_page_html(
         coverage_section = f'''<section class="py-16 bg-white">
 <div class="max-w-7xl mx-auto px-4">
 <div class="text-center mb-10">
-<span class="inline-block px-4 py-1.5 bg-lime-100 text-lime-700 rounded-full text-sm font-medium mb-4">Service Area</span>
+<span class="inline-block px-4 py-1.5 bg-lime-100 text-blue-700 rounded-full text-sm font-medium mb-4">Service Area</span>
 <h2 class="text-3xl font-bold text-navy-700 mb-3">Delivering Across {loc_name}</h2>
 <p class="text-gray-600">Select your county for local delivery information.</p>
 </div>
@@ -189,12 +189,12 @@ def generate_full_location_page_html(
         city_cards = []
         for city in cities[:20]:
             city_slug = slugify(city) + "-" + state_slug
-            city_cards.append(f'<a href="{SITE_DOMAIN}/locations/durable-medical-equipment-in-{city_slug}.html" class="bg-white rounded-lg p-4 border border-gray-200 hover:border-lime-400 hover:shadow-sm transition-all text-center"><span class="font-medium text-navy-700 hover:text-lime-600">{city}</span></a>')
+            city_cards.append(f'<a href="{SITE_DOMAIN}/locations/durable-medical-equipment-in-{city_slug}.html" class="bg-white rounded-lg p-4 border border-gray-200 hover:border-lime-400 hover:shadow-sm transition-all text-center"><span class="font-medium text-navy-700 hover:text-blue-600">{city}</span></a>')
         
         coverage_section = f'''<section class="py-16 bg-white">
 <div class="max-w-7xl mx-auto px-4">
 <div class="text-center mb-10">
-<span class="inline-block px-4 py-1.5 bg-lime-100 text-lime-700 rounded-full text-sm font-medium mb-4">Local Delivery</span>
+<span class="inline-block px-4 py-1.5 bg-lime-100 text-blue-700 rounded-full text-sm font-medium mb-4">Local Delivery</span>
 <h2 class="text-3xl font-bold text-navy-700 mb-3">Cities We Serve in {loc_name}</h2>
 <p class="text-gray-600">Click your city for local information.</p>
 </div>
@@ -211,17 +211,17 @@ def generate_full_location_page_html(
 <div class="bg-white rounded-xl p-6 border border-gray-200">
 <h3 class="font-semibold text-navy-700 mb-2">Back Braces</h3>
 <p class="text-gray-600 text-sm mb-4">Support for lower back pain, post-surgery recovery, and spinal conditions.</p>
-<a href="tel:7279667767" class="text-lime-600 font-medium text-sm hover:underline">Check Eligibility</a>
+<a href="tel:2488864363" class="text-blue-600 font-medium text-sm hover:underline">Check Eligibility</a>
 </div>
 <div class="bg-white rounded-xl p-6 border border-gray-200">
 <h3 class="font-semibold text-navy-700 mb-2">Knee Braces</h3>
 <p class="text-gray-600 text-sm mb-4">Stability and relief for arthritis, injuries, and post-operative care.</p>
-<a href="tel:7279667767" class="text-lime-600 font-medium text-sm hover:underline">Check Eligibility</a>
+<a href="tel:2488864363" class="text-blue-600 font-medium text-sm hover:underline">Check Eligibility</a>
 </div>
 <div class="bg-white rounded-xl p-6 border border-gray-200">
 <h3 class="font-semibold text-navy-700 mb-2">Mobility Aids</h3>
 <p class="text-gray-600 text-sm mb-4">Wheelchairs, walkers, and rollators for improved independence.</p>
-<a href="tel:7279667767" class="text-lime-600 font-medium text-sm hover:underline">Check Eligibility</a>
+<a href="tel:2488864363" class="text-blue-600 font-medium text-sm hover:underline">Check Eligibility</a>
 </div>
 </div>'''
     
@@ -230,7 +230,7 @@ def generate_full_location_page_html(
     products_section = f'''<section class="py-16 bg-gray-50">
 <div class="max-w-7xl mx-auto px-4">
 <div class="text-center mb-10">
-<span class="inline-block px-4 py-1.5 bg-lime-100 text-lime-700 rounded-full text-sm font-medium mb-4">Equipment</span>
+<span class="inline-block px-4 py-1.5 bg-lime-100 text-blue-700 rounded-full text-sm font-medium mb-4">Equipment</span>
 <h2 class="text-3xl font-bold text-navy-700 mb-3">Medicare-Covered DME</h2>
 <p class="text-gray-600">Quality equipment delivered to {loc_name}.</p>
 </div>
@@ -249,7 +249,7 @@ def generate_full_location_page_html(
 <meta name="theme-color" content="#1e3a5f">
 <title>{title}</title>
 <meta name="description" content="{description}">
-<meta name="author" content="DME PROS">
+<meta name="author" content="MediNova Medical Supplies">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 
 <!-- Open Graph / Facebook -->
@@ -258,8 +258,8 @@ def generate_full_location_page_html(
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{description}">
 <meta property="og:image" content="{og_image_url}">
-<meta property="og:image:alt" content="DME PROS serving {loc_name} with Medicare-covered medical equipment">
-<meta property="og:site_name" content="DME PROS">
+<meta property="og:image:alt" content="MediNova Medical Supplies serving {loc_name} with Medicare-covered medical equipment">
+<meta property="og:site_name" content="MediNova Medical Supplies">
 <meta property="og:locale" content="en_US">
 
 <!-- Twitter Card -->
@@ -268,7 +268,7 @@ def generate_full_location_page_html(
 <meta name="twitter:title" content="{title}">
 <meta name="twitter:description" content="{description}">
 <meta name="twitter:image" content="{og_image_url}">
-<meta name="twitter:image:alt" content="DME PROS serving {loc_name} with Medicare-covered medical equipment">
+<meta name="twitter:image:alt" content="MediNova Medical Supplies serving {loc_name} with Medicare-covered medical equipment">
 <meta name="twitter:site" content="@dmepros">
 
 <!-- SEO -->
@@ -283,11 +283,11 @@ def generate_full_location_page_html(
 {{
   "@context": "https://schema.org",
   "@type": "MedicalBusiness",
-  "name": "DME PROS - {loc_name}",
+  "name": "MediNova Medical Supplies - {loc_name}",
   "description": "{description}",
   "url": "{page_url}",
-  "telephone": "+1-727-966-7767",
-  "email": "info@dmepros.com",
+  "telephone": "+1-248-886-4363",
+  "email": "info@medinovadme.com",
   "address": {{
     "@type": "PostalAddress",
     "addressLocality": "{loc_name}",
@@ -346,7 +346,7 @@ def generate_full_location_page_html(
   "description": "{description}",
   "isPartOf": {{
     "@type": "WebSite",
-    "name": "DME PROS",
+    "name": "MediNova Medical Supplies",
     "url": "{SITE_DOMAIN}"
   }}
 }}
@@ -386,7 +386,7 @@ tailwind.config = {{
   theme: {{
     extend: {{
       colors: {{
-        lime: {{ 50:'#f7fee7',100:'#ecfccb',200:'#d9f99d',300:'#bef264',400:'#a3e635',500:'#84cc16',600:'#65a30d',700:'#4d7c0f' }},
+        lime: {{ 50:'#f7fee7',100:'#ecfccb',200:'#d9f99d',300:'#bef264',400:'#a3e635',500:'#0055CC',600:'#65a30d',700:'#4d7c0f' }},
         navy: {{ 700:'#1e3a5f',800:'#172e4d',900:'#0f1f33' }}
       }}
     }}
@@ -403,8 +403,8 @@ html{{scroll-behavior:smooth}}
 .modal-overlay.active .modal-content{{transform:scale(1)}}
 .step{{display:none}}.step.active{{display:block}}
 .opt{{border:2px solid #e5e7eb;border-radius:0.75rem;padding:1rem;cursor:pointer;transition:all 0.2s}}
-.opt:hover{{border-color:#84cc16;background:#f7fee7}}
-.opt.sel{{border-color:#84cc16;background:#ecfccb}}
+.opt:hover{{border-color:#0055CC;background:#f7fee7}}
+.opt.sel{{border-color:#0055CC;background:#ecfccb}}
 .mobile-drawer-overlay{{position:fixed;inset:0;background:rgba(15,23,42,0.5);opacity:0;visibility:hidden;transition:opacity 0.25s ease,visibility 0.25s ease;z-index:80}}
 .mobile-drawer{{position:fixed;top:0;right:0;bottom:0;width:min(86vw,360px);background:rgba(255,255,255,0.98);backdrop-filter:blur(14px);border-left:1px solid rgba(226,232,240,0.9);box-shadow:-20px 0 50px rgba(15,23,42,0.18);transform:translateX(100%);transition:transform 0.25s ease;z-index:90;display:flex;flex-direction:column;padding:1.5rem;gap:1.5rem}}
 body.mobile-drawer-open .mobile-drawer-overlay{{opacity:1;visibility:visible}}
@@ -417,16 +417,16 @@ body.mobile-drawer-open .mobile-drawer{{transform:translateX(0)}}
 <div class="bg-navy-700 text-white py-2.5 px-4">
 <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between text-sm">
 <div class="flex items-center gap-6">
-<a href="tel:7279667767" class="flex items-center gap-2 hover:text-lime-400">
+<a href="tel:2488864363" class="flex items-center gap-2 hover:text-blue-400">
 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-<span class="font-medium">(727) 966-7767</span>
+<span class="font-medium">(248) 886-4-DME (4363)</span>
 </a>
 <span class="hidden md:flex items-center gap-2 text-gray-300">
 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
 <span>Serving {region_name}</span>
 </span>
 </div>
-<a href="{SITE_DOMAIN}/" class="flex items-center gap-2 hover:text-lime-400">
+<a href="{SITE_DOMAIN}/" class="flex items-center gap-2 hover:text-blue-400">
 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
 <span>Home</span>
 </a>
@@ -437,13 +437,13 @@ body.mobile-drawer-open .mobile-drawer{{transform:translateX(0)}}
 <header class="bg-white border-b border-gray-100 py-4 sticky top-0 z-50">
 <div class="max-w-7xl mx-auto px-4 flex items-center justify-between">
 <a href="{SITE_DOMAIN}/" class="flex items-center gap-2" data-brand-logo-link data-default-href="{SITE_DOMAIN}/">
-<img data-brand-logo-image alt="DME PROS logo" class="h-[70px] max-w-[230px] object-contain hidden" />
+<img data-brand-logo-image alt="MediNova Medical Supplies logo" class="h-[70px] max-w-[230px] object-contain hidden" />
 <span data-brand-logo-fallback class="text-2xl font-extrabold text-navy-700">DME</span>
-<span data-brand-logo-fallback class="text-2xl font-extrabold text-lime-500">PROS</span>
+<span data-brand-logo-fallback class="text-2xl font-extrabold text-blue-500">PROS</span>
 </a>
 <nav class="hidden md:flex items-center gap-4 text-sm">
 {f'<span class="text-gray-500">{breadcrumb}<span class="text-navy-700 font-medium">{loc_name}</span></span>' if breadcrumb else ''}
-<a href="#contact" class="bg-lime-500 hover:bg-lime-600 text-white px-5 py-2 rounded-lg font-semibold">Get Started</a>
+<a href="#contact" class="bg-blue-500 hover:bg-lime-600 text-white px-5 py-2 rounded-lg font-semibold">Get Started</a>
 </nav>
 <button id="mobile-menu-btn" type="button" class="md:hidden p-2 rounded-xl text-navy-700 hover:bg-gray-100" aria-label="Open navigation menu" data-testid="location-mobile-menu-button"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
 </div>
@@ -453,22 +453,22 @@ body.mobile-drawer-open .mobile-drawer{{transform:translateX(0)}}
 <aside id="mobile-drawer" class="mobile-drawer md:hidden" aria-hidden="true" data-testid="location-mobile-drawer">
 <div class="flex items-start justify-between gap-4">
 <a href="{SITE_DOMAIN}/" class="flex items-center gap-2" data-brand-logo-link data-default-href="{SITE_DOMAIN}/" data-testid="location-mobile-menu-logo-link">
-<img data-brand-logo-image alt="DME PROS logo" class="h-[70px] max-w-[230px] object-contain hidden" data-testid="location-mobile-menu-logo-image" />
+<img data-brand-logo-image alt="MediNova Medical Supplies logo" class="h-[70px] max-w-[230px] object-contain hidden" data-testid="location-mobile-menu-logo-image" />
 <span data-brand-logo-fallback class="text-2xl font-extrabold text-navy-700">DME</span>
-<span data-brand-logo-fallback class="text-2xl font-extrabold text-lime-500">PROS</span>
+<span data-brand-logo-fallback class="text-2xl font-extrabold text-blue-500">PROS</span>
 </a>
 <button id="mobile-menu-close" type="button" class="p-2 rounded-xl text-navy-700 hover:bg-gray-100" aria-label="Close navigation menu" data-testid="location-mobile-menu-close-button"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
 </div>
 <p class="text-sm text-gray-500">Serving {region_name} with Medicare-covered DME delivery and fast support.</p>
 <nav class="flex flex-col gap-2" aria-label="Mobile navigation" data-testid="location-mobile-menu-nav">
-<a href="{SITE_DOMAIN}/" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-navy-700 hover:bg-lime-50 hover:text-lime-700" data-testid="location-mobile-menu-link-home"><span>Home</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
-<a href="{SITE_DOMAIN}/products" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-navy-700 hover:bg-lime-50 hover:text-lime-700" data-testid="location-mobile-menu-link-products"><span>Products</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
-<a href="{SITE_DOMAIN}/locations" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-navy-700 hover:bg-lime-50 hover:text-lime-700" data-testid="location-mobile-menu-link-service-areas"><span>Coverage Areas</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
-<a href="#contact" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-navy-700 hover:bg-lime-50 hover:text-lime-700" data-testid="location-mobile-menu-link-contact"><span>Contact</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
+<a href="{SITE_DOMAIN}/" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-navy-700 hover:bg-blue-50 hover:text-blue-700" data-testid="location-mobile-menu-link-home"><span>Home</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
+<a href="{SITE_DOMAIN}/products" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-navy-700 hover:bg-blue-50 hover:text-blue-700" data-testid="location-mobile-menu-link-products"><span>Products</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
+<a href="{SITE_DOMAIN}/locations" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-navy-700 hover:bg-blue-50 hover:text-blue-700" data-testid="location-mobile-menu-link-service-areas"><span>Coverage Areas</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
+<a href="#contact" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-navy-700 hover:bg-blue-50 hover:text-blue-700" data-testid="location-mobile-menu-link-contact"><span>Contact</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
 </nav>
 <div class="mt-auto space-y-3 border-t border-gray-200 pt-6">
-<a href="tel:7279667767" class="flex w-full items-center justify-center gap-2 rounded-2xl border border-gray-200 px-4 py-3 font-semibold text-navy-700 hover:bg-lime-50 hover:text-lime-700" data-testid="location-mobile-menu-call-button"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>(727) 966-7767</a>
-<a href="#contact" class="flex w-full items-center justify-center gap-2 rounded-2xl bg-lime-500 px-4 py-3 font-semibold text-white hover:bg-lime-600" data-testid="location-mobile-menu-primary-cta">{cta_text}<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
+<a href="tel:2488864363" class="flex w-full items-center justify-center gap-2 rounded-2xl border border-gray-200 px-4 py-3 font-semibold text-navy-700 hover:bg-blue-50 hover:text-blue-700" data-testid="location-mobile-menu-call-button"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>(248) 886-4-DME (4363)</a>
+<a href="#contact" class="flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-500 px-4 py-3 font-semibold text-white hover:bg-lime-600" data-testid="location-mobile-menu-primary-cta">{cta_text}<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
 </div>
 </aside>
 
@@ -480,26 +480,26 @@ body.mobile-drawer-open .mobile-drawer{{transform:translateX(0)}}
 </div>
 <div class="max-w-7xl mx-auto px-4 relative">
 <div class="max-w-3xl">
-<div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 rounded-full text-lime-400 text-sm font-medium mb-6">
+<div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 rounded-full text-blue-400 text-sm font-medium mb-6">
 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
 Medicare Accredited
 </div>
 <h1 class="text-4xl md:text-5xl font-bold text-white leading-tight mb-6">{headline}</h1>
 <p class="text-lg text-gray-300 mb-8 leading-relaxed">{intro_text}</p>
 <div class="flex flex-col sm:flex-row gap-4 mb-8">
-<button onclick="openModal()" class="group bg-lime-500 hover:bg-lime-400 text-white px-8 py-4 text-lg font-semibold rounded-xl flex items-center justify-center gap-2">
+<button onclick="openModal()" class="group bg-blue-500 hover:bg-lime-400 text-white px-8 py-4 text-lg font-semibold rounded-xl flex items-center justify-center gap-2">
 {cta_text}
 <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
 </button>
-<a href="tel:7279667767" class="border-2 border-white/30 hover:border-white/50 text-white px-8 py-4 text-lg font-semibold rounded-xl flex items-center justify-center gap-2">
+<a href="tel:2488864363" class="border-2 border-white/30 hover:border-white/50 text-white px-8 py-4 text-lg font-semibold rounded-xl flex items-center justify-center gap-2">
 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-(727) 966-7767
+(248) 886-4-DME (4363)
 </a>
 </div>
 <div class="flex flex-wrap gap-6 text-white/80 text-sm">
-<span class="flex items-center gap-2"><svg class="w-4 h-4 text-lime-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Free Delivery</span>
-<span class="flex items-center gap-2"><svg class="w-4 h-4 text-lime-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>$0 Out-of-Pocket</span>
-<span class="flex items-center gap-2"><svg class="w-4 h-4 text-lime-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>We Handle Paperwork</span>
+<span class="flex items-center gap-2"><svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Free Delivery</span>
+<span class="flex items-center gap-2"><svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>$0 Out-of-Pocket</span>
+<span class="flex items-center gap-2"><svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>We Handle Paperwork</span>
 </div>
 </div>
 </div>
@@ -511,28 +511,28 @@ Medicare Accredited
 <div class="grid md:grid-cols-4 gap-6 text-center">
 <div class="p-6">
 <div class="w-12 h-12 bg-lime-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-<svg class="w-6 h-6 text-lime-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
 </div>
 <h3 class="font-semibold text-navy-700 mb-1">Medicare Accepted</h3>
 <p class="text-gray-600 text-sm">Most equipment covered at no cost.</p>
 </div>
 <div class="p-6">
 <div class="w-12 h-12 bg-lime-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-<svg class="w-6 h-6 text-lime-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
 </div>
 <h3 class="font-semibold text-navy-700 mb-1">Free Delivery</h3>
 <p class="text-gray-600 text-sm">Shipped to your door in {loc_name}.</p>
 </div>
 <div class="p-6">
 <div class="w-12 h-12 bg-lime-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-<svg class="w-6 h-6 text-lime-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
 </div>
 <h3 class="font-semibold text-navy-700 mb-1">Easy Paperwork</h3>
 <p class="text-gray-600 text-sm">We handle insurance and doctors.</p>
 </div>
 <div class="p-6">
 <div class="w-12 h-12 bg-lime-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-<svg class="w-6 h-6 text-lime-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
 </div>
 <h3 class="font-semibold text-navy-700 mb-1">Expert Support</h3>
 <p class="text-gray-600 text-sm">Bilingual team ready to help.</p>
@@ -552,22 +552,22 @@ Medicare Accredited
 <div class="max-w-7xl mx-auto px-4">
 <div class="grid lg:grid-cols-2 gap-12 items-center">
 <div>
-<span class="inline-block px-4 py-1.5 bg-lime-100 text-lime-700 rounded-full text-sm font-medium mb-4">About DME PROS</span>
+<span class="inline-block px-4 py-1.5 bg-lime-100 text-blue-700 rounded-full text-sm font-medium mb-4">About MediNova Medical Supplies</span>
 <h2 class="text-3xl font-bold text-navy-700 mb-6">Your {loc_name} DME Partner</h2>
 <p class="text-gray-600 mb-6">{about_text}</p>
 <div class="grid grid-cols-2 gap-4">
-<div class="flex items-center gap-3"><div class="w-8 h-8 bg-lime-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-lime-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><span class="text-sm font-medium text-navy-700">Licensed</span></div>
-<div class="flex items-center gap-3"><div class="w-8 h-8 bg-lime-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-lime-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><span class="text-sm font-medium text-navy-700">HIPAA Compliant</span></div>
-<div class="flex items-center gap-3"><div class="w-8 h-8 bg-lime-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-lime-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><span class="text-sm font-medium text-navy-700">Nationwide</span></div>
-<div class="flex items-center gap-3"><div class="w-8 h-8 bg-lime-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-lime-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><span class="text-sm font-medium text-navy-700">Bilingual</span></div>
+<div class="flex items-center gap-3"><div class="w-8 h-8 bg-lime-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><span class="text-sm font-medium text-navy-700">Licensed</span></div>
+<div class="flex items-center gap-3"><div class="w-8 h-8 bg-lime-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><span class="text-sm font-medium text-navy-700">HIPAA Compliant</span></div>
+<div class="flex items-center gap-3"><div class="w-8 h-8 bg-lime-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><span class="text-sm font-medium text-navy-700">Nationwide</span></div>
+<div class="flex items-center gap-3"><div class="w-8 h-8 bg-lime-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><span class="text-sm font-medium text-navy-700">Bilingual</span></div>
 </div>
 </div>
-<div class="bg-lime-50 rounded-2xl p-8 text-center">
-<div class="w-16 h-16 bg-lime-500 rounded-full flex items-center justify-center mx-auto mb-4">
+<div class="bg-blue-50 rounded-2xl p-8 text-center">
+<div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
 </div>
 <p class="text-xl font-bold text-navy-700 mb-1">Proudly Serving</p>
-<p class="text-lime-600 font-semibold">{loc_name}</p>
+<p class="text-blue-600 font-semibold">{loc_name}</p>
 </div>
 </div>
 </div>
@@ -579,8 +579,8 @@ Medicare Accredited
 <h2 class="text-3xl font-bold text-white mb-6">Ready to Get Started?</h2>
 <p class="text-gray-300 mb-8">Check your eligibility in 60 seconds. We'll handle the rest.</p>
 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-<button onclick="openModal()" class="bg-lime-500 hover:bg-lime-400 text-white px-8 py-4 text-lg font-semibold rounded-xl">{cta_text}</button>
-<a href="tel:7279667767" class="border-2 border-white/30 text-white px-8 py-4 text-lg font-semibold rounded-xl">(727) 966-7767</a>
+<button onclick="openModal()" class="bg-blue-500 hover:bg-lime-400 text-white px-8 py-4 text-lg font-semibold rounded-xl">{cta_text}</button>
+<a href="tel:2488864363" class="border-2 border-white/30 text-white px-8 py-4 text-lg font-semibold rounded-xl">(248) 886-4-DME (4363)</a>
 </div>
 </div>
 </section>
@@ -601,15 +601,15 @@ Medicare Accredited
 <textarea name="message" rows="3" placeholder="What equipment do you need?" data-testid="location-contact-message-input" class="w-full mb-4 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500 resize-none"></textarea>
 <div class="p-3 bg-gray-50 rounded-lg space-y-2 mb-4">
 <label class="flex items-start gap-2 cursor-pointer">
-<input type="checkbox" name="consent_contact" required data-testid="location-contact-consent-contact-checkbox" class="w-4 h-4 mt-0.5 text-lime-500 rounded">
-<span class="text-xs text-gray-600"><strong>Consent to Contact:</strong> I agree to be contacted by DME PROS via phone, email, or text.</span>
+<input type="checkbox" name="consent_contact" required data-testid="location-contact-consent-contact-checkbox" class="w-4 h-4 mt-0.5 text-blue-500 rounded">
+<span class="text-xs text-gray-600"><strong>Consent to Contact:</strong> I agree to be contacted by MediNova Medical Supplies via phone, email, or text.</span>
 </label>
 <label class="flex items-start gap-2 cursor-pointer">
-<input type="checkbox" name="consent_tcpa" required data-testid="location-contact-consent-tcpa-checkbox" class="w-4 h-4 mt-0.5 text-lime-500 rounded">
+<input type="checkbox" name="consent_tcpa" required data-testid="location-contact-consent-tcpa-checkbox" class="w-4 h-4 mt-0.5 text-blue-500 rounded">
 <span class="text-xs text-gray-600"><strong>TCPA:</strong> I consent to automated calls/texts. Msg rates apply. Not required for purchase.</span>
 </label>
 <label class="flex items-start gap-2 cursor-pointer">
-<input type="checkbox" name="consent_hipaa" required data-testid="location-contact-consent-hipaa-checkbox" class="w-4 h-4 mt-0.5 text-lime-500 rounded">
+<input type="checkbox" name="consent_hipaa" required data-testid="location-contact-consent-hipaa-checkbox" class="w-4 h-4 mt-0.5 text-blue-500 rounded">
 <span class="text-xs text-gray-600"><strong>HIPAA:</strong> I authorize sharing my health info with providers and insurance as needed.</span>
 </label>
 </div>
@@ -617,7 +617,7 @@ Medicare Accredited
 <label for="location-contact-website">Leave this field empty</label>
 <input id="location-contact-website" type="text" name="website" tabindex="-1" autocomplete="off" data-testid="location-contact-honeypot-input">
 </div>
-<button type="submit" data-testid="location-contact-submit-button" class="w-full bg-lime-500 hover:bg-lime-600 text-white py-3 rounded-lg font-semibold">Submit</button>
+<button type="submit" data-testid="location-contact-submit-button" class="w-full bg-blue-500 hover:bg-lime-600 text-white py-3 rounded-lg font-semibold">Submit</button>
 </form>
 </div>
 </section>
@@ -629,29 +629,29 @@ Medicare Accredited
 <div>
 <div class="flex items-center gap-2 mb-4">
 <span class="text-xl font-extrabold">DME</span>
-<span class="text-xl font-extrabold text-lime-500">PROS</span>
+<span class="text-xl font-extrabold text-blue-500">PROS</span>
 </div>
 <p class="text-gray-400 text-sm">Medicare DME supplier serving {loc_name}.</p>
 </div>
 <div>
 <h4 class="font-semibold mb-4">Links</h4>
 <ul class="space-y-2 text-gray-400 text-sm">
-<li><a href="{SITE_DOMAIN}/" class="hover:text-lime-400">Home</a></li>
-<li><a href="{SITE_DOMAIN}/locations/" class="hover:text-lime-400">Coverage Areas</a></li>
-<li><a href="{parent_link}" class="hover:text-lime-400">Back</a></li>
+<li><a href="{SITE_DOMAIN}/" class="hover:text-blue-400">Home</a></li>
+<li><a href="{SITE_DOMAIN}/locations/" class="hover:text-blue-400">Coverage Areas</a></li>
+<li><a href="{parent_link}" class="hover:text-blue-400">Back</a></li>
 </ul>
 </div>
 <div>
 <h4 class="font-semibold mb-4">Contact</h4>
 <ul class="space-y-2 text-gray-400 text-sm">
-<li><a href="tel:7279667767" class="hover:text-lime-400">(727) 966-7767</a></li>
-<li>info@dmepros.com</li>
+<li><a href="tel:2488864363" class="hover:text-blue-400">(248) 886-4-DME (4363)</a></li>
+<li>info@medinovadme.com</li>
 <li>Nationwide Delivery</li>
 </ul>
 </div>
 </div>
 <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
-<p>&copy; 2025 DME PROS. All rights reserved.</p>
+<p>&copy; 2025 MediNova Medical Supplies. All rights reserved.</p>
 </div>
 </div>
 </footer>
@@ -663,9 +663,9 @@ Medicare Accredited
 <div><h2 class="text-lg font-bold text-navy-700">Check Eligibility</h2><p class="text-xs text-gray-500">60 seconds</p></div>
 <button onclick="closeModal()" class="p-1.5 hover:bg-gray-100 rounded-lg"><svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
 </div>
-<div class="px-4 py-2 bg-lime-50">
-<div class="flex justify-between text-xs mb-1"><span id="stxt">Step 1 of 4</span><span id="ptxt" class="text-lime-600 font-medium">25%</span></div>
-<div class="w-full h-1.5 bg-lime-100 rounded-full"><div id="pbar" class="h-full bg-lime-500 rounded-full transition-all" style="width:25%"></div></div>
+<div class="px-4 py-2 bg-blue-50">
+<div class="flex justify-between text-xs mb-1"><span id="stxt">Step 1 of 4</span><span id="ptxt" class="text-blue-600 font-medium">25%</span></div>
+<div class="w-full h-1.5 bg-lime-100 rounded-full"><div id="pbar" class="h-full bg-blue-500 rounded-full transition-all" style="width:25%"></div></div>
 </div>
 <form id="eform" class="p-4" data-testid="location-eligibility-form">
 <div class="step active" data-step="1">
@@ -712,15 +712,15 @@ Medicare Accredited
 </div>
 <div class="step" data-step="5">
 <div class="text-center py-6">
-<div class="w-16 h-16 bg-lime-100 rounded-full flex items-center justify-center mx-auto mb-4"><svg class="w-8 h-8 text-lime-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div>
+<div class="w-16 h-16 bg-lime-100 rounded-full flex items-center justify-center mx-auto mb-4"><svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div>
 <h3 class="text-xl font-bold text-navy-700 mb-2">Thank You!</h3>
 <p class="text-gray-600 text-sm mb-4">We'll contact you within 24 hours.</p>
-<button type="button" onclick="closeModal()" class="bg-lime-500 text-white px-6 py-2 rounded-lg font-semibold">Close</button>
+<button type="button" onclick="closeModal()" class="bg-blue-500 text-white px-6 py-2 rounded-lg font-semibold">Close</button>
 </div>
 </div>
 <div id="nav" class="flex justify-between mt-4 pt-4 border-t">
 <button type="button" onclick="prev()" id="pbtn" data-testid="location-eligibility-back-button" class="px-4 py-2 border rounded-lg text-sm" style="visibility:hidden">Back</button>
-<button type="button" onclick="next()" id="nbtn" data-testid="location-eligibility-next-button" class="px-4 py-2 bg-lime-500 text-white rounded-lg text-sm">Next</button>
+<button type="button" onclick="next()" id="nbtn" data-testid="location-eligibility-next-button" class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm">Next</button>
 </div>
 </form>
 </div>
