@@ -1,36 +1,51 @@
-# DME PROS CRM - Product Requirements Document
+# MediNova Medical Supplies CRM - Product Requirements Document
 
 > Agent quick-start rules: see `/app/AGENT_RULES.md`
 
 ## Project Overview
-**Project Name**: DME PROS (formerly dme-rus-crm)
+**Project Name**: MediNova Medical Supplies CRM (rebranded from DME PROS)
 **Source**: https://github.com/BUCS2424/New-Core-Lead-vender-DME-r-us
 **Setup Date**: 2026-03-13
-**Last Updated**: 2026-04-14
+**Last Updated**: 2026-05-16
 
 ## Architecture
 - **Backend**: FastAPI (Python) on port 8001
 - **Frontend**: React with craco, Tailwind CSS on port 3000
 - **Database**: MongoDB (local)
-- **Key Features**: CRM for DME (Durable Medical Equipment) with patients, leads, orders, fax, voice, analytics
+- **Key Features**: CRM for DME (Durable Medical Equipment) with patients, leads, orders, fax, voice, analytics, public landing site
 
 ## Branding
-- **Company Name**: DME PROS
-- **Phone**: (727) 966-7767 (727-966-PROS)
-- **Address**: Nationwide Delivery
-- **Color Scheme**: Lime green (#84CC16) + Navy blue (#1e3a5f) - matching dmerus.com
+- **Company Name**: MediNova Medical Supplies
+- **Phone**: (248) 886-4-DME
+- **Address**: Waterford, MI 48327
+- **Color Scheme**: MediNova Blue (#0055CC + #00A3E0 gradient)
+- **Font**: Figtree (Google Fonts)
 
 ## What's Been Implemented
-- [x] Repository cloned and setup
-- [x] All dependencies installed
-- [x] Environment variables configured
-- [x] Rebranded from "Mastech Med DME" to "DME PROS"
-- [x] Phone number updated to (727) 966-7767
-- [x] Address changed to "Nationwide Delivery"
-- [x] Color scheme updated to lime/navy (matching dmerus.com)
-- [x] Landing page completely redesigned with new colors
-- [x] All 40+ pages updated with new color scheme
-- [x] Super admin account created: mel@a2gdesigns.com
+- [x] All items from original DME PROS CRM above (see full history in git log)
+- [x] **MediNova Rebrand (2026-05)**:
+  - Complete rebrand from "DME PROS" (lime-green) to "MediNova Medical Supplies" (blue gradient)
+  - All hardcoded "DME PROS" strings, old phone/email replaced across backend, frontend, templates
+  - Wired dynamic logo via BrandingContext to ALL public pages (landing, location pages, legal docs, login)
+  - Seeded 4 legal documents (Privacy Policy, ToS, HIPAA, Accessibility) to DB
+  - Fixed LegalDocumentPage styling to MediNova blue
+  - Fixed favicon wiring globally
+  - Fixed StorageSettings.js + GeneralSettingsManager.js silent auth failures (settings save now works)
+- [x] **Landing Page Visual Overhaul (2026-05-16)**:
+  - Switched typography to **Figtree** (Google Fonts); CSS `--font-sans` variable overrides all inline font-family styles
+  - Added full CSS design token system (`:root` `--mn-*` variables for color, shadow, radius, font)
+  - Glassmorphism sticky nav with `backdrop-filter: blur(14px)` + scroll-triggered shadow (`mn-scrolled` class via JS)
+  - Hero radial-gradient background on `#F6FAFF` (removed flat gradient)
+  - Alternating section backgrounds: white ↔ `#F6FAFF` with 1px hairline separators
+  - Section spacing reduced from `py-28` to `py-16 md:py-20` for tighter professional rhythm
+  - Unified card token system on all cards: consistent `var(--mn-radius-card)`, `var(--mn-border)`, `var(--mn-shadow-1/2)` hover lift
+  - `IntersectionObserver` scroll-reveal animations on all section headers + grid items (stagger delays, respects `prefers-reduced-motion`)
+  - Noise texture overlay on hero, testimonials section, and contact left panel
+  - FAQ chevron animation uses CSS `.open` class (no more inline style transforms)
+  - Footer updated to `#0B1B33` dark navy
+  - All `transition: all` replaced with specific transition properties
+  - `data-testid` attributes added to nav links, feature cards, cert cards, FAQ items, testimonial cards, section headings
+
 - [x] Feature flags system implemented with FeatureContext
 - [x] ChatWidget now respects live_chat feature flag
 - [x] Layout sidebar respects fax_center, phone_dialer, doctors_directory flags
@@ -175,17 +190,14 @@
 - video_conferencing, marketing_campaigns, lead_intake_hub
 
 ## Prioritized Backlog
-- P1: Add more data sources to "Stay Up To Date" page (CMS Marketplace API for plan lookups, state-specific health info)
-- P0: User acceptance check for print/fax lead workflow in real sales process
-- P0: Configure Telnyx fax settings in preview/prod to enable actual outgoing fax delivery
-- P0: User acceptance check for doctor tab workflow (search, quick-create, multi-doctor, multi-product linking)
-- P0: User acceptance check for NPI search + import quality across multiple states/specialties
-- P0: Confirm final legal/compliance wording for encryption section in policy docs/UI text
-- P0: Continue credit usage tracking in assistant progress/final summaries
-- P0: Optional next step: add “Sync from Availity” and “Sync from Waystar” buttons with merge-without-overwrite strategy (fields already mapped for future integration)
-- P1: Add server-side rate limiting thresholds specific to `/api/public/leads` spam bursts
-- P1: Add printable PDF export option (downloadable file) alongside browser print
-- P2: Refactor oversized files (`backend/server.py`, `frontend/src/pages/DevSettingsPage.js`)
+- P0: User acceptance check of new landing page visual design (2026-05-16 overhaul)
+- P1: Wire Availity & Waystar live API sync (schemas exist, APIs currently mocked)
+- P1: Configure Telnyx API keys for fax/voice functionality
+- P1: Add EMERGENT_LLM_KEY to backend .env for AI features
+- P1: Add server-side rate limiting specific to /api/public/leads spam bursts
+- P2: Refactor server.py (17k+ lines) into modular route files
+- P2: PDF export option alongside browser print for leads
+- P2: Add more data sources to Stay Up To Date page
 
 ## Login Credentials
 - **Email**: mel@a2gdesigns.com

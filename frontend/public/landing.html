@@ -70,19 +70,42 @@
         }
     </script>
     
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Figtree -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
-        * { font-family: 'Inter', sans-serif; }
+        /* ====== DESIGN TOKENS ====== */
+        :root {
+            --mn-primary: #0055CC;
+            --mn-secondary: #0090D0;
+            --mn-navy: #0B2A5B;
+            --mn-navy-2: #0A1F44;
+            --mn-bg: #F6FAFF;
+            --mn-surface: #FFFFFF;
+            --mn-surface-2: #F1F6FF;
+            --mn-border: #D9E6F7;
+            --mn-text: #0B1B33;
+            --mn-muted: #4B607A;
+            --mn-ring: rgba(0,85,204,0.28);
+            --mn-radius-card: 16px;
+            --mn-radius-btn: 12px;
+            --mn-shadow-1: 0 1px 2px rgba(16,24,40,0.06);
+            --mn-shadow-2: 0 10px 28px rgba(16,24,40,0.10);
+            --mn-shadow-3: 0 18px 48px rgba(16,24,40,0.14);
+            --font-sans: 'Figtree', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * { font-family: var(--font-sans) !important; }
+        body { background: var(--mn-bg); color: var(--mn-text); }
         html { scroll-behavior: smooth; }
-        
-        /* Animations */
+        ::selection { background: rgba(0,144,208,0.22); }
+
+        /* ====== ANIMATIONS ====== */
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
@@ -93,7 +116,24 @@
         }
         .animate-float { animation: float 3s ease-in-out infinite; }
         .animate-fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
-        
+
+        /* ====== SCROLL REVEAL ====== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(14px);
+            transition: opacity 520ms cubic-bezier(0.22,1,0.36,1), transform 520ms cubic-bezier(0.22,1,0.36,1);
+        }
+        .reveal.is-visible { opacity: 1; transform: translateY(0); }
+        .reveal-delay-1 { transition-delay: 80ms; }
+        .reveal-delay-2 { transition-delay: 160ms; }
+        .reveal-delay-3 { transition-delay: 240ms; }
+        .reveal-delay-4 { transition-delay: 320ms; }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .reveal { opacity: 1; transform: none; transition: none; }
+        }
+
+        /* ====== GRADIENT TEXT ====== */
         .gradient-text {
             background: linear-gradient(135deg, #0055CC, #00A3E0);
             -webkit-background-clip: text;
@@ -101,9 +141,8 @@
             background-clip: text;
         }
 
-        .btn-glow {
-            position: relative;
-        }
+        /* ====== BUTTON GLOW ====== */
+        .btn-glow { position: relative; }
         .btn-glow::after {
             content: '';
             position: absolute;
@@ -112,26 +151,51 @@
             border-radius: inherit;
             z-index: -1;
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity 300ms ease;
             filter: blur(12px);
         }
-        .btn-glow:hover::after { opacity: 0.5; }
+        .btn-glow:hover::after { opacity: 0.45; }
 
+        /* ====== CARD HOVER ====== */
         .card-hover {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
         }
         .card-hover:hover {
-            transform: translateY(-4px);
+            transform: translateY(-3px);
+            box-shadow: var(--mn-shadow-2);
         }
 
-        .img-zoom img {
-            transition: transform 0.7s ease-out;
+        /* ====== IMAGE ZOOM ====== */
+        .img-zoom img { transition: transform 700ms ease-out; }
+        .img-zoom:hover img { transform: scale(1.05); }
+
+        /* ====== NOISE OVERLAY ====== */
+        .noise-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: .07;
+            mix-blend-mode: multiply;
+            background-image: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%222%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.35%22/%3E%3C/svg%3E');
         }
-        .img-zoom:hover img {
-            transform: scale(1.05);
+
+        /* ====== STICKY NAV ====== */
+        #landing-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(217,230,247,0.7);
+            transition: box-shadow 220ms ease, border-color 220ms ease;
         }
-        
-        /* Modal */
+        #landing-header.mn-scrolled {
+            box-shadow: 0 10px 28px rgba(16,24,40,0.08);
+            border-bottom-color: rgba(217,230,247,0.95);
+        }
+
+        /* ====== MODAL ====== */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -143,12 +207,9 @@
             justify-content: center;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.3s;
+            transition: opacity 300ms ease, visibility 300ms ease;
         }
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
         .modal-content {
             background: white;
             border-radius: 1.5rem;
@@ -156,89 +217,78 @@
             width: 95%;
             max-height: 90vh;
             overflow-y: auto;
-            transform: scale(0.9);
-            transition: transform 0.3s;
+            transform: scale(0.92);
+            transition: transform 300ms cubic-bezier(0.22,1,0.36,1);
         }
-        .modal-overlay.active .modal-content {
-            transform: scale(1);
-        }
-        
-        /* Form steps */
+        .modal-overlay.active .modal-content { transform: scale(1); }
+
+        /* ====== FORM STEPS ====== */
         .step { display: none; }
         .step.active { display: block; }
-        
-        /* Selection cards */
+
+        /* ====== SELECTION CARDS ====== */
         .selection-card {
             border: 2px solid #e5e7eb;
             border-radius: 1rem;
             padding: 1.5rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: border-color 200ms ease, background-color 200ms ease;
         }
-        .selection-card:hover {
-            border-color: #00A3E0;
-            background: #eff6ff;
-        }
-        .selection-card.selected {
-            border-color: #0055CC;
-            background: #dbeafe;
-        }
+        .selection-card:hover { border-color: #00A3E0; background: #eff6ff; }
+        .selection-card.selected { border-color: #0055CC; background: #dbeafe; }
 
+        /* ====== MOBILE DRAWER ====== */
         .mobile-drawer-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.5);
+            background: rgba(15,23,42,0.5);
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.25s ease, visibility 0.25s ease;
+            transition: opacity 250ms ease, visibility 250ms ease;
             z-index: 80;
         }
-
         .mobile-drawer {
             position: fixed;
-            top: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; right: 0; bottom: 0;
             width: min(86vw, 360px);
             background: rgba(255,255,255,0.98);
             backdrop-filter: blur(14px);
             border-left: 1px solid rgba(226,232,240,0.9);
-            box-shadow: -20px 0 50px rgba(15, 23, 42, 0.18);
+            box-shadow: -20px 0 50px rgba(15,23,42,0.18);
             transform: translateX(100%);
-            transition: transform 0.25s ease;
+            transition: transform 250ms ease;
             z-index: 90;
             display: flex;
             flex-direction: column;
             padding: 1.5rem;
             gap: 1.5rem;
         }
+        body.mobile-drawer-open .mobile-drawer-overlay { opacity: 1; visibility: visible; }
+        body.mobile-drawer-open .mobile-drawer { transform: translateX(0); }
 
-        body.mobile-drawer-open .mobile-drawer-overlay {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        body.mobile-drawer-open .mobile-drawer {
-            transform: translateX(0);
-        }
-
-        /* Embedded mode for phased native migration */
+        /* ====== EMBED MODE ====== */
         body.embed-rest #landing-top-bar,
         body.embed-rest #landing-header,
-        body.embed-rest #landing-hero {
-            display: none !important;
-        }
+        body.embed-rest #landing-hero { display: none !important; }
 
-        /* FAQ accordion */
+        /* ====== FAQ ACCORDION ====== */
         .faq-answer {
             max-height: 0;
             opacity: 0;
             overflow: hidden;
-            transition: max-height 0.5s ease, opacity 0.5s ease;
+            transition: max-height 400ms cubic-bezier(0.22,1,0.36,1), opacity 380ms ease;
         }
-        .faq-answer.open {
-            max-height: 500px;
-            opacity: 1;
+        .faq-answer.open { max-height: 500px; opacity: 1; }
+        .faq-chevron {
+            transition: transform 300ms cubic-bezier(0.22,1,0.36,1);
+            flex-shrink: 0;
+        }
+        .faq-chevron.open { transform: rotate(180deg); }
+
+        /* ====== FOCUS RING ====== */
+        :focus-visible {
+            outline: 2px solid var(--mn-ring);
+            outline-offset: 2px;
         }
     </style>
     
@@ -275,7 +325,7 @@
     }
     </script>
 </head>
-<body class="bg-white">
+<body class="bg-[#F6FAFF]">
     <script>
         if (new URLSearchParams(window.location.search).get('embed') === 'rest') {
             document.body.classList.add('embed-rest');
@@ -306,8 +356,7 @@
         </div>
     </div>
 
-    <!-- Header -->
-    <header id="landing-header" class="bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm py-4 sticky top-0 z-50">
+    <header id="landing-header" class="py-4">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex items-center justify-between">
                 <!-- Logo -->
@@ -316,16 +365,16 @@
                 </a>
                 
                 <!-- Desktop Nav -->
-                <nav class="hidden lg:flex items-center gap-8">
-                    <a href="/products" class="text-gray-700 hover:text-[#0055CC] font-medium transition-colors">Products</a>
-                    <a href="/locations" class="text-gray-700 hover:text-[#0055CC] font-medium transition-colors">Coverage Areas</a>
-                    <a href="#about" class="text-gray-700 hover:text-[#0055CC] font-medium transition-colors">About</a>
-                    <a href="#contact" class="text-gray-700 hover:text-[#0055CC] font-medium transition-colors">Contact</a>
-                    <a href="tel:2488864363" class="hidden xl:flex items-center gap-2 text-[#0055CC] font-semibold">
+                <nav class="hidden lg:flex items-center gap-8" data-testid="desktop-nav">
+                    <a href="/products" data-testid="nav-products-link" class="text-[var(--mn-muted)] hover:text-[#0055CC] font-medium transition-colors duration-200">Products</a>
+                    <a href="/locations" data-testid="nav-coverage-link" class="text-[var(--mn-muted)] hover:text-[#0055CC] font-medium transition-colors duration-200">Coverage Areas</a>
+                    <a href="#about" data-testid="nav-about-link" class="text-[var(--mn-muted)] hover:text-[#0055CC] font-medium transition-colors duration-200">About</a>
+                    <a href="#contact" data-testid="nav-contact-link" class="text-[var(--mn-muted)] hover:text-[#0055CC] font-medium transition-colors duration-200">Contact</a>
+                    <a href="tel:2488864363" data-testid="nav-phone-link" class="hidden xl:flex items-center gap-2 text-[#0055CC] font-semibold">
                         <i data-lucide="phone" class="w-4 h-4"></i>
                         (248) 886-4-DME
                     </a>
-                    <button onclick="openEligibilityModal()" class="btn-glow bg-gradient-to-r from-[#0055CC] to-[#00A3E0] hover:from-[#004299] hover:to-[#0090C9] text-white px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-blue-500/30 hover:shadow-xl transition-all">
+                    <button onclick="openEligibilityModal()" data-testid="nav-cta-button" class="btn-glow bg-gradient-to-r from-[#0055CC] to-[#00A3E0] hover:from-[#004299] hover:to-[#0090C9] text-white px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-shadow duration-200 active:scale-[0.98]">
                         Check Eligibility
                     </button>
                 </nav>
@@ -381,7 +430,9 @@
     </aside>
 
     <!-- Hero Section -->
-    <section id="landing-hero" class="relative min-h-[85vh] pt-16 md:pt-24 overflow-hidden bg-gradient-to-br from-white via-slate-50 to-blue-50">
+    <section id="landing-hero" class="relative min-h-[85vh] pt-16 md:pt-24 overflow-hidden" style="background: radial-gradient(900px circle at 15% 10%, rgba(0,144,208,0.13), transparent 55%), radial-gradient(700px circle at 85% 30%, rgba(0,85,204,0.10), transparent 52%), #F6FAFF;">
+        <!-- Noise texture -->
+        <div class="noise-overlay"></div>
         <!-- Background elements -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none">
             <div class="absolute top-20 right-0 w-[700px] h-[700px] bg-gradient-to-br from-[#00A3E0]/15 to-[#0055CC]/10 rounded-full blur-3xl animate-pulse" style="animation-duration: 4s;"></div>
@@ -437,7 +488,7 @@
                         </div>
                     </div>
 
-                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight animate-fade-in-up" style="animation-delay: 0.2s;">
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight animate-fade-in-up" style="animation-delay: 0.2s;" data-testid="hero-heading">
                         <span class="gradient-text">Quality Medical</span>
                         <span class="gradient-text block">Equipment</span>
                         <span class="text-gray-900 block">Delivered Free</span>
@@ -486,27 +537,27 @@
     </section>
 
     <!-- Why Choose Us - The MediNova Difference -->
-    <section class="py-28 bg-white relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#00A3E0]/30 to-transparent"></div>
+    <section class="py-16 md:py-20 bg-white relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D9E6F7] to-transparent"></div>
         <div class="max-w-6xl mx-auto px-4">
             <!-- Section Header -->
-            <div class="text-center mb-20">
+            <div class="text-center mb-16 reveal">
                 <div class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-slate-600 text-sm font-medium mb-8">
                     <i data-lucide="circle-check-big" class="w-4 h-4 text-[#0055CC]"></i>
                     Why Choose Us
                 </div>
-                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6" style="font-family: 'Manrope', sans-serif; letter-spacing: -0.02em;">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-[var(--mn-text)] mb-5" style="letter-spacing: -0.02em;" data-testid="section-difference-heading">
                     The <span class="gradient-text">MediNova</span> Difference
                 </h2>
-                <p class="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed" style="font-family: 'Inter', sans-serif;">
+                <p class="text-base md:text-lg text-[var(--mn-muted)] max-w-2xl mx-auto leading-relaxed">
                     We make getting Medicare-covered medical equipment simple, fast, and hassle-free. Our accredited team handles everything from insurance verification to free home delivery.
                 </p>
             </div>
 
             <!-- Feature Cards -->
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
                 <!-- Card 1: Medicare Accredited -->
-                <div class="group relative bg-white rounded-[28px] shadow-[0_4px_40px_rgba(0,85,204,0.06)] border border-slate-100/80 hover:shadow-[0_8px_50px_rgba(0,85,204,0.12)] transition-all duration-500 overflow-hidden">
+                <div class="group relative bg-white rounded-[28px] shadow-[0_4px_40px_rgba(0,85,204,0.06)] border border-[var(--mn-border)] hover:shadow-[0_8px_50px_rgba(0,85,204,0.12)] hover:border-[rgba(0,85,204,0.18)] hover:-translate-y-0.5 transition-shadow duration-300 overflow-hidden reveal reveal-delay-1" data-testid="feature-card-medicare">
                     <!-- Subtle blue glow in top-right -->
                     <div class="absolute -top-16 -right-16 w-40 h-40 bg-gradient-to-br from-[#00A3E0]/8 to-transparent rounded-full"></div>
                     <div class="relative z-10 p-8 pt-10 pb-10 text-center flex flex-col items-center">
@@ -524,7 +575,7 @@
                 </div>
 
                 <!-- Card 2: Free Delivery -->
-                <div class="group relative bg-white rounded-[28px] shadow-[0_4px_40px_rgba(0,85,204,0.06)] border border-slate-100/80 hover:shadow-[0_8px_50px_rgba(0,85,204,0.12)] transition-all duration-500 overflow-hidden">
+                <div class="group relative bg-white rounded-[28px] shadow-[0_4px_40px_rgba(0,85,204,0.06)] border border-[var(--mn-border)] hover:shadow-[0_8px_50px_rgba(0,85,204,0.12)] hover:border-[rgba(0,85,204,0.18)] hover:-translate-y-0.5 transition-shadow duration-300 overflow-hidden reveal reveal-delay-2" data-testid="feature-card-delivery">
                     <div class="absolute -top-16 -right-16 w-40 h-40 bg-gradient-to-br from-[#00A3E0]/8 to-transparent rounded-full"></div>
                     <div class="relative z-10 p-8 pt-10 pb-10 text-center flex flex-col items-center">
                         <div class="relative mb-7">
@@ -539,7 +590,7 @@
                 </div>
 
                 <!-- Card 3: We Handle Paperwork -->
-                <div class="group relative bg-white rounded-[28px] shadow-[0_4px_40px_rgba(0,85,204,0.06)] border border-slate-100/80 hover:shadow-[0_8px_50px_rgba(0,85,204,0.12)] transition-all duration-500 overflow-hidden">
+                <div class="group relative bg-white rounded-[28px] shadow-[0_4px_40px_rgba(0,85,204,0.06)] border border-[var(--mn-border)] hover:shadow-[0_8px_50px_rgba(0,85,204,0.12)] hover:border-[rgba(0,85,204,0.18)] hover:-translate-y-0.5 transition-shadow duration-300 overflow-hidden reveal reveal-delay-3" data-testid="feature-card-paperwork">
                     <div class="absolute -top-16 -right-16 w-40 h-40 bg-gradient-to-br from-[#00A3E0]/8 to-transparent rounded-full"></div>
                     <div class="relative z-10 p-8 pt-10 pb-10 text-center flex flex-col items-center">
                         <div class="relative mb-7">
@@ -554,7 +605,7 @@
                 </div>
 
                 <!-- Card 4: Expert Support -->
-                <div class="group relative bg-white rounded-[28px] shadow-[0_4px_40px_rgba(0,85,204,0.06)] border border-slate-100/80 hover:shadow-[0_8px_50px_rgba(0,85,204,0.12)] transition-all duration-500 overflow-hidden">
+                <div class="group relative bg-white rounded-[28px] shadow-[0_4px_40px_rgba(0,85,204,0.06)] border border-[var(--mn-border)] hover:shadow-[0_8px_50px_rgba(0,85,204,0.12)] hover:border-[rgba(0,85,204,0.18)] hover:-translate-y-0.5 transition-shadow duration-300 overflow-hidden reveal reveal-delay-4" data-testid="feature-card-support">
                     <div class="absolute -top-16 -right-16 w-40 h-40 bg-gradient-to-br from-[#00A3E0]/8 to-transparent rounded-full"></div>
                     <div class="relative z-10 p-8 pt-10 pb-10 text-center flex flex-col items-center">
                         <div class="relative mb-7">
@@ -572,27 +623,28 @@
     </section>
 
     <!-- About Section -->
-    <section id="about" class="py-28 bg-gradient-to-br from-slate-50 via-blue-50/20 to-cyan-50/10 relative overflow-hidden">
-        <div class="absolute top-20 right-0 w-96 h-96 bg-[#00A3E0]/8 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-20 left-0 w-80 h-80 bg-[#0055CC]/6 rounded-full blur-3xl"></div>
+    <section id="about" class="py-16 md:py-20 bg-[#F6FAFF] relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D9E6F7] to-transparent"></div>
+        <div class="absolute top-20 right-0 w-96 h-96 bg-[#00A3E0]/6 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-20 left-0 w-80 h-80 bg-[#0055CC]/5 rounded-full blur-3xl"></div>
         <div class="max-w-7xl mx-auto px-4 relative">
             <div class="grid lg:grid-cols-2 gap-16 lg:gap-20 items-start">
                 <!-- Left: Text Content -->
-                <div class="space-y-6">
-                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-full text-[#0055CC] text-sm font-medium shadow-sm">
+                <div class="space-y-6 reveal">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[var(--mn-border)] rounded-full text-[#0055CC] text-sm font-medium shadow-[var(--mn-shadow-1)]">
                         <i data-lucide="user" class="w-4 h-4"></i>
                         About MediNova
                     </div>
 
-                    <h2 class="text-3xl md:text-4xl lg:text-[42px] font-extrabold text-gray-900 leading-tight" style="font-family: 'Manrope', sans-serif; letter-spacing: -0.02em;">
+                    <h2 class="text-3xl md:text-4xl lg:text-[42px] font-extrabold text-[var(--mn-text)] leading-tight" style="letter-spacing: -0.02em;" data-testid="section-about-heading">
                         Your Trusted Partner for
                         <span class="gradient-text block">Medicare-Covered</span>
                         <span class="gradient-text">Equipment</span>
                     </h2>
                     
-                    <div class="space-y-5 text-gray-600 leading-relaxed text-[16px]" style="font-family: 'Inter', sans-serif;">
+                    <div class="space-y-5 text-[var(--mn-muted)] leading-relaxed text-base">
                         <p>
-                            <strong class="text-gray-900 font-semibold">MediNova Medical Supplies is a Medicare-accredited DME supplier</strong> specializing in providing high-quality durable medical equipment to Medicare beneficiaries. Our mission is to improve your quality of life by making it easy to get the equipment you need.
+                            <strong class="text-[var(--mn-text)] font-semibold">MediNova Medical Supplies is a Medicare-accredited DME supplier</strong> specializing in providing high-quality durable medical equipment to Medicare beneficiaries. Our mission is to improve your quality of life by making it easy to get the equipment you need.
                         </p>
                         <p>
                             Located in Waterford, Michigan, we serve patients nationwide with personalized care and attention. Our team handles all the paperwork, insurance verification, and delivery so you can focus on what matters most — your health.
@@ -601,50 +653,50 @@
 
                     <!-- Credential Pills - 2x2 Grid -->
                     <div class="grid grid-cols-2 gap-4 pt-4">
-                        <div class="flex items-center gap-3 bg-white rounded-2xl px-5 py-4 shadow-sm border border-slate-100 hover:shadow-md hover:border-[#00A3E0]/30 transition-all">
+                        <div class="flex items-center gap-3 bg-white rounded-2xl px-5 py-4 shadow-[var(--mn-shadow-1)] border border-[var(--mn-border)] hover:shadow-[var(--mn-shadow-2)] hover:border-[rgba(0,85,204,0.2)] transition-shadow duration-200">
                             <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#3B8BF5] to-[#0055CC] flex items-center justify-center shadow-sm flex-shrink-0">
                                 <i data-lucide="circle-check-big" class="w-4 h-4 text-white"></i>
                             </div>
-                            <span class="text-gray-700 font-medium text-[15px]">Licensed & Accredited</span>
+                            <span class="text-[var(--mn-text)] font-medium text-sm">Licensed & Accredited</span>
                         </div>
-                        <div class="flex items-center gap-3 bg-white rounded-2xl px-5 py-4 shadow-sm border border-slate-100 hover:shadow-md hover:border-[#00A3E0]/30 transition-all">
+                        <div class="flex items-center gap-3 bg-white rounded-2xl px-5 py-4 shadow-[var(--mn-shadow-1)] border border-[var(--mn-border)] hover:shadow-[var(--mn-shadow-2)] hover:border-[rgba(0,85,204,0.2)] transition-shadow duration-200">
                             <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#3B8BF5] to-[#0055CC] flex items-center justify-center shadow-sm flex-shrink-0">
                                 <i data-lucide="circle-check-big" class="w-4 h-4 text-white"></i>
                             </div>
-                            <span class="text-gray-700 font-medium text-[15px]">HIPAA Compliant</span>
+                            <span class="text-[var(--mn-text)] font-medium text-sm">HIPAA Compliant</span>
                         </div>
-                        <div class="flex items-center gap-3 bg-white rounded-2xl px-5 py-4 shadow-sm border border-slate-100 hover:shadow-md hover:border-[#00A3E0]/30 transition-all">
+                        <div class="flex items-center gap-3 bg-white rounded-2xl px-5 py-4 shadow-[var(--mn-shadow-1)] border border-[var(--mn-border)] hover:shadow-[var(--mn-shadow-2)] hover:border-[rgba(0,85,204,0.2)] transition-shadow duration-200">
                             <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#3B8BF5] to-[#0055CC] flex items-center justify-center shadow-sm flex-shrink-0">
                                 <i data-lucide="circle-check-big" class="w-4 h-4 text-white"></i>
                             </div>
-                            <span class="text-gray-700 font-medium text-[15px]">Nationwide Shipping</span>
+                            <span class="text-[var(--mn-text)] font-medium text-sm">Nationwide Shipping</span>
                         </div>
-                        <div class="flex items-center gap-3 bg-white rounded-2xl px-5 py-4 shadow-sm border border-slate-100 hover:shadow-md hover:border-[#00A3E0]/30 transition-all">
+                        <div class="flex items-center gap-3 bg-white rounded-2xl px-5 py-4 shadow-[var(--mn-shadow-1)] border border-[var(--mn-border)] hover:shadow-[var(--mn-shadow-2)] hover:border-[rgba(0,85,204,0.2)] transition-shadow duration-200">
                             <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#3B8BF5] to-[#0055CC] flex items-center justify-center shadow-sm flex-shrink-0">
                                 <i data-lucide="circle-check-big" class="w-4 h-4 text-white"></i>
                             </div>
-                            <span class="text-gray-700 font-medium text-[15px]">Bilingual Support</span>
+                            <span class="text-[var(--mn-text)] font-medium text-sm">Bilingual Support</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Right: Image with floating badge -->
-                <div class="relative mt-4 lg:mt-0">
-                    <div class="relative rounded-3xl overflow-hidden shadow-2xl shadow-gray-300/40">
+                <div class="relative mt-4 lg:mt-0 reveal reveal-delay-2">
+                    <div class="relative rounded-3xl overflow-hidden shadow-[var(--mn-shadow-3)] border border-[var(--mn-border)]">
                         <img src="/images/medinova/hero.jpg" alt="Healthcare professional consulting with a patient about medical equipment" class="w-full h-auto object-cover" loading="lazy">
                         <div class="absolute inset-0 bg-gradient-to-t from-[#0055CC]/10 to-transparent"></div>
                     </div>
                     <!-- Decorative element top-right -->
                     <div class="absolute -top-5 -right-5 w-28 h-28 bg-gradient-to-br from-[#00A3E0]/60 to-[#00C4FF]/40 rounded-[20px] -z-10 rotate-12"></div>
                     <!-- 15+ Years Experience floating card -->
-                    <div class="absolute -bottom-6 left-4 md:left-8 bg-white rounded-2xl shadow-xl shadow-gray-200/60 px-6 py-5 border border-gray-100">
+                    <div class="absolute -bottom-6 left-4 md:left-8 bg-white rounded-2xl shadow-[var(--mn-shadow-2)] px-6 py-5 border border-[var(--mn-border)]">
                         <div class="flex items-center gap-4">
                             <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#3B8BF5] to-[#0055CC] flex items-center justify-center shadow-lg shadow-blue-500/25">
                                 <i data-lucide="award" class="w-7 h-7 text-white"></i>
                             </div>
                             <div>
                                 <div class="text-3xl font-extrabold gradient-text leading-none">15+</div>
-                                <div class="text-gray-500 font-medium text-sm mt-0.5">Years Experience</div>
+                                <div class="text-[var(--mn-muted)] font-medium text-sm mt-0.5">Years Experience</div>
                             </div>
                         </div>
                     </div>
@@ -654,65 +706,66 @@
     </section>
 
     <!-- Certifications & Accreditations -->
-    <section class="py-28 bg-gradient-to-b from-slate-50/80 to-white relative overflow-hidden">
+    <section class="py-16 md:py-20 bg-white relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D9E6F7] to-transparent"></div>
         <div class="max-w-6xl mx-auto px-4 relative">
             <!-- Section Header -->
-            <div class="text-center mb-20">
-                <div class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-full text-[#0055CC] text-sm font-medium shadow-sm mb-8">
+            <div class="text-center mb-14 reveal">
+                <div class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-[var(--mn-border)] rounded-full text-[#0055CC] text-sm font-medium shadow-[var(--mn-shadow-1)] mb-7">
                     <i data-lucide="badge-check" class="w-4 h-4"></i>
                     Credentials
                 </div>
-                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6" style="font-family: 'Manrope', sans-serif; letter-spacing: -0.02em;">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-[var(--mn-text)] mb-5" style="letter-spacing: -0.02em;" data-testid="section-certifications-heading">
                     Our <span class="gradient-text">Certifications</span> & Accreditations
                 </h2>
-                <p class="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed" style="font-family: 'Inter', sans-serif;">
+                <p class="text-base md:text-lg text-[var(--mn-muted)] max-w-2xl mx-auto leading-relaxed">
                     Yes, MediNova maintains the highest industry standards and certifications to ensure quality care for our patients, including Medicare enrollment and HIPAA compliance.
                 </p>
             </div>
 
             <!-- Certification Cards -->
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
                 <!-- Medicare Enrolled -->
-                <div class="group bg-white rounded-[24px] border border-slate-100/80 shadow-[0_2px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgba(0,85,204,0.08)] hover:border-slate-200 transition-all duration-500 overflow-hidden">
-                    <div class="p-8 pt-12 pb-10 text-center flex flex-col items-center">
-                        <div class="w-16 h-16 rounded-2xl bg-[#E8F2FF] flex items-center justify-center mb-7">
+                <div class="group bg-white rounded-[var(--mn-radius-card)] border border-[var(--mn-border)] shadow-[var(--mn-shadow-1)] hover:shadow-[var(--mn-shadow-2)] hover:border-[rgba(0,85,204,0.18)] hover:-translate-y-0.5 transition-shadow duration-300 overflow-hidden reveal reveal-delay-1" data-testid="cert-card-medicare">
+                    <div class="p-8 pt-10 pb-8 text-center flex flex-col items-center">
+                        <div class="w-16 h-16 rounded-2xl bg-[#E8F2FF] flex items-center justify-center mb-6">
                             <i data-lucide="badge-check" class="w-7 h-7 text-[#0055CC]"></i>
                         </div>
-                        <h3 class="text-[17px] font-bold text-gray-900 mb-2.5" style="font-family: 'Manrope', sans-serif;">Medicare Enrolled</h3>
-                        <p class="text-[14px] text-gray-500 leading-relaxed" style="font-family: 'Inter', sans-serif;">Officially enrolled Medicare DME supplier</p>
+                        <h3 class="text-base font-bold text-[var(--mn-text)] mb-2">Medicare Enrolled</h3>
+                        <p class="text-sm text-[var(--mn-muted)] leading-relaxed">Officially enrolled Medicare DME supplier</p>
                     </div>
                 </div>
 
                 <!-- Accredited Supplier -->
-                <div class="group bg-white rounded-[24px] border border-slate-100/80 shadow-[0_2px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgba(0,85,204,0.08)] hover:border-slate-200 transition-all duration-500 overflow-hidden">
-                    <div class="p-8 pt-12 pb-10 text-center flex flex-col items-center">
-                        <div class="w-16 h-16 rounded-2xl bg-[#E8F2FF] flex items-center justify-center mb-7">
+                <div class="group bg-white rounded-[var(--mn-radius-card)] border border-[var(--mn-border)] shadow-[var(--mn-shadow-1)] hover:shadow-[var(--mn-shadow-2)] hover:border-[rgba(0,85,204,0.18)] hover:-translate-y-0.5 transition-shadow duration-300 overflow-hidden reveal reveal-delay-2" data-testid="cert-card-accredited">
+                    <div class="p-8 pt-10 pb-8 text-center flex flex-col items-center">
+                        <div class="w-16 h-16 rounded-2xl bg-[#E8F2FF] flex items-center justify-center mb-6">
                             <i data-lucide="award" class="w-7 h-7 text-[#0055CC]"></i>
                         </div>
-                        <h3 class="text-[17px] font-bold text-gray-900 mb-2.5" style="font-family: 'Manrope', sans-serif;">Accredited Supplier</h3>
-                        <p class="text-[14px] text-gray-500 leading-relaxed" style="font-family: 'Inter', sans-serif;">Nationally accredited DME supplier</p>
+                        <h3 class="text-base font-bold text-[var(--mn-text)] mb-2">Accredited Supplier</h3>
+                        <p class="text-sm text-[var(--mn-muted)] leading-relaxed">Nationally accredited DME supplier</p>
                     </div>
                 </div>
 
                 <!-- HIPAA Compliant -->
-                <div class="group bg-white rounded-[24px] border border-slate-100/80 shadow-[0_2px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgba(0,85,204,0.08)] hover:border-slate-200 transition-all duration-500 overflow-hidden">
-                    <div class="p-8 pt-12 pb-10 text-center flex flex-col items-center">
-                        <div class="w-16 h-16 rounded-2xl bg-[#E8F2FF] flex items-center justify-center mb-7">
+                <div class="group bg-white rounded-[var(--mn-radius-card)] border border-[var(--mn-border)] shadow-[var(--mn-shadow-1)] hover:shadow-[var(--mn-shadow-2)] hover:border-[rgba(0,85,204,0.18)] hover:-translate-y-0.5 transition-shadow duration-300 overflow-hidden reveal reveal-delay-3" data-testid="cert-card-hipaa">
+                    <div class="p-8 pt-10 pb-8 text-center flex flex-col items-center">
+                        <div class="w-16 h-16 rounded-2xl bg-[#E8F2FF] flex items-center justify-center mb-6">
                             <i data-lucide="lock" class="w-7 h-7 text-[#0055CC]"></i>
                         </div>
-                        <h3 class="text-[17px] font-bold text-gray-900 mb-2.5" style="font-family: 'Manrope', sans-serif;">HIPAA Compliant</h3>
-                        <p class="text-[14px] text-gray-500 leading-relaxed" style="font-family: 'Inter', sans-serif;">Full compliance with patient privacy laws</p>
+                        <h3 class="text-base font-bold text-[var(--mn-text)] mb-2">HIPAA Compliant</h3>
+                        <p class="text-sm text-[var(--mn-muted)] leading-relaxed">Full compliance with patient privacy laws</p>
                     </div>
                 </div>
 
                 <!-- Licensed & Bonded -->
-                <div class="group bg-white rounded-[24px] border border-slate-100/80 shadow-[0_2px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgba(0,85,204,0.08)] hover:border-slate-200 transition-all duration-500 overflow-hidden">
-                    <div class="p-8 pt-12 pb-10 text-center flex flex-col items-center">
-                        <div class="w-16 h-16 rounded-2xl bg-[#E8F2FF] flex items-center justify-center mb-7">
+                <div class="group bg-white rounded-[var(--mn-radius-card)] border border-[var(--mn-border)] shadow-[var(--mn-shadow-1)] hover:shadow-[var(--mn-shadow-2)] hover:border-[rgba(0,85,204,0.18)] hover:-translate-y-0.5 transition-shadow duration-300 overflow-hidden reveal reveal-delay-4" data-testid="cert-card-licensed">
+                    <div class="p-8 pt-10 pb-8 text-center flex flex-col items-center">
+                        <div class="w-16 h-16 rounded-2xl bg-[#E8F2FF] flex items-center justify-center mb-6">
                             <i data-lucide="shield" class="w-7 h-7 text-[#0055CC]"></i>
                         </div>
-                        <h3 class="text-[17px] font-bold text-gray-900 mb-2.5" style="font-family: 'Manrope', sans-serif;">Licensed & Bonded</h3>
-                        <p class="text-[14px] text-gray-500 leading-relaxed" style="font-family: 'Inter', sans-serif;">Fully licensed medical equipment provider</p>
+                        <h3 class="text-base font-bold text-[var(--mn-text)] mb-2">Licensed & Bonded</h3>
+                        <p class="text-sm text-[var(--mn-muted)] leading-relaxed">Fully licensed medical equipment provider</p>
                     </div>
                 </div>
             </div>
@@ -720,26 +773,27 @@
     </section>
 
     <!-- Medicare-Covered Products Section -->
-    <section class="py-28 bg-gradient-to-b from-white via-slate-50/60 to-slate-50/80 relative overflow-hidden">
-        <div class="absolute top-20 left-0 w-96 h-96 bg-[#00A3E0]/5 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-10 right-0 w-80 h-80 bg-[#0055CC]/4 rounded-full blur-3xl"></div>
+    <section class="py-16 md:py-20 bg-[#F6FAFF] relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D9E6F7] to-transparent"></div>
+        <div class="absolute top-20 left-0 w-96 h-96 bg-[#00A3E0]/4 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-10 right-0 w-80 h-80 bg-[#0055CC]/3 rounded-full blur-3xl"></div>
         <div class="max-w-4xl mx-auto px-4 relative">
             <!-- Section Header -->
-            <div class="text-center mb-16">
-                <div class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-full text-[#0055CC] text-sm font-medium shadow-sm mb-8">
+            <div class="text-center mb-12 reveal">
+                <div class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-[var(--mn-border)] rounded-full text-[#0055CC] text-sm font-medium shadow-[var(--mn-shadow-1)] mb-7">
                     <i data-lucide="stethoscope" class="w-4 h-4"></i>
                     Medical Equipment
                 </div>
-                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6" style="font-family: 'Manrope', sans-serif; letter-spacing: -0.02em;">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-[var(--mn-text)] mb-5" style="letter-spacing: -0.02em;" data-testid="section-products-heading">
                     Medicare-Covered <span class="gradient-text">Durable Medical Equipment</span>
                 </h2>
-                <p class="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed" style="font-family: 'Inter', sans-serif;">
+                <p class="text-base md:text-lg text-[var(--mn-muted)] max-w-2xl mx-auto leading-relaxed">
                     We provide knee braces, back braces, wheelchairs, CPAP machines, blood pressure monitors, and more — all covered by Medicare. Click any category below to see available products.
                 </p>
             </div>
 
             <!-- Product Categories List -->
-            <div class="space-y-5" id="product-categories-list">
+            <div class="space-y-4 reveal reveal-delay-1" id="product-categories-list">
                 <!-- Loading state -->
                 <div id="products-loading" class="text-center py-8 text-gray-400">
                     <div class="animate-spin w-6 h-6 border-2 border-[#0055CC] border-t-transparent rounded-full mx-auto mb-3"></div>
@@ -879,149 +933,150 @@
 
 
     <!-- FAQ Section -->
-    <section class="py-28 bg-gradient-to-b from-slate-50/80 to-white relative overflow-hidden">
+    <section class="py-16 md:py-20 bg-white relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D9E6F7] to-transparent"></div>
         <div class="max-w-3xl mx-auto px-4 relative">
             <!-- Section Header -->
-            <div class="text-center mb-16">
-                <div class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-full text-slate-600 text-sm font-medium shadow-sm mb-8">
+            <div class="text-center mb-12 reveal">
+                <div class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-[var(--mn-border)] rounded-full text-[var(--mn-muted)] text-sm font-medium shadow-[var(--mn-shadow-1)] mb-7">
                     <i data-lucide="circle-help" class="w-4 h-4 text-[#0055CC]"></i>
                     FAQ
                 </div>
-                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6" style="font-family: 'Manrope', sans-serif; letter-spacing: -0.02em;">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-[var(--mn-text)] mb-5" style="letter-spacing: -0.02em;" data-testid="section-faq-heading">
                     Frequently Asked <span class="gradient-text">Questions</span>
                 </h2>
-                <p class="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed" style="font-family: 'Inter', sans-serif;">
+                <p class="text-base md:text-lg text-[var(--mn-muted)] max-w-2xl mx-auto leading-relaxed">
                     Get answers to common questions about Medicare-covered medical equipment and our services.
                 </p>
             </div>
 
             <!-- FAQ Items -->
-            <div class="space-y-4" id="faq-list">
+            <div class="space-y-3" id="faq-list">
                 <!-- Q1 -->
-                <div class="border border-slate-200/80 rounded-2xl overflow-hidden bg-white hover:border-slate-300 transition-all">
-                    <button onclick="toggleFaq(this)" class="w-full px-6 py-5 flex items-center justify-between text-left transition-all">
+                <div class="border border-[var(--mn-border)] rounded-2xl overflow-hidden bg-white hover:border-[rgba(0,85,204,0.2)] hover:shadow-[var(--mn-shadow-1)] transition-shadow duration-200 reveal" data-testid="faq-item-1">
+                    <button onclick="toggleFaq(this)" aria-expanded="false" class="w-full px-6 py-5 flex items-center justify-between text-left" data-testid="faq-item-1-trigger">
                         <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-[#E8F2FF] text-[#0055CC] flex-shrink-0">
-                                <i data-lucide="circle-help" class="w-5 h-5"></i>
+                            <div class="w-9 h-9 rounded-full flex items-center justify-center bg-[#E8F2FF] text-[#0055CC] flex-shrink-0">
+                                <i data-lucide="circle-help" class="w-4 h-4"></i>
                             </div>
-                            <h3 class="font-semibold text-gray-900" style="font-family: 'Inter', sans-serif;">What is Durable Medical Equipment (DME)?</h3>
+                            <h3 class="font-semibold text-[var(--mn-text)] text-sm md:text-base">What is Durable Medical Equipment (DME)?</h3>
                         </div>
-                        <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-slate-100 text-gray-400 faq-chevron transition-transform flex-shrink-0 ml-4">
-                            <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                        <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-[var(--mn-surface-2)] text-[var(--mn-muted)] faq-chevron ml-4">
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
                         </div>
                     </button>
                     <div class="faq-answer">
                         <div class="px-6 pb-6 pt-1">
-                            <p class="text-gray-500 leading-relaxed pl-14" style="font-family: 'Inter', sans-serif;">Durable Medical Equipment (DME) includes medical devices prescribed by doctors for home use, such as knee braces, back braces, wheelchairs, CPAP machines, and blood pressure monitors. Medicare Part B covers DME when medically necessary and prescribed by your healthcare provider.</p>
+                            <p class="text-[var(--mn-muted)] leading-relaxed text-sm pl-13">Durable Medical Equipment (DME) includes medical devices prescribed by doctors for home use, such as knee braces, back braces, wheelchairs, CPAP machines, and blood pressure monitors. Medicare Part B covers DME when medically necessary and prescribed by your healthcare provider.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Q2 -->
-                <div class="border border-slate-200/80 rounded-2xl overflow-hidden bg-white hover:border-slate-300 transition-all">
-                    <button onclick="toggleFaq(this)" class="w-full px-6 py-5 flex items-center justify-between text-left transition-all">
+                <div class="border border-[var(--mn-border)] rounded-2xl overflow-hidden bg-white hover:border-[rgba(0,85,204,0.2)] hover:shadow-[var(--mn-shadow-1)] transition-shadow duration-200 reveal reveal-delay-1" data-testid="faq-item-2">
+                    <button onclick="toggleFaq(this)" aria-expanded="false" class="w-full px-6 py-5 flex items-center justify-between text-left" data-testid="faq-item-2-trigger">
                         <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-[#E8F2FF] text-[#0055CC] flex-shrink-0">
-                                <i data-lucide="circle-help" class="w-5 h-5"></i>
+                            <div class="w-9 h-9 rounded-full flex items-center justify-center bg-[#E8F2FF] text-[#0055CC] flex-shrink-0">
+                                <i data-lucide="circle-help" class="w-4 h-4"></i>
                             </div>
-                            <h3 class="font-semibold text-gray-900" style="font-family: 'Inter', sans-serif;">Does Medicare cover medical equipment?</h3>
+                            <h3 class="font-semibold text-[var(--mn-text)] text-sm md:text-base">Does Medicare cover medical equipment?</h3>
                         </div>
-                        <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-slate-100 text-gray-400 faq-chevron transition-transform flex-shrink-0 ml-4">
-                            <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                        <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-[var(--mn-surface-2)] text-[var(--mn-muted)] faq-chevron ml-4">
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
                         </div>
                     </button>
                     <div class="faq-answer">
                         <div class="px-6 pb-6 pt-1">
-                            <p class="text-gray-500 leading-relaxed pl-14" style="font-family: 'Inter', sans-serif;">Yes, Medicare Part B covers durable medical equipment when prescribed by your doctor and deemed medically necessary. As a Medicare-accredited supplier, MediNova handles all insurance paperwork for you, making the process simple and hassle-free.</p>
+                            <p class="text-[var(--mn-muted)] leading-relaxed text-sm pl-13">Yes, Medicare Part B covers durable medical equipment when prescribed by your doctor and deemed medically necessary. As a Medicare-accredited supplier, MediNova handles all insurance paperwork for you, making the process simple and hassle-free.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Q3 -->
-                <div class="border border-slate-200/80 rounded-2xl overflow-hidden bg-white hover:border-slate-300 transition-all">
-                    <button onclick="toggleFaq(this)" class="w-full px-6 py-5 flex items-center justify-between text-left transition-all">
+                <div class="border border-[var(--mn-border)] rounded-2xl overflow-hidden bg-white hover:border-[rgba(0,85,204,0.2)] hover:shadow-[var(--mn-shadow-1)] transition-shadow duration-200 reveal reveal-delay-2" data-testid="faq-item-3">
+                    <button onclick="toggleFaq(this)" aria-expanded="false" class="w-full px-6 py-5 flex items-center justify-between text-left" data-testid="faq-item-3-trigger">
                         <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-[#E8F2FF] text-[#0055CC] flex-shrink-0">
-                                <i data-lucide="circle-help" class="w-5 h-5"></i>
+                            <div class="w-9 h-9 rounded-full flex items-center justify-center bg-[#E8F2FF] text-[#0055CC] flex-shrink-0">
+                                <i data-lucide="circle-help" class="w-4 h-4"></i>
                             </div>
-                            <h3 class="font-semibold text-gray-900" style="font-family: 'Inter', sans-serif;">Is delivery free for medical equipment?</h3>
+                            <h3 class="font-semibold text-[var(--mn-text)] text-sm md:text-base">Is delivery free for medical equipment?</h3>
                         </div>
-                        <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-slate-100 text-gray-400 faq-chevron transition-transform flex-shrink-0 ml-4">
-                            <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                        <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-[var(--mn-surface-2)] text-[var(--mn-muted)] faq-chevron ml-4">
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
                         </div>
                     </button>
                     <div class="faq-answer">
                         <div class="px-6 pb-6 pt-1">
-                            <p class="text-gray-500 leading-relaxed pl-14" style="font-family: 'Inter', sans-serif;">Yes, MediNova offers free nationwide delivery on all Medicare-covered medical equipment. We deliver directly to your home at no additional cost, ensuring you receive your equipment quickly and conveniently.</p>
+                            <p class="text-[var(--mn-muted)] leading-relaxed text-sm pl-13">Yes, MediNova offers free nationwide delivery on all Medicare-covered medical equipment. We deliver directly to your home at no additional cost, ensuring you receive your equipment quickly and conveniently.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Q4 -->
-                <div class="border border-slate-200/80 rounded-2xl overflow-hidden bg-white hover:border-slate-300 transition-all">
-                    <button onclick="toggleFaq(this)" class="w-full px-6 py-5 flex items-center justify-between text-left transition-all">
+                <div class="border border-[var(--mn-border)] rounded-2xl overflow-hidden bg-white hover:border-[rgba(0,85,204,0.2)] hover:shadow-[var(--mn-shadow-1)] transition-shadow duration-200 reveal reveal-delay-3" data-testid="faq-item-4">
+                    <button onclick="toggleFaq(this)" aria-expanded="false" class="w-full px-6 py-5 flex items-center justify-between text-left" data-testid="faq-item-4-trigger">
                         <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-[#E8F2FF] text-[#0055CC] flex-shrink-0">
-                                <i data-lucide="circle-help" class="w-5 h-5"></i>
+                            <div class="w-9 h-9 rounded-full flex items-center justify-center bg-[#E8F2FF] text-[#0055CC] flex-shrink-0">
+                                <i data-lucide="circle-help" class="w-4 h-4"></i>
                             </div>
-                            <h3 class="font-semibold text-gray-900" style="font-family: 'Inter', sans-serif;">How do I check if I qualify for Medicare-covered equipment?</h3>
+                            <h3 class="font-semibold text-[var(--mn-text)] text-sm md:text-base">How do I check if I qualify for Medicare-covered equipment?</h3>
                         </div>
-                        <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-slate-100 text-gray-400 faq-chevron transition-transform flex-shrink-0 ml-4">
-                            <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                        <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-[var(--mn-surface-2)] text-[var(--mn-muted)] faq-chevron ml-4">
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
                         </div>
                     </button>
                     <div class="faq-answer">
                         <div class="px-6 pb-6 pt-1">
-                            <p class="text-gray-500 leading-relaxed pl-14" style="font-family: 'Inter', sans-serif;">You can check your eligibility in 60 seconds using our online eligibility checker or by calling (248) 886-4-DME (4363). Our specialists will verify your Medicare coverage, coordinate with your doctor, and handle all the necessary paperwork.</p>
+                            <p class="text-[var(--mn-muted)] leading-relaxed text-sm pl-13">You can check your eligibility in 60 seconds using our online eligibility checker or by calling (248) 886-4-DME (4363). Our specialists will verify your Medicare coverage, coordinate with your doctor, and handle all the necessary paperwork.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Q5 -->
-                <div class="border border-slate-200/80 rounded-2xl overflow-hidden bg-white hover:border-slate-300 transition-all">
-                    <button onclick="toggleFaq(this)" class="w-full px-6 py-5 flex items-center justify-between text-left transition-all">
+                <div class="border border-[var(--mn-border)] rounded-2xl overflow-hidden bg-white hover:border-[rgba(0,85,204,0.2)] hover:shadow-[var(--mn-shadow-1)] transition-shadow duration-200 reveal reveal-delay-4" data-testid="faq-item-5">
+                    <button onclick="toggleFaq(this)" aria-expanded="false" class="w-full px-6 py-5 flex items-center justify-between text-left" data-testid="faq-item-5-trigger">
                         <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-[#E8F2FF] text-[#0055CC] flex-shrink-0">
-                                <i data-lucide="circle-help" class="w-5 h-5"></i>
+                            <div class="w-9 h-9 rounded-full flex items-center justify-center bg-[#E8F2FF] text-[#0055CC] flex-shrink-0">
+                                <i data-lucide="circle-help" class="w-4 h-4"></i>
                             </div>
-                            <h3 class="font-semibold text-gray-900" style="font-family: 'Inter', sans-serif;">What types of braces does MediNova provide?</h3>
+                            <h3 class="font-semibold text-[var(--mn-text)] text-sm md:text-base">What types of braces does MediNova provide?</h3>
                         </div>
-                        <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-slate-100 text-gray-400 faq-chevron transition-transform flex-shrink-0 ml-4">
-                            <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                        <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-[var(--mn-surface-2)] text-[var(--mn-muted)] faq-chevron ml-4">
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
                         </div>
                     </button>
                     <div class="faq-answer">
                         <div class="px-6 pb-6 pt-1">
-                            <p class="text-gray-500 leading-relaxed pl-14" style="font-family: 'Inter', sans-serif;">MediNova provides a wide range of Medicare-covered braces including back braces (LSO/TLSO), knee braces, ankle braces, wrist braces, shoulder braces, and cervical collars. All braces are prescribed by your doctor and covered by Medicare when medically necessary.</p>
+                            <p class="text-[var(--mn-muted)] leading-relaxed text-sm pl-13">MediNova provides a wide range of Medicare-covered braces including back braces (LSO/TLSO), knee braces, ankle braces, wrist braces, shoulder braces, and cervical collars. All braces are prescribed by your doctor and covered by Medicare when medically necessary.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Q6 -->
-                <div class="border border-slate-200/80 rounded-2xl overflow-hidden bg-white hover:border-slate-300 transition-all">
-                    <button onclick="toggleFaq(this)" class="w-full px-6 py-5 flex items-center justify-between text-left transition-all">
+                <div class="border border-[var(--mn-border)] rounded-2xl overflow-hidden bg-white hover:border-[rgba(0,85,204,0.2)] hover:shadow-[var(--mn-shadow-1)] transition-shadow duration-200 reveal reveal-delay-4" data-testid="faq-item-6">
+                    <button onclick="toggleFaq(this)" aria-expanded="false" class="w-full px-6 py-5 flex items-center justify-between text-left" data-testid="faq-item-6-trigger">
                         <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-[#E8F2FF] text-[#0055CC] flex-shrink-0">
-                                <i data-lucide="circle-help" class="w-5 h-5"></i>
+                            <div class="w-9 h-9 rounded-full flex items-center justify-center bg-[#E8F2FF] text-[#0055CC] flex-shrink-0">
+                                <i data-lucide="circle-help" class="w-4 h-4"></i>
                             </div>
-                            <h3 class="font-semibold text-gray-900" style="font-family: 'Inter', sans-serif;">How long does it take to receive my equipment?</h3>
+                            <h3 class="font-semibold text-[var(--mn-text)] text-sm md:text-base">How long does it take to receive my equipment?</h3>
                         </div>
-                        <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-slate-100 text-gray-400 faq-chevron transition-transform flex-shrink-0 ml-4">
-                            <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                        <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-[var(--mn-surface-2)] text-[var(--mn-muted)] faq-chevron ml-4">
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
                         </div>
                     </button>
                     <div class="faq-answer">
                         <div class="px-6 pb-6 pt-1">
-                            <p class="text-gray-500 leading-relaxed pl-14" style="font-family: 'Inter', sans-serif;">Once your insurance is verified and your doctor's prescription is received, most equipment is shipped within 2-5 business days. Our team works quickly to process your order and arrange free delivery directly to your home.</p>
+                            <p class="text-[var(--mn-muted)] leading-relaxed text-sm pl-13">Once your insurance is verified and your doctor's prescription is received, most equipment is shipped within 2-5 business days. Our team works quickly to process your order and arrange free delivery directly to your home.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- CTA below FAQ -->
-            <div class="mt-16 text-center p-10 bg-gradient-to-br from-[#0055CC]/5 via-[#00A3E0]/5 to-cyan-50 rounded-3xl border border-[#00A3E0]/20">
-                <p class="text-gray-700 text-lg mb-4">Still have questions? Our specialists are here to help.</p>
-                <a href="tel:2488864363" class="inline-flex items-center gap-2 text-[#0055CC] font-bold text-lg hover:text-[#00A3E0] transition-colors">
+            <div class="mt-12 text-center p-10 bg-[#F1F6FF] rounded-3xl border border-[var(--mn-border)] reveal">
+                <p class="text-[var(--mn-text)] text-base mb-4">Still have questions? Our specialists are here to help.</p>
+                <a href="tel:2488864363" class="inline-flex items-center gap-2 text-[#0055CC] font-bold text-lg hover:text-[#00A3E0] transition-colors duration-200">
                     <i data-lucide="phone" class="w-5 h-5"></i>
                     Call (248) 886-4-DME
                 </a>
@@ -1030,7 +1085,9 @@
     </section>
 
     <!-- Testimonials -->
-    <section class="py-24 bg-gradient-to-br from-[#0055CC] via-[#0066DD] to-[#00A3E0] relative overflow-hidden">
+    <section class="py-16 md:py-20 bg-gradient-to-br from-[#0055CC] via-[#0066DD] to-[#00A3E0] relative overflow-hidden">
+        <!-- Noise texture for testimonials bg -->
+        <div class="noise-overlay" style="opacity:.06;mix-blend-mode:overlay;"></div>
         <div class="absolute inset-0 pointer-events-none">
             <div class="absolute top-20 left-10 w-56 h-56 bg-white/5 rounded-full blur-2xl"></div>
             <div class="absolute bottom-20 right-20 w-72 h-72 bg-white/5 rounded-full blur-2xl"></div>
@@ -1041,12 +1098,12 @@
         </div>
         <div class="relative max-w-7xl mx-auto px-4">
             <!-- Section Header -->
-            <div class="text-center mb-16">
+            <div class="text-center mb-14 reveal">
                 <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/15 border border-white/20 rounded-full text-white text-sm font-semibold mb-6">
                     <i data-lucide="message-square" class="w-4 h-4"></i>
                     Testimonials
                 </div>
-                <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-5 tracking-tight">What Our Patients Say</h2>
+                <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-5 tracking-tight" data-testid="section-testimonials-heading">What Our Patients Say</h2>
                 <p class="text-white/75 text-base md:text-lg max-w-xl mx-auto leading-relaxed">
                     Don't just take our word for it. Hear from our satisfied patients who<br class="hidden md:block">
                     have improved their quality of life with MediNova.
@@ -1054,10 +1111,10 @@
             </div>
 
             <!-- Testimonial Cards -->
-            <div class="grid md:grid-cols-3 gap-7">
+            <div class="grid md:grid-cols-3 gap-6">
 
                 <!-- Card 1 -->
-                <div class="flex flex-col bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl hover:bg-white/15 hover:border-white/30 transition-all duration-300 rounded-3xl overflow-hidden group">
+                <div class="flex flex-col bg-white/12 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.12)] hover:bg-white/18 hover:border-white/30 transition-shadow duration-300 rounded-3xl overflow-hidden reveal reveal-delay-1" data-testid="testimonial-card-1">
                     <div class="p-8 flex flex-col flex-1">
                         <!-- Quote Icon -->
                         <div class="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center mb-6 flex-shrink-0">
@@ -1087,7 +1144,7 @@
                 </div>
 
                 <!-- Card 2 -->
-                <div class="flex flex-col bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl hover:bg-white/15 hover:border-white/30 transition-all duration-300 rounded-3xl overflow-hidden group">
+                <div class="flex flex-col bg-white/12 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.12)] hover:bg-white/18 hover:border-white/30 transition-shadow duration-300 rounded-3xl overflow-hidden reveal reveal-delay-2" data-testid="testimonial-card-2">
                     <div class="p-8 flex flex-col flex-1">
                         <!-- Quote Icon -->
                         <div class="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center mb-6 flex-shrink-0">
@@ -1117,7 +1174,7 @@
                 </div>
 
                 <!-- Card 3 -->
-                <div class="flex flex-col bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl hover:bg-white/15 hover:border-white/30 transition-all duration-300 rounded-3xl overflow-hidden group">
+                <div class="flex flex-col bg-white/12 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.12)] hover:bg-white/18 hover:border-white/30 transition-shadow duration-300 rounded-3xl overflow-hidden reveal reveal-delay-3" data-testid="testimonial-card-3">
                     <div class="p-8 flex flex-col flex-1">
                         <!-- Quote Icon -->
                         <div class="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center mb-6 flex-shrink-0">
@@ -1151,32 +1208,35 @@
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="relative overflow-hidden bg-[#F0F4FF]">
+    <section id="contact" class="relative overflow-hidden bg-[#F6FAFF]">
+        <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D9E6F7] to-transparent"></div>
         <!-- Subtle dot-pattern overlay -->
-        <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle, #0055CC 1px, transparent 1px); background-size: 28px 28px;"></div>
+        <div class="absolute inset-0 opacity-[0.025]" style="background-image: radial-gradient(circle, #0055CC 1px, transparent 1px); background-size: 28px 28px;"></div>
 
         <div class="relative max-w-7xl mx-auto px-4">
             <!-- Section Header -->
-            <div class="text-center pt-24 pb-14">
+            <div class="text-center pt-20 pb-12 reveal">
                 <div class="inline-flex items-center gap-2 px-4 py-2 bg-[#0055CC]/10 rounded-full text-[#0055CC] text-sm font-semibold mb-5">
                     <i data-lucide="headphones" class="w-4 h-4"></i>
                     Contact Us
                 </div>
-                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-[var(--mn-text)] mb-4 tracking-tight" data-testid="section-contact-heading">
                     Ready to <span class="gradient-text">Get Started?</span>
                 </h2>
-                <p class="text-gray-500 text-base md:text-lg max-w-xl mx-auto leading-relaxed">
+                <p class="text-[var(--mn-muted)] text-base md:text-lg max-w-xl mx-auto leading-relaxed">
                     Our team is ready to help you get the medical equipment you need.<br class="hidden md:block">
                     Contact us today for a free eligibility check.
                 </p>
             </div>
 
             <!-- Two-column card -->
-            <div class="pb-24">
+            <div class="pb-24 reveal reveal-delay-1">
                 <div class="rounded-3xl overflow-hidden shadow-2xl shadow-blue-900/10 flex flex-col lg:flex-row">
 
                     <!-- LEFT: Dark Info Panel -->
                     <div class="lg:w-[42%] bg-gradient-to-br from-[#003FA3] via-[#0055CC] to-[#0070E0] relative p-10 md:p-12 flex flex-col justify-between">
+                        <!-- Noise overlay for left panel -->
+                        <div class="noise-overlay" style="opacity:.05;mix-blend-mode:overlay;"></div>
                         <!-- Decorative circles -->
                         <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/3 translate-x-1/3 pointer-events-none"></div>
                         <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/3 -translate-x-1/3 pointer-events-none"></div>
@@ -1327,7 +1387,7 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-16">
+    <footer class="bg-[#0B1B33] text-white py-14 border-t border-white/5">
         <div class="max-w-7xl mx-auto px-4">
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16 mb-12">
                 <!-- Company Info -->
@@ -1554,11 +1614,16 @@
             
             // Close all
             document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('open'));
-            document.querySelectorAll('.faq-chevron').forEach(c => c.style.transform = '');
+            document.querySelectorAll('.faq-chevron').forEach(c => {
+                c.classList.remove('open');
+                c.style.transform = '';
+            });
+            document.querySelectorAll('[onclick="toggleFaq(this)"]').forEach(b => b.setAttribute('aria-expanded', 'false'));
             
             if (!isOpen) {
                 answer.classList.add('open');
-                chevron.style.transform = 'rotate(180deg)';
+                chevron.classList.add('open');
+                btn.setAttribute('aria-expanded', 'true');
             }
         }
 
@@ -1798,6 +1863,32 @@
         loadBranding();
         primeFormStartTime('contact-form');
         primeFormStartTime('eligibility-form');
+
+        // ---- Sticky nav scroll shadow ----
+        (function() {
+            var header = document.getElementById('landing-header');
+            if (!header) return;
+            window.addEventListener('scroll', function() {
+                header.classList.toggle('mn-scrolled', window.scrollY > 12);
+            }, { passive: true });
+        })();
+
+        // ---- Scroll-reveal IntersectionObserver ----
+        (function() {
+            var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (prefersReduced) return;
+            var els = document.querySelectorAll('.reveal');
+            if (!els.length) return;
+            var io = new IntersectionObserver(function(entries) {
+                entries.forEach(function(e) {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('is-visible');
+                        io.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.14, rootMargin: '0px 0px -8% 0px' });
+            els.forEach(function(el) { io.observe(el); });
+        })();
     </script>
 </body>
 </html>
