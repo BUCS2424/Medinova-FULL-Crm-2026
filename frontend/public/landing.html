@@ -394,7 +394,7 @@
                         <i data-lucide="phone" class="w-4 h-4"></i>
                         (248) 886-4-DME
                     </a>
-                    <button onclick="openEligibilityModal()" data-testid="nav-cta-button" class="btn-glow bg-gradient-to-r from-[#0055CC] to-[#00A3E0] hover:from-[#004299] hover:to-[#0090C9] text-white px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-shadow duration-200 active:scale-[0.98]">
+                    <button onclick="goToGetStarted()" data-testid="nav-cta-button" class="btn-glow bg-gradient-to-r from-[#0055CC] to-[#00A3E0] hover:from-[#004299] hover:to-[#0090C9] text-white px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-shadow duration-200 active:scale-[0.98]">
                         Check Eligibility
                     </button>
                 </nav>
@@ -442,7 +442,7 @@
                 <i data-lucide="phone" class="w-4 h-4"></i>
                 (248) 886-4-DME
             </a>
-            <button onclick="openEligibilityModal()" class="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#0055CC] to-[#00A3E0] px-4 py-3 font-semibold text-white hover:from-[#004299] hover:to-[#0090C9]" data-testid="landing-mobile-menu-primary-cta">
+            <button onclick="goToGetStarted()" class="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#0055CC] to-[#00A3E0] px-4 py-3 font-semibold text-white hover:from-[#004299] hover:to-[#0090C9]" data-testid="landing-mobile-menu-primary-cta">
                 Check Eligibility
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </button>
@@ -519,7 +519,7 @@
                     </p>
 
                     <div class="flex flex-col sm:flex-row gap-4 animate-fade-in-up" style="animation-delay: 0.4s;">
-                        <button onclick="openEligibilityModal()" class="btn-glow group bg-gradient-to-r from-[#0055CC] to-[#0066EE] hover:from-[#004299] hover:to-[#0055CC] text-white font-bold text-lg px-8 py-4 rounded-2xl shadow-xl shadow-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/40 transition-all duration-300 flex items-center justify-center gap-2">
+                        <button onclick="goToGetStarted()" class="btn-glow group bg-gradient-to-r from-[#0055CC] to-[#0066EE] hover:from-[#004299] hover:to-[#0055CC] text-white font-bold text-lg px-8 py-4 rounded-2xl shadow-xl shadow-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/40 transition-all duration-300 flex items-center justify-center gap-2">
                             <i data-lucide="sparkles" class="w-5 h-5"></i>
                             Check My Eligibility
                             <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
@@ -1677,10 +1677,14 @@
             return { firstName, lastName };
         }
         
-        function openEligibilityModal() {
-            document.getElementById('eligibility-modal').classList.add('active');
-            document.body.style.overflow = 'hidden';
-            primeFormStartTime('eligibility-form');
+        function goToGetStarted(pain) {
+            var url = '/get-started';
+            if (pain) url += '?pain=' + encodeURIComponent(pain);
+            window.top.location.href = url;
+        }
+
+        function openEligibilityModal(pain) {
+            goToGetStarted(pain);
         }
         
         function closeEligibilityModal() {

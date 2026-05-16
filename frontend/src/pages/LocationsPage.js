@@ -240,7 +240,7 @@ export default function LocationsPage() {
                   items={menuItems}
                   title="Browse Coverage Areas"
                   description="Find your state, county, or city and connect with the MediNova Medical Supplies team fast."
-                  primaryHref="/#contact"
+                  primaryHref="/get-started?formType=location_page"
                   primaryLabel="Check Eligibility"
                 />
               </div>

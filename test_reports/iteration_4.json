@@ -1,0 +1,74 @@
+{
+  "summary": "Comprehensive testing of /get-started 4-step wizard form and backend /api/public/leads endpoint. All UI steps, navigation, validation, and design elements verified. One CRITICAL integration bug found: form submission always fails with 422 'TCPA consent is required' because the backend requires consentTcpa=true but the frontend never sends this field.",
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "POST /api/public/leads",
+        "issue": "Backend requires 'consentTcpa: true' (line 2465-2466 in server.py) but frontend GetStartedPage.jsx never includes 'consentTcpa' in the axios.post payload. Result: every form submission returns 422 'TCPA consent is required'. Success screen 'You're All Set!' is unreachable.",
+        "priority": "CRITICAL"
+      }
+    ],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "Full form submission",
+        "issue": "Form submission fails with 'TCPA consent is required' error shown in UI — caused by missing consentTcpa field in axios.post payload (server.py line 2465 enforces it but GetStartedPage.jsx doesn't send it)",
+        "affected_selectors": ["[data-testid='form-error']", "[data-testid='next-btn']", "[data-testid='success-card']"]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_get_started_leads.py",
+    "/app/test_reports/pytest/get_started_leads_results.xml"
+  ],
+  "action_items": [
+    "FIX CRITICAL: In GetStartedPage.jsx handleSubmit(), add 'consentTcpa: data.consentContact' to the axios.post payload (TCPA = Consent to Contact phone/text). This field is required by the backend but never sent by the frontend. Fix: add line 'consentTcpa: data.consentContact,' after 'consentInsurance: data.consentInsurance,' in the payload at line ~198"
+  ],
+  "critical_code_review_comments": [
+    "CRITICAL: server.py line 2465 enforces `consent_tcpa is not True` → 422, but GetStartedPage.jsx has no consentTcpa field in state or payload. The frontend has 3 checkboxes (Contact, HIPAA, Insurance) but no TCPA checkbox. Fix: either (a) add consentTcpa: data.consentContact to payload since Consent to Contact IS TCPA consent, or (b) remove the TCPA check from backend since the form has an equivalent Consent to Contact checkbox.",
+    "Minor: Progress bar fill color is 'bg-gray-900' (dark/black) instead of blue (bg-[#0055CC]). The container background is blue-100 but fill is gray-900 — slightly inconsistent with the overall blue theme but not broken."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_get_started_leads.py"
+  ],
+  "success_rate": {
+    "backend": "87.5% (7/8 tests passed — 1 failed: test_valid_submission_without_tcpa confirms the bug)",
+    "frontend": "93% (13/14 requirements verified — success screen unreachable due to TCPA bug)"
+  },
+  "test_credentials": "No auth required — public form",
+  "seed_data_creation": "None — form submission fails due to TCPA bug so no test leads created",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "The /get-started page (GetStartedPage.jsx) is a 4-step wizard. Steps 1-4 UI all work correctly. The only issue is form submission fails with 422 'TCPA consent is required'. Fix: add consentTcpa: data.consentContact to the axios.post payload in handleSubmit(). After the fix, verify the success screen 'You're All Set!' appears. URL prefill works (?pain=knee skips to step 2). Landing page CTAs navigate to /get-started. Product pages (ProductDetailPage.js, ProductCatalogPage.js) already point primaryHref to /get-started.",
+  "verified_features": [
+    "✅ /get-started page loads as full page (not modal), URL is /get-started",
+    "✅ Step 1: 'Where is your pain?' with 5 tiles (Back, Knee, Wrist, Shoulder, Other) in 3+2 grid",
+    "✅ Step 1: Selecting a tile highlights it with blue border and checkmark indicator",
+    "✅ Step 1: Clicking Next without selection shows error 'Please select an option to continue.'",
+    "✅ Step 2: 'What insurance do you have?' with 4 tiles (Medicare, Medicaid, Private, Other)",
+    "✅ Step 3: 'Do you have a doctor you've seen in the last year?' with Yes/No tiles",
+    "✅ Step 3: Clicking Next without selection shows error 'Please select an option to continue.'",
+    "✅ Step 4: Gradient blue-to-green header with 'Request Information' + product name 'Back Braces'",
+    "✅ Step 4: Amber info banner present",
+    "✅ Step 4: All form fields present (First Name, Last Name, Phone, Email, ZIP, Best Time, Notes)",
+    "✅ Step 4: Consent & Authorization section with 3 checkboxes and e-signature field",
+    "✅ Step 4: Submit without consents shows 'Please accept all required consents to continue.'",
+    "✅ Back button navigates to previous step",
+    "✅ Progress bar: 25% on step 1, 50% on step 2, 75% on step 3 — correct",
+    "✅ URL prefill ?pain=knee skips to Step 2 with Knee pre-selected",
+    "✅ Landing page 'Check Eligibility' CTA navigates to /get-started (goToGetStarted in landing.html)",
+    "✅ ProductDetailPage.js: primaryHref points to /get-started",
+    "✅ ProductCatalogPage.js: primaryHref points to /get-started",
+    "❌ Full form submission fails with 422 'TCPA consent is required' — success screen unreachable"
+  ],
+  "rca_of_issue": {
+    "bug": "Form submission 422 TCPA consent is required",
+    "root_cause": "server.py line 2465: 'if lead_data.consent_tcpa is not True: raise HTTPException(status_code=422, detail=\"TCPA consent is required\")'. The field 'consent_tcpa' maps from JSON key 'consentTcpa' (via Field alias). GetStartedPage.jsx only sends consentContact, consentHipaa, consentInsurance but NOT consentTcpa.",
+    "reproduction": "1. Go to /get-started, 2. Select pain tile, 3. Select insurance, 4. Select doctor answer, 5. Fill all fields, check all 3 boxes, type signature, 6. Click 'Get Started' → API returns 422 'TCPA consent is required'",
+    "mitigation": "Add 'consentTcpa: data.consentContact,' to the axios.post payload in GetStartedPage.jsx handleSubmit() function. TCPA (Telephone Consumer Protection Act) consent maps 1:1 to the Consent to Contact checkbox in this form."
+  }
+}

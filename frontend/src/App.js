@@ -54,6 +54,7 @@ import StayUpToDatePage from "./pages/StayUpToDatePage";
 import CoverageAreaPage from "./pages/CoverageAreaPage";
 import DevPageGenerator from "./pages/DevPageGenerator";
 import PageGeneratorEditor from "./pages/PageGeneratorEditor";
+import GetStartedPage from "./pages/GetStartedPage";
 
 // Components
 import Layout from "./components/Layout";
@@ -437,6 +438,9 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+      {/* Get Started — public multi-step intake form */}
+      <Route path="/get-started" element={<GetStartedPage />} />
 
       {/* Legal Documents (Public) */}
       <Route path="/legal/:slug" element={<LegalDocumentPage />} />

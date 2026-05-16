@@ -743,7 +743,7 @@ export default function ProductCatalogPage() {
                   items={menuItems}
                   title="Browse Products"
                   description="Shop categories, compare options, and request Medicare-covered equipment support."
-                  primaryHref="/#contact"
+                  primaryHref="/get-started?formType=product_catalog"
                   primaryLabel="Request Callback"
                 />
               </div>

@@ -555,7 +555,7 @@ export default function ProductDetailPage() {
                     items={menuItems}
                     title="Product Navigation"
                     description="Move between products, service areas, and support from one quick menu."
-                    primaryHref="/#contact"
+                    primaryHref={`/get-started?formType=product_page&pain=${categorySlug || productSlug || ''}`}
                     primaryLabel="Check Eligibility"
                   />
                 </div>
