@@ -23,6 +23,7 @@ import UsersPage from "./pages/UsersPage";
 import AuditLogsPage from "./pages/AuditLogsPage";
 import DoctorPortalPage from "./pages/DoctorPortalPage";
 import DoctorsPage from "./pages/DoctorsPage";
+import InsuranceVerificationPage from "./pages/InsuranceVerificationPage";
 import DevSettingsPage from "./pages/DevSettingsPage";
 import AdminSettingsPage from "./pages/AdminSettingsPage";
 import ProductCatalogPage from "./pages/ProductCatalogPage";
@@ -262,6 +263,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <DoctorsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/insurance-verification"
+        element={
+          <ProtectedRoute>
+            <InsuranceVerificationPage />
           </ProtectedRoute>
         }
       />

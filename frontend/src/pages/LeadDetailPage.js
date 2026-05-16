@@ -63,8 +63,10 @@ import {
   Link2,
   DollarSign,
   Plus,
-  Package
+  Package,
+  ShieldCheck
 } from 'lucide-react';
+import { useFeatures } from '../contexts/FeatureContext';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -129,6 +131,15 @@ export default function LeadDetailPage() {
     secondary_insurance: '',
     address: ''
   });
+
+  // Insurance Eligibility check
+  const [eligModalOpen, setEligModalOpen] = useState(false);
+  const [eligService, setEligService] = useState('availity');
+  const [eligForm, setEligForm] = useState({ payer_id: '', member_id: '', service_type: 'DME' });
+  const [eligRunning, setEligRunning] = useState(false);
+  const [eligResult, setEligResult] = useState(null);
+  const { isFeatureEnabled } = useFeatures();
+  const insuranceEnabled = isFeatureEnabled('availity_integration') || isFeatureEnabled('waystar_integration');
   
   // Comments state
   const [comments, setComments] = useState([]);
@@ -557,6 +568,26 @@ export default function LeadDetailPage() {
                       <FileText className="w-4 h-4 mr-1" />
                       Fax
                     </Button>
+                    {insuranceEnabled && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setEligForm({
+                            payer_id: lead.primary_insurance || '',
+                            member_id: lead.member_id || lead.insurance_id || '',
+                            service_type: 'DME'
+                          });
+                          setEligResult(null);
+                          setEligModalOpen(true);
+                        }}
+                        data-testid="lead-check-eligibility-button"
+                        className="gap-1"
+                      >
+                        <ShieldCheck className="w-4 h-4" />
+                        Eligibility
+                      </Button>
+                    )}
                     <Button size="sm" onClick={() => setIsConvertOpen(true)}>
                       <UserPlus className="w-4 h-4 mr-1" />
                       Convert
@@ -1384,6 +1415,99 @@ export default function LeadDetailPage() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Insurance Eligibility Check Modal */}
+      <Dialog open={eligModalOpen} onOpenChange={setEligModalOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-[#0055CC]" />
+              Check Insurance Eligibility
+            </DialogTitle>
+            <DialogDescription>
+              Run a real-time eligibility check for {lead?.first_name} {lead?.last_name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            {/* Service selector */}
+            {isFeatureEnabled('availity_integration') && isFeatureEnabled('waystar_integration') && (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setEligService('availity')}
+                  className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-colors ${eligService === 'availity' ? 'bg-[#0055CC] text-white border-[#0055CC]' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                  data-testid="elig-service-availity"
+                >Availity</button>
+                <button
+                  onClick={() => setEligService('waystar')}
+                  className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-colors ${eligService === 'waystar' ? 'bg-[#0055CC] text-white border-[#0055CC]' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                  data-testid="elig-service-waystar"
+                >Waystar</button>
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-gray-700">Payer ID *</label>
+                <Input
+                  data-testid="elig-modal-payer-id"
+                  placeholder="e.g. MCARE"
+                  value={eligForm.payer_id}
+                  onChange={e => setEligForm(f => ({ ...f, payer_id: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-gray-700">Member / Insurance ID *</label>
+                <Input
+                  data-testid="elig-modal-member-id"
+                  placeholder="Insurance Member ID"
+                  value={eligForm.member_id}
+                  onChange={e => setEligForm(f => ({ ...f, member_id: e.target.value }))}
+                />
+              </div>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-500 space-y-0.5">
+              <p><span className="font-medium text-gray-700">Patient:</span> {lead?.first_name} {lead?.last_name}</p>
+              <p><span className="font-medium text-gray-700">DOB on file:</span> {lead?.date_of_birth || 'Not set'}</p>
+            </div>
+            {eligResult && (
+              <div className={`rounded-lg border p-3 text-sm ${eligResult.error ? 'bg-red-50 border-red-200 text-red-700' : eligResult.eligible !== false ? 'bg-green-50 border-green-200 text-green-700' : 'bg-yellow-50 border-yellow-200 text-yellow-700'}`}>
+                <p className="font-medium mb-1">{eligResult.error ? 'Check Failed' : eligResult.eligible !== false ? 'Eligible — Coverage Active' : 'Not Eligible'}</p>
+                <pre className="text-xs overflow-auto max-h-32 bg-white/70 rounded p-2 text-gray-600">{JSON.stringify(eligResult, null, 2)}</pre>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEligModalOpen(false)}>Cancel</Button>
+            <Button
+              data-testid="elig-modal-run-btn"
+              disabled={eligRunning || !eligForm.payer_id || !eligForm.member_id}
+              onClick={async () => {
+                setEligRunning(true);
+                setEligResult(null);
+                try {
+                  const endpoint = eligService === 'availity' ? '/api/availity/eligibility/check' : '/api/waystar/eligibility/check';
+                  const payload = eligService === 'availity'
+                    ? { payer_id: eligForm.payer_id, member_id: eligForm.member_id, member_first_name: lead?.first_name, member_last_name: lead?.last_name, member_dob: lead?.date_of_birth, service_type_codes: ['DM'] }
+                    : { payer_id: eligForm.payer_id, member_id: eligForm.member_id, first_name: lead?.first_name, last_name: lead?.last_name, date_of_birth: lead?.date_of_birth, service_type: eligForm.service_type };
+                  const res = await axios.post(`${API_URL}${endpoint}`, payload, { headers: getHeaders() });
+                  setEligResult(res.data);
+                  // Update lead status to verifying_insurance and log activity
+                  await axios.patch(`${API_URL}/api/leads/${lead.id}`, { status: 'verifying_insurance' }, { headers: getHeaders() });
+                  toast.success('Eligibility check complete — status updated');
+                } catch (err) {
+                  const msg = err.response?.data?.detail || 'Check failed';
+                  setEligResult({ error: true, message: msg });
+                  toast.error(msg);
+                } finally {
+                  setEligRunning(false);
+                }
+              }}
+              className="gap-2"
+            >
+              {eligRunning ? <><Loader2 className="w-4 h-4 animate-spin" />Checking...</> : <><ShieldCheck className="w-4 h-4" />Run Check</>}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

@@ -2,23 +2,45 @@
 Waystar API routes for healthcare revenue cycle management.
 Handles configuration, eligibility verification, claims status, and prior authorization.
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, timezone
 import httpx
 import logging
 import base64
+import jwt
+import os
 
 logger = logging.getLogger(__name__)
 
 waystar_router = APIRouter(prefix="/waystar", tags=["waystar"])
+security = HTTPBearer()
+
+JWT_SECRET = os.environ.get('JWT_SECRET', 'your-secret-key-change-in-production')
+JWT_ALGORITHM = "HS256"
 
 _db = None
 
 def set_database(db):
     global _db
     _db = db
+
+
+async def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Verify JWT token and return user data"""
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user = await _db.users.find_one({"id": payload.get("sub")})
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+        return {"id": user.get("id"), "email": user.get("email"), "role": user.get("role")}
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
 
 
 class WaystarConfigUpdate(BaseModel):
@@ -31,8 +53,8 @@ class WaystarConfigUpdate(BaseModel):
 # ==================== CONFIG ====================
 
 @waystar_router.get("/config")
-async def get_waystar_config():
-    """Get Waystar API configuration"""
+async def get_waystar_config(user: dict = Depends(verify_token)):
+    """Get Waystar API configuration (requires auth)"""
     config = await _db.site_settings.find_one({"type": "waystar_config"}, {"_id": 0})
     if not config:
         return {
@@ -54,14 +76,14 @@ async def get_waystar_config():
 
 
 @waystar_router.put("/config")
-async def update_waystar_config(data: WaystarConfigUpdate):
-    """Save Waystar API configuration"""
+async def update_waystar_config(data: WaystarConfigUpdate, user: dict = Depends(verify_token)):
+    """Save Waystar API configuration (requires auth)"""
     existing = await _db.site_settings.find_one({"type": "waystar_config"}, {"_id": 0})
     
     update = {
         "type": "waystar_config",
         "updated_at": datetime.now(timezone.utc).isoformat(),
-        "updated_by": "admin",
+        "updated_by": user.get("email", "admin"),
     }
     
     if data.client_id is not None:
@@ -95,8 +117,8 @@ async def update_waystar_config(data: WaystarConfigUpdate):
 # ==================== CONNECTION TEST ====================
 
 @waystar_router.get("/status")
-async def get_waystar_status():
-    """Test Waystar API connection"""
+async def get_waystar_status(user: dict = Depends(verify_token)):
+    """Test Waystar API connection (requires auth)"""
     config = await _db.site_settings.find_one({"type": "waystar_config"}, {"_id": 0})
     if not config or not config.get("client_id") or not config.get("client_secret"):
         return {"configured": False, "connected": False, "message": "Not configured"}
@@ -123,7 +145,7 @@ async def get_waystar_status():
 # ==================== ELIGIBILITY (270/271) ====================
 
 @waystar_router.post("/eligibility/check")
-async def check_eligibility(data: dict):
+async def check_eligibility(data: dict, user: dict = Depends(verify_token)):
     """Check patient eligibility via Waystar 270/271 transaction"""
     config = await _db.site_settings.find_one({"type": "waystar_config"}, {"_id": 0})
     if not config or not config.get("client_id"):
@@ -181,7 +203,7 @@ async def check_eligibility(data: dict):
 # ==================== CLAIMS STATUS (276/277) ====================
 
 @waystar_router.post("/claims/status")
-async def check_claim_status(data: dict):
+async def check_claim_status(data: dict, user: dict = Depends(verify_token)):
     """Check claim status via Waystar 276/277 transaction"""
     config = await _db.site_settings.find_one({"type": "waystar_config"}, {"_id": 0})
     if not config or not config.get("client_id"):
@@ -230,7 +252,7 @@ async def check_claim_status(data: dict):
 # ==================== ACTIVITY LOGS ====================
 
 @waystar_router.get("/logs")
-async def get_waystar_logs(limit: int = 50):
+async def get_waystar_logs(limit: int = 50, user: dict = Depends(verify_token)):
     """Get recent Waystar API activity logs"""
     logs = await _db.waystar_logs.find(
         {}, {"_id": 0}

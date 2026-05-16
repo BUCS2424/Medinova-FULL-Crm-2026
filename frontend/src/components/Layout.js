@@ -52,7 +52,8 @@ import {
   Ticket,
   PhoneCall,
   ExternalLink,
-  Newspaper
+  Newspaper,
+  ShieldCheck
 } from 'lucide-react';
 import axios from 'axios';
 import SlideOutDialer from './SlideOutDialer';
@@ -82,6 +83,9 @@ const doctorsNavItem = { to: '/doctors', icon: Stethoscope, label: 'Doctors' };
 // Live Chat - visible to admin, sales_manager, super_admin, store_owner
 const chatNavItem = { to: '/admin-settings?tab=chat', icon: MessageCircle, label: 'Live Chat' };
 
+// Insurance Verification - visible when Availity or Waystar feature is enabled
+const insuranceNavItem = { to: '/insurance-verification', icon: ShieldCheck, label: 'Insurance Verify' };
+
 const adminNavItems = [];
 
 export const Layout = ({ children }) => {
@@ -109,6 +113,8 @@ export const Layout = ({ children }) => {
   const phoneDialerEnabled = isFeatureEnabled('phone_dialer');
   const faxCenterEnabled = isFeatureEnabled('fax_center');
   const analyticsEnabled = isFeatureEnabled('analytics_dashboard');
+  const availityEnabled = isFeatureEnabled('availity_integration');
+  const waystarEnabled = isFeatureEnabled('waystar_integration');
 
   // Play notification sound
   const playNotificationSound = useCallback(() => {
@@ -345,6 +351,10 @@ export const Layout = ({ children }) => {
               {/* Doctors Directory - visible when feature is enabled */}
               {doctorsDirectoryEnabled && (
                 <NavItem item={doctorsNavItem} />
+              )}
+              {/* Insurance Verification - visible when Availity or Waystar is enabled */}
+              {(availityEnabled || waystarEnabled) && (
+                <NavItem item={insuranceNavItem} data-testid="nav-insurance-verify" />
               )}
             </div>
 
