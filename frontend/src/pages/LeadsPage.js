@@ -4,11 +4,12 @@ import axios from 'axios';
 import {
   DndContext,
   DragOverlay,
-  closestCorners,
+  closestCenter,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
+  useDroppable,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -297,13 +298,17 @@ function KanbanColumn({ status, leads, onConvert, onCardClick, children }) {
   const StatusIcon = statusConfig.icon;
   const leadIds = leads.map(l => l.id);
 
+  // Make the column itself a drop target (critical for cross-column drops)
+  const { setNodeRef: setDropRef, isOver } = useDroppable({ id: status.value });
+
   return (
     <div 
       className={`
         flex flex-col w-80 min-w-[320px] rounded-2xl overflow-hidden
         bg-gradient-to-b ${statusConfig.bgLight} dark:from-navy-800 dark:to-navy-900
         border ${statusConfig.borderColor} dark:border-slate-700
-        shadow-sm
+        shadow-sm transition-colors duration-150
+        ${isOver ? 'ring-2 ring-inset ring-blue-400/60 bg-blue-50/40' : ''}
       `}
       data-testid={`pipeline-${status.value}`}
     >
@@ -329,7 +334,10 @@ function KanbanColumn({ status, leads, onConvert, onCardClick, children }) {
       </div>
 
       {/* Column Content - Scrollable */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-3 max-h-[calc(100vh-300px)] min-h-[200px]">
+      <div
+        ref={setDropRef}
+        className="flex-1 overflow-y-auto p-3 space-y-3 max-h-[calc(100vh-300px)] min-h-[200px]"
+      >
         <SortableContext items={leadIds} strategy={verticalListSortingStrategy}>
           {leads.map((lead) => (
             <SortableLeadCard
@@ -385,6 +393,7 @@ export default function LeadsPage() {
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState(null);
   const [activeId, setActiveId] = useState(null);
+  const [leadsSnapshot, setLeadsSnapshot] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [importing, setImporting] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -461,22 +470,29 @@ export default function LeadsPage() {
   // Drag handlers
   const handleDragStart = (event) => {
     setActiveId(event.active.id);
+    // Snapshot leads at drag start so we can revert on error
+    setLeadsSnapshot(leads);
   };
 
   const handleDragOver = (event) => {
     const { active, over } = event;
     if (!over) return;
 
-    const activeId = active.id;
+    const activeLeadId = active.id;
     const overId = over.id;
 
-    // Find containers
-    const activeContainer = findContainer(activeId);
-    const overContainer = findContainer(overId) || over.id;
+    const targetStatus = LEAD_STATUSES.find(s => s.value === overId)?.value
+      || leads.find(l => l.id === overId)?.status;
 
-    if (!activeContainer || !overContainer || activeContainer === overContainer) {
-      return;
-    }
+    if (!targetStatus) return;
+
+    const activeLead = leads.find(l => l.id === activeLeadId);
+    if (!activeLead || activeLead.status === targetStatus) return;
+
+    // Live move while dragging so the card previews in the new column
+    setLeads(prev => prev.map(l =>
+      l.id === activeLeadId ? { ...l, status: targetStatus } : l
+    ));
   };
 
   const handleDragEnd = async (event) => {
@@ -485,42 +501,33 @@ export default function LeadsPage() {
 
     if (!over) return;
 
-    const activeId = active.id;
+    const activeLeadId = active.id;
     const overId = over.id;
 
-    // Determine target status
-    let targetStatus = null;
-    
-    // Check if dropped on a column
-    const isOverColumn = LEAD_STATUSES.some(s => s.value === overId);
-    if (isOverColumn) {
-      targetStatus = overId;
-    } else {
-      // Dropped on another card - find its status
-      const overLead = leads.find(l => l.id === overId);
-      targetStatus = overLead?.status;
-    }
+    // Resolve which column the card was dropped into:
+    // 1. If dropped directly onto a column droppable (id === status.value)
+    // 2. If dropped onto another card (find that card's status)
+    let targetStatus = LEAD_STATUSES.find(s => s.value === overId)?.value
+      || leads.find(l => l.id === overId)?.status;
 
     if (!targetStatus) return;
 
-    const activeLead = leads.find(l => l.id === activeId);
+    const activeLead = leads.find(l => l.id === activeLeadId);
     if (!activeLead || activeLead.status === targetStatus) return;
 
     // Optimistic update
-    setLeads(prev => prev.map(l => 
-      l.id === activeId ? { ...l, status: targetStatus } : l
+    setLeads(prev => prev.map(l =>
+      l.id === activeLeadId ? { ...l, status: targetStatus } : l
     ));
 
-    // Update on server
+    // Persist to server
     try {
-      await axios.put(`${API_URL}/api/leads/${activeId}`, { status: targetStatus });
+      await axios.put(`${API_URL}/api/leads/${activeLeadId}`, { status: targetStatus });
       toast.success(`Moved to ${LEAD_STATUSES.find(s => s.value === targetStatus)?.label}`);
     } catch (error) {
-      // Revert on error
-      setLeads(prev => prev.map(l => 
-        l.id === activeId ? { ...l, status: activeLead.status } : l
-      ));
-      toast.error('Failed to update lead status');
+      // Revert to pre-drag snapshot
+      setLeads(leadsSnapshot);
+      toast.error('Failed to update status');
     }
   };
 
@@ -760,7 +767,7 @@ export default function LeadsPage() {
       {viewMode === 'board' ? (
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCorners}
+          collisionDetection={closestCenter}
           onDragStart={handleDragStart}
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
