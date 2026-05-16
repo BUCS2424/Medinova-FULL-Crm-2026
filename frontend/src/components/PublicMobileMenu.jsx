@@ -17,7 +17,7 @@ export const PublicMobileMenu = ({
   primaryHref = '/#contact',
   primaryLabel = 'Get Started',
   secondaryHref = 'tel:7279667767',
-  secondaryLabel = '(727) 966-7767',
+  secondaryLabel = '(248) 886-4-DME',
 }) => {
   return (
     <Sheet>

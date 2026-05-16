@@ -10,7 +10,7 @@ import {
 import { PublicBrandLogo } from '../components/PublicBrandLogo';
 import { PublicMobileMenu } from '../components/PublicMobileMenu';
 
-const SITE_DOMAIN = "https://dmepros.com";
+const SITE_DOMAIN = "https://medinovadme.com";
 
 const resourceCategories = [
   {
@@ -384,7 +384,7 @@ export default function MedicareResourcesPage() {
           <div className="grid md:grid-cols-3 gap-8 mb-8">
             <div><h3 className="text-xl font-bold mb-4">MediNova Medical Supplies</h3><p className="text-gray-400 text-sm">Medicare-accredited DME supplier serving patients nationwide.</p></div>
             <div><h4 className="font-semibold mb-4">Quick Links</h4><ul className="space-y-2 text-gray-400 text-sm"><li><a href="/" className="hover:text-white">Home</a></li><li><a href="/products" className="hover:text-white">Products</a></li><li><a href="/locations/" className="hover:text-white">Coverage Areas</a></li><li><a href="/medicare-resources" className="hover:text-lime-400 text-lime-400">Medicare Resources</a></li></ul></div>
-            <div><h4 className="font-semibold mb-4">Contact</h4><ul className="space-y-2 text-gray-400 text-sm"><li><a href="tel:2488864363" className="hover:text-white">(248) 886-4-DME</a></li><li><a href="mailto:info@dmepros.com" className="hover:text-white">info@dmepros.com</a></li></ul></div>
+            <div><h4 className="font-semibold mb-4">Contact</h4><ul className="space-y-2 text-gray-400 text-sm"><li><a href="tel:2488864363" className="hover:text-white">(248) 886-4-DME</a></li><li><a href="mailto:info@medinovadme.com" className="hover:text-white">info@medinovadme.com</a></li></ul></div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
             <p>&copy; 2025 MediNova Medical Supplies. All Rights Reserved.</p>

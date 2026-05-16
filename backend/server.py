@@ -131,11 +131,11 @@ REGION_LABELS = {
 def normalize_public_site_url(raw_url: Optional[str]) -> str:
     candidate = (raw_url or "").strip()
     if not candidate:
-        return "https://dmepros.com"
+        return "https://medinovadme.com"
 
     parsed = urlsplit(candidate if "://" in candidate else f"https://{candidate}")
     if parsed.scheme not in {"http", "https"} or not parsed.netloc:
-        return "https://dmepros.com"
+        return "https://medinovadme.com"
 
     return urlunsplit((parsed.scheme, parsed.netloc, "", "", "")).rstrip("/")
 
@@ -9109,7 +9109,7 @@ class SiteSettingsModel(BaseModel):
     dashboard_logo_link: Optional[str] = "/dashboard"
     favicon_url: Optional[str] = None
     pwa_icon_url: Optional[str] = None
-    site_domain: Optional[str] = None  # e.g. "https://dmepros.com" - used for location page URLs
+    site_domain: Optional[str] = None  # e.g. "https://medinovadme.com" - used for location page URLs
     branding_version: Optional[str] = None
 
 @api_router.get("/dev/settings/site")
@@ -10336,19 +10336,19 @@ async def test_email_send(credentials: HTTPAuthorizationCredentials = Depends(se
         smtp_username = settings.get("smtp_username")
         smtp_password = settings.get("smtp_password")
         from_email = settings.get("from_email")
-        from_name = settings.get("from_name", "DME PROS")
+        from_name = settings.get("from_name", "MediNova Medical Supplies")
         
         # Create test email
         msg = MIMEMultipart('alternative')
-        msg['Subject'] = "Test Email from DME PROS"
+        msg['Subject'] = "Test Email from MediNova Medical Supplies"
         msg['From'] = f"{from_name} <{from_email}>"
         msg['To'] = user['email']
         
         html_content = f"""
         <html>
         <body style="font-family: Arial, sans-serif; padding: 20px;">
-            <h2 style="color: #2563eb;">Email Configuration Test</h2>
-            <p>This is a test email from your DME PROS system.</p>
+            <h2 style="color: #0055CC;">Email Configuration Test</h2>
+            <p>This is a test email from your MediNova Medical Supplies system.</p>
             <p>If you're receiving this, your SMTP settings are configured correctly!</p>
             <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
             <p style="font-size: 12px; color: #666;">
@@ -11714,7 +11714,7 @@ from xml.etree.ElementTree import Element, SubElement, tostring
 from xml.dom import minidom
 
 # Site configuration for SEO
-SITE_URL = normalize_public_site_url(os.environ.get("SITE_URL", "https://dmepros.com"))
+SITE_URL = normalize_public_site_url(os.environ.get("SITE_URL", "https://medinovadme.com"))
 
 @api_router.get("/sitemap.xml")
 async def generate_sitemap():
@@ -13803,20 +13803,20 @@ def build_locations_index_html(site_domain: str, state_cards: str, stats: dict) 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DME Coverage Areas | Nationwide Coverage | DME PROS</title>
-  <meta name="description" content="DME PROS delivers Medicare-covered durable medical equipment nationwide. Search states and browse coverage details across the United States.">
+  <title>DME Coverage Areas | Nationwide Coverage | MediNova Medical Supplies</title>
+  <meta name="description" content="MediNova Medical Supplies delivers Medicare-covered durable medical equipment nationwide. Search states and browse coverage details across the United States.">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="DME Coverage Areas | Nationwide Coverage | DME PROS">
-  <meta property="og:description" content="Search DME PROS coverage areas across the United States and browse local Medicare-covered equipment delivery details.">
+  <meta property="og:title" content="DME Coverage Areas | Nationwide Coverage | MediNova Medical Supplies">
+  <meta property="og:description" content="Search MediNova Medical Supplies coverage areas across the United States and browse local Medicare-covered equipment delivery details.">
   <meta property="og:url" content="{site_domain}/locations/">
   <meta property="og:image" content="https://customer-assets.emergentagent.com/job_7965af6d-d9f9-48a9-9447-d2e9a0ead878/artifacts/e812a763_durable-medical-equipment-wheelchair.jpg">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="DME Coverage Areas | Nationwide Coverage | DME PROS">
-  <meta name="twitter:description" content="Search DME PROS coverage areas across the United States and browse local Medicare-covered equipment delivery details.">
+  <meta name="twitter:title" content="DME Coverage Areas | Nationwide Coverage | MediNova Medical Supplies">
+  <meta name="twitter:description" content="Search MediNova Medical Supplies coverage areas across the United States and browse local Medicare-covered equipment delivery details.">
   <link rel="canonical" href="{site_domain}/locations/">
   {A2G_ANALYTICS_SCRIPT}
-  <script type="application/ld+json">{{"@context":"https://schema.org","@type":"CollectionPage","name":"DME PROS Coverage Areas","url":"{site_domain}/locations/","description":"Search DME PROS coverage areas across the United States and browse local Medicare-covered equipment delivery details."}}</script>
+  <script type="application/ld+json">{{"@context":"https://schema.org","@type":"CollectionPage","name":"MediNova Medical Supplies Coverage Areas","url":"{site_domain}/locations/","description":"Search MediNova Medical Supplies coverage areas across the United States and browse local Medicare-covered equipment delivery details."}}</script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -13835,15 +13835,14 @@ def build_locations_index_html(site_domain: str, state_cards: str, stats: dict) 
   <header class="bg-[#121b2f] text-white border-b border-white/5 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
       <a href="{site_domain}/" data-brand-logo-link data-default-href="{site_domain}/" class="flex items-center gap-3">
-        <img data-brand-logo-image alt="DME PROS logo" class="h-[70px] max-w-[230px] object-contain hidden" />
-        <div class="w-11 h-11 rounded-2xl bg-[#ff9f1c] flex items-center justify-center text-white shadow-lg shadow-[#ff9f1c]/20" data-brand-logo-fallback><i data-lucide="shield-check" class="w-6 h-6"></i></div>
-        <div data-brand-logo-fallback>
-          <div class="text-2xl font-bold leading-none">DME PROS</div>
-          <div class="text-xs text-slate-400 mt-1">Medicare DME Supplier</div>
+        <img data-brand-logo-image src="/images/medinova/logo.webp" alt="MediNova Medical Supplies logo" class="h-[60px] max-w-[200px] object-contain" onerror="this.style.display='none';document.querySelectorAll('[data-brand-logo-fallback]').forEach(n=>n.style.display='')" />
+        <div data-brand-logo-fallback style="display:none">
+          <div class="text-2xl font-bold leading-none text-white">MediNova</div>
+          <div class="text-xs text-slate-400 mt-1">Medical Supplies</div>
         </div>
       </a>
       <div class="hidden md:flex items-center gap-4">
-        <a href="tel:7279667767" class="inline-flex items-center gap-2 rounded-2xl bg-[#ff9f1c] px-5 py-3 font-semibold text-white shadow-lg shadow-[#ff9f1c]/20 hover:bg-[#ffb03a] transition-colors"><i data-lucide="phone" class="w-4 h-4"></i>(727) 966-7767</a>
+        <a href="tel:2488864363" class="inline-flex items-center gap-2 rounded-2xl bg-[#0055CC] px-5 py-3 font-semibold text-white shadow-lg shadow-[#0055CC]/20 hover:bg-[#004299] transition-colors"><i data-lucide="phone" class="w-4 h-4"></i>(248) 886-4-DME</a>
         <a href="{site_domain}/login" class="text-slate-200 hover:text-white font-medium">Patient Login</a>
       </div>
       <button id="mobile-menu-btn" type="button" class="md:hidden inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 text-white hover:bg-white/5" aria-label="Open navigation menu"><i data-lucide="menu" class="w-5 h-5"></i></button>
@@ -13854,9 +13853,8 @@ def build_locations_index_html(site_domain: str, state_cards: str, stats: dict) 
   <aside id="mobile-drawer" class="mobile-drawer md:hidden" aria-hidden="true">
     <div class="flex items-start justify-between gap-4">
       <a href="{site_domain}/" data-brand-logo-link data-default-href="{site_domain}/" class="flex items-center gap-3">
-        <img data-brand-logo-image alt="DME PROS logo" class="h-[70px] max-w-[230px] object-contain hidden" />
-        <div class="w-11 h-11 rounded-2xl bg-[#ff9f1c] flex items-center justify-center text-white" data-brand-logo-fallback><i data-lucide="shield-check" class="w-6 h-6"></i></div>
-        <div data-brand-logo-fallback><div class="text-xl font-bold text-white">DME PROS</div><div class="text-xs text-slate-400">Medicare DME Supplier</div></div>
+        <img data-brand-logo-image src="/images/medinova/logo.webp" alt="MediNova Medical Supplies logo" class="h-[55px] max-w-[180px] object-contain" onerror="this.style.display='none';document.querySelectorAll('[data-brand-logo-fallback]').forEach(n=>n.style.display='')" />
+        <div data-brand-logo-fallback style="display:none"><div class="text-xl font-bold text-white">MediNova Medical Supplies</div><div class="text-xs text-slate-400">Medicare DME Supplier</div></div>
       </a>
       <button id="mobile-menu-close" type="button" class="p-2 rounded-xl text-white hover:bg-white/5" aria-label="Close navigation menu"><i data-lucide="x" class="w-6 h-6"></i></button>
     </div>
@@ -13868,8 +13866,8 @@ def build_locations_index_html(site_domain: str, state_cards: str, stats: dict) 
       <a href="{site_domain}/#contact" class="flex items-center justify-between rounded-2xl bg-white/5 px-4 py-3 font-medium text-white hover:bg-white/10">Contact<i data-lucide="arrow-right" class="w-4 h-4"></i></a>
     </nav>
     <div class="mt-auto space-y-3 border-t border-white/10 pt-6">
-      <a href="tel:7279667767" class="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 px-4 py-3 font-semibold text-white hover:bg-white/5"><i data-lucide="phone" class="w-4 h-4"></i>(727) 966-7767</a>
-      <a href="{site_domain}/login" class="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#ff9f1c] px-4 py-3 font-semibold text-white hover:bg-[#ffb03a]">Patient Login</a>
+      <a href="tel:2488864363" class="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 px-4 py-3 font-semibold text-white hover:bg-white/5"><i data-lucide="phone" class="w-4 h-4"></i>(248) 886-4-DME</a>
+      <a href="{site_domain}/login" class="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0055CC] px-4 py-3 font-semibold text-white hover:bg-[#004299]">Patient Login</a>
     </div>
   </aside>
 
@@ -14103,7 +14101,7 @@ async def api_serve_locations_index():
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["*", "https://dmepros.com", "https://www.dmepros.com"],
+    allow_origins=["*", "https://medinovadme.com", "https://www.medinovadme.com"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -14699,7 +14697,7 @@ async def send_newsletter_campaign(campaign_id: str, current_user: dict = Depend
     smtp_username = email_settings.get("smtp_username")
     smtp_password = email_settings.get("smtp_password")
     from_email = email_settings.get("from_email")
-    from_name = email_settings.get("from_name", "DME PROS")
+    from_name = email_settings.get("from_name", "MediNova Medical Supplies")
     
     try:
         # Connect to SMTP server
@@ -14728,7 +14726,7 @@ async def send_newsletter_campaign(campaign_id: str, current_user: dict = Depend
                     <br><br>
                     <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
                     <p style="font-size: 12px; color: #666; text-align: center;">
-                        You're receiving this because you signed up at DME PROS.<br>
+                        You're receiving this because you signed up at MediNova Medical Supplies.<br>
                         <a href="{unsubscribe_url}" style="color: #666;">Unsubscribe from this list</a>
                     </p>
                 """
@@ -14813,7 +14811,7 @@ async def generate_ai_newsletter(data: AINewsletterRequest, current_user: dict =
         prompt = f"""Write a professional healthcare newsletter email about: {data.subject}
 
 Tone: {data.tone}
-Company: DME PROS - A trusted durable medical equipment supplier
+Company: MediNova Medical Supplies - A trusted durable medical equipment supplier
 {product_info}
 
 Requirements:
@@ -14878,29 +14876,29 @@ Return JSON format:
         
         fallback_content = f"""
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px;">
-                <h1 style="color: white; margin: 0; font-size: 24px;">DME PROS</h1>
-                <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Your Trusted DME Partner</p>
+            <div style="background: linear-gradient(135deg, #0055CC, #0090D0); padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px;">
+                <h1 style="color: white; margin: 0; font-size: 24px;">MediNova Medical Supplies</h1>
+                <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Your Trusted Medicare DME Partner</p>
             </div>
             
             <h2 style="color: #333;">{data.subject}</h2>
             
             <p style="color: #555; line-height: 1.6;">
-                Thank you for being a valued member of the DME PROS community. We're committed to providing 
+                Thank you for being a valued member of the MediNova Medical Supplies community. We're committed to providing 
                 you with the highest quality durable medical equipment and exceptional service.
             </p>
             
             {products_html}
             
-            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 30px; text-align: center;">
+            <div style="background: #f0f4ff; padding: 20px; border-radius: 8px; margin-top: 30px; text-align: center;">
                 <p style="color: #333; margin: 0 0 15px 0;">Have questions about your DME needs?</p>
-                <a href="tel:7279667767" style="display: inline-block; background: #d97706; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-                    Call Us: (727) 966-7767
+                <a href="tel:2488864363" style="display: inline-block; background: #0055CC; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                    Call Us: (248) 886-4-DME
                 </a>
             </div>
             
             <p style="color: #888; font-size: 12px; margin-top: 30px; text-align: center;">
-                DME PROS | Quality Medical Equipment You Can Trust
+                MediNova Medical Supplies | Quality Medicare DME You Can Trust
             </p>
         </div>
         """
@@ -15461,13 +15459,13 @@ class WhisperMessage(BaseModel):
     text: str
 
 # Knowledge base for Joffry
-JOFFRY_SYSTEM_PROMPT = """You are Joffry, a friendly and professional AI assistant for DME PROS, a Medicare-certified Durable Medical Equipment (DME) supplier with Nationwide Delivery.
+JOFFRY_SYSTEM_PROMPT = """You are Joffry, a friendly and professional AI assistant for MediNova Medical Supplies, a Medicare-certified Durable Medical Equipment (DME) supplier with Nationwide Delivery.
 
-**About DME PROS:**
+**About MediNova Medical Supplies:**
 - Medicare-accredited DME supplier serving all 50 US states
-- Phone: (727) 966-7767
+- Phone: (248) 886-4-DME (4363)
 - Service Area: Nationwide Delivery across all 50 states
-- Email: info@dmepros.com
+- Email: info@medinovadme.com
 - HIPAA compliant, dedicated to patient privacy and care
 
 **Our Products:**
@@ -15551,7 +15549,7 @@ async def start_chat_session(
     welcome_message = {
         "id": str(uuid.uuid4()),
         "type": ChatMessageType.AI,
-        "text": "Hi there! 👋 I'm Joffry, your virtual assistant at DME PROS. I'm here to help you learn about our Medicare-covered medical equipment. How can I assist you today?",
+        "text": "Hi there! 👋 I'm Joffry, your virtual assistant at MediNova Medical Supplies. I'm here to help you learn about our Medicare-covered medical equipment. How can I assist you today?",
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
     
@@ -16104,7 +16102,7 @@ async def close_chat(
     system_message = {
         "id": str(uuid.uuid4()),
         "type": ChatMessageType.SYSTEM,
-        "text": "This chat session has been closed. Thank you for contacting DME PROS!",
+        "text": "This chat session has been closed. Thank you for contacting MediNova Medical Supplies!",
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
     

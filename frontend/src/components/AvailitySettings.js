@@ -117,7 +117,7 @@ export default function AvailitySettings() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label>Organization Name</Label>
-            <Input data-testid="availity-org-name-input" value={config.organization_name} onChange={(e) => setConfig({ ...config, organization_name: e.target.value })} placeholder="e.g., DME PROSical Equipment" />
+            <Input data-testid="availity-org-name-input" value={config.organization_name} onChange={(e) => setConfig({ ...config, organization_name: e.target.value })} placeholder="e.g., MediNova Medical Supplies" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">

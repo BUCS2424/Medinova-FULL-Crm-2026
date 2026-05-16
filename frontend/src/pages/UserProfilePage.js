@@ -157,7 +157,7 @@ export default function UserProfilePage() {
       if (permission === 'granted') {
         toast.success('Desktop notifications enabled!');
         // Send test notification
-        new Notification('DME PROS', {
+        new Notification('MediNova Medical Supplies', {
           body: 'You will now receive desktop notifications for chats and alerts.',
           icon: '/favicon.ico'
         });

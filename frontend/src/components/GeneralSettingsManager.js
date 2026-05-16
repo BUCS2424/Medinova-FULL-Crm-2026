@@ -582,7 +582,7 @@ export default function GeneralSettingsManager() {
                 {/* Production Domain */}
                 <div className="space-y-2 pt-4 border-t">
                   <Label className="flex items-center gap-2"><Globe className="w-4 h-4" />Production Domain <Badge variant="outline" className="text-xs">SEO Critical</Badge></Label>
-                  <Input value={siteSettings.site_domain} onChange={(e) => setSiteSettings(prev => ({ ...prev, site_domain: e.target.value }))} placeholder="https://dmepros.com" data-testid="site-domain-input" />
+                  <Input value={siteSettings.site_domain} onChange={(e) => setSiteSettings(prev => ({ ...prev, site_domain: e.target.value }))} placeholder="https://medinovadme.com" data-testid="site-domain-input" />
                   <p className="text-xs text-muted-foreground">Used for generated location page links. Include https://</p>
                 </div>
 

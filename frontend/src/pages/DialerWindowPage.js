@@ -664,7 +664,7 @@ export default function DialerWindowPage() {
       client.newCall({
         destinationNumber: formattedNumber,
         callerNumber: sipCredentials?.phone_number || '',
-        callerName: sipCredentials?.caller_name || 'DME PROSical',
+        callerName: sipCredentials?.caller_name || 'MediNova Medical Supplies',
         audio: true,
         video: false
       });

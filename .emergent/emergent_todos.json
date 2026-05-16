@@ -1,50 +1,14 @@
 [
   {
-    "content": "Download and place MediNova assets (logo, hero image)",
+    "content": "Fix all DME PROS references in server.py (email, CORS, site URL, AI assistant, templates)",
     "status": "completed"
   },
   {
-    "content": "Update landing.html - full MediNova theme (blue gradient, hero, benefits, about, FAQ, testimonials, contact, footer)",
+    "content": "Fix all DME PROS references in frontend src/ files",
     "status": "completed"
   },
   {
-    "content": "Update LandingPage.js meta tags - MediNova branding",
-    "status": "completed"
-  },
-  {
-    "content": "Update App.css - color scheme from lime/navy to blue gradient",
-    "status": "completed"
-  },
-  {
-    "content": "Update index.css CSS variables - primary from lime to blue",
-    "status": "completed"
-  },
-  {
-    "content": "Update tailwind.config.js - remap lime palette to blue",
-    "status": "completed"
-  },
-  {
-    "content": "Update Layout.js - sidebar MediNova logo and branding",
-    "status": "completed"
-  },
-  {
-    "content": "Update LoginPage.js - MediNova logo and blue accents",
-    "status": "completed"
-  },
-  {
-    "content": "Update index.html - MediNova page title and SEO meta",
-    "status": "completed"
-  },
-  {
-    "content": "Update all DME PROS text references to MediNova across components",
-    "status": "completed"
-  },
-  {
-    "content": "Update PublicBrandLogo.jsx fallback to MediNova logo",
-    "status": "completed"
-  },
-  {
-    "content": "Verify compilation and visual test",
+    "content": "Fix DME PROS references in location_page.py template",
     "status": "completed"
   }
 ]

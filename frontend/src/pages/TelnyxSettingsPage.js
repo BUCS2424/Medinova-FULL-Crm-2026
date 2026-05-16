@@ -135,7 +135,7 @@ export default function TelnyxSettingsPage() {
   // IVR Configuration
   const [ivrConfig, setIvrConfig] = useState({
     enabled: true,
-    greeting: "Thank you for calling DME PROSical Equipment. ",
+    greeting: "Thank you for calling MediNova Medical Supplies. ",
     main_menu: "Press 1 for Sales and new orders. Press 2 for Support and existing orders. Press 3 for Billing. Press 4 to check your eligibility. Press 0 to speak with an operator.",
     sales_menu: "You've reached Sales. Press 1 to speak with a representative, or press 0 to return to the main menu.",
     support_menu: "You've reached Support. Press 1 for order status. Press 2 for technical support. Press 0 to return to the main menu.",
@@ -1102,8 +1102,7 @@ export default function TelnyxSettingsPage() {
                         id="voice_caller_name"
                         value={voiceConfig.caller_name || ''}
                         onChange={(e) => setVoiceConfig(prev => ({ ...prev, caller_name: e.target.value }))}
-                        placeholder="DME PROSical"
-                        maxLength={15}
+                        placeholder="MediNova Medical Supplies"                        maxLength={15}
                       />
                       <p className="text-xs text-muted-foreground">Business name shown on recipient's caller ID (max 15 chars)</p>
                     </div>
@@ -1256,7 +1255,7 @@ export default function TelnyxSettingsPage() {
                     id="fax_caller_name"
                     value={faxConfig.caller_name || ''}
                     onChange={(e) => setFaxConfig(prev => ({ ...prev, caller_name: e.target.value }))}
-                    placeholder="DME PROSical"
+                    placeholder="MediNova"
                     maxLength={15}
                   />
                   <p className="text-xs text-muted-foreground">Business name shown on recipient's fax header (max 15 chars)</p>

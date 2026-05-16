@@ -83,7 +83,7 @@ export default function VoiceSettingsPage() {
   // IVR Configuration
   const [ivrConfig, setIvrConfig] = useState({
     enabled: true,
-    greeting: "Thank you for calling DME PROSical Equipment. ",
+    greeting: "Thank you for calling MediNova Medical Supplies. ",
     main_menu: "Press 1 for Sales and new orders. Press 2 for Support and existing orders. Press 3 for Billing. Press 4 to check your eligibility. Press 0 to speak with an operator.",
     sales_menu: "You've reached Sales. Press 1 to speak with a representative, or press 0 to return to the main menu.",
     support_menu: "You've reached Support. Press 1 for order status. Press 2 for technical support. Press 0 to return to the main menu.",

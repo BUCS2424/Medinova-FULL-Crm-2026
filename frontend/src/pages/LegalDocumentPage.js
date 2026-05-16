@@ -348,14 +348,14 @@ export default function LegalDocumentPage() {
                   className="inline-flex items-center gap-2 bg-white border border-slate-200 hover:border-lime-300 hover:bg-lime-50 px-4 py-2 rounded-lg text-slate-700 hover:text-lime-700 transition-all"
                 >
                   <Phone className="w-4 h-4" />
-                  (727) 966-7767
+                  (248) 886-4-DME (4363)
                 </a>
                 <a 
-                  href="mailto:info@dmepros.com" 
+                  href="mailto:info@medinovadme.com" 
                   className="inline-flex items-center gap-2 bg-white border border-slate-200 hover:border-lime-300 hover:bg-lime-50 px-4 py-2 rounded-lg text-slate-700 hover:text-lime-700 transition-all"
                 >
                   <Mail className="w-4 h-4" />
-                  info@dmepros.com
+                  info@medinovadme.com
                 </a>
               </div>
             </div>
@@ -420,7 +420,7 @@ function Header() {
             className="hidden md:flex items-center gap-2 text-slate-600 hover:text-lime-600 transition-colors"
           >
             <Phone className="w-4 h-4" />
-            <span className="text-sm font-medium">(727) 966-7767</span>
+            <span className="text-sm font-medium">(248) 886-4-DME</span>
           </a>
           <Link 
             to="/"
@@ -485,13 +485,13 @@ function Footer({ links = [], currentSlug }) {
               <li>
                 <a href="tel:7279667767" className="flex items-center gap-2 hover:text-white transition-colors">
                   <Phone className="w-4 h-4" />
-                  (727) 966-7767
+                  (248) 886-4-DME (4363)
                 </a>
               </li>
               <li>
-                <a href="mailto:info@dmepros.com" className="flex items-center gap-2 hover:text-white transition-colors">
+                <a href="mailto:info@medinovadme.com" className="flex items-center gap-2 hover:text-white transition-colors">
                   <Mail className="w-4 h-4" />
-                  info@dmepros.com
+                  info@medinovadme.com
                 </a>
               </li>
               <li className="flex items-start gap-2">

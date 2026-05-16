@@ -269,7 +269,7 @@ def generate_full_location_page_html(
 <meta name="twitter:description" content="{description}">
 <meta name="twitter:image" content="{og_image_url}">
 <meta name="twitter:image:alt" content="MediNova Medical Supplies serving {loc_name} with Medicare-covered medical equipment">
-<meta name="twitter:site" content="@dmepros">
+<meta name="twitter:site" content="@medinovadme">
 
 <!-- SEO -->
 <meta name="googlebot" content="index, follow">
@@ -301,8 +301,8 @@ def generate_full_location_page_html(
   "priceRange": "$0 - Covered by Medicare",
   "openingHours": "Mo-Th 09:30-17:30",
   "sameAs": [
-    "https://www.facebook.com/dmepros",
-    "https://www.instagram.com/dmepros"
+    "https://www.facebook.com/medinovadme",
+    "https://www.instagram.com/medinovadme"
   ],
   "hasOfferCatalog": {{
     "@type": "OfferCatalog",
