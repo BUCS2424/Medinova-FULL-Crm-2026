@@ -721,6 +721,165 @@
         </div>
     </section>
 
+    <!-- Medicare-Covered Products Section -->
+    <section class="py-28 bg-gradient-to-b from-white via-slate-50/60 to-slate-50/80 relative overflow-hidden">
+        <div class="absolute top-20 left-0 w-96 h-96 bg-[#00A3E0]/5 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-10 right-0 w-80 h-80 bg-[#0055CC]/4 rounded-full blur-3xl"></div>
+        <div class="max-w-4xl mx-auto px-4 relative">
+            <!-- Section Header -->
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-full text-[#0055CC] text-sm font-medium shadow-sm mb-8">
+                    <i data-lucide="stethoscope" class="w-4 h-4"></i>
+                    Medical Equipment
+                </div>
+                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6" style="font-family: 'Manrope', sans-serif; letter-spacing: -0.02em;">
+                    Medicare-Covered <span class="gradient-text">Durable Medical Equipment</span>
+                </h2>
+                <p class="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed" style="font-family: 'Inter', sans-serif;">
+                    We provide knee braces, back braces, wheelchairs, CPAP machines, blood pressure monitors, and more — all covered by Medicare. Click any category below to see available products.
+                </p>
+            </div>
+
+            <!-- Product Categories List -->
+            <div class="space-y-5" id="product-categories-list">
+                <!-- Loading state -->
+                <div id="products-loading" class="text-center py-8 text-gray-400">
+                    <div class="animate-spin w-6 h-6 border-2 border-[#0055CC] border-t-transparent rounded-full mx-auto mb-3"></div>
+                    Loading categories...
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Fetch product categories from API and render them
+        (async function loadProductCategories() {
+            const container = document.getElementById('product-categories-list');
+            const loading = document.getElementById('products-loading');
+            
+            // Category icon mapping
+            const categoryIcons = {
+                'orthopedic': 'bone',
+                'orthotics': 'bone',
+                'emergency': 'activity',
+                'monitoring': 'activity',
+                'mobility': 'accessibility',
+                'respiratory': 'wind',
+                'bathroom': 'bath',
+                'safety': 'shield',
+                'default': 'package'
+            };
+
+            function getIconForCategory(name) {
+                const lower = name.toLowerCase();
+                for (const [key, icon] of Object.entries(categoryIcons)) {
+                    if (lower.includes(key)) return icon;
+                }
+                return categoryIcons.default;
+            }
+
+            try {
+                // Fetch both categories and products in parallel to get counts
+                const [catRes, prodRes] = await Promise.all([
+                    fetch('/api/public/product-categories'),
+                    fetch('/api/public/products')
+                ]);
+                
+                if (!catRes.ok) throw new Error('Failed to fetch categories');
+                const categories = await catRes.json();
+                
+                // Count products per category
+                let productCounts = {};
+                if (prodRes.ok) {
+                    const products = await prodRes.json();
+                    if (Array.isArray(products)) {
+                        products.forEach(p => {
+                            const catId = p.category_id || '';
+                            productCounts[catId] = (productCounts[catId] || 0) + 1;
+                        });
+                    }
+                }
+                
+                if (!categories || categories.length === 0) {
+                    loading.innerHTML = '';
+                    container.innerHTML = buildStaticCategories();
+                    lucide.createIcons();
+                    return;
+                }
+
+                loading.remove();
+                
+                categories.forEach((cat, index) => {
+                    const productCount = productCounts[cat.id] || 0;
+                    const icon = getIconForCategory(cat.name);
+                    const card = document.createElement('a');
+                    card.href = '/products';
+                    card.className = 'group flex items-center justify-between bg-white rounded-[20px] border border-slate-100/80 shadow-[0_2px_16px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_30px_rgba(0,85,204,0.08)] hover:border-slate-200 transition-all duration-400 px-6 py-5 cursor-pointer';
+                    card.style.animationDelay = `${index * 0.08}s`;
+                    card.innerHTML = `
+                        <div class="flex items-center gap-5">
+                            <div class="w-14 h-14 rounded-2xl bg-[#E8F2FF] flex items-center justify-center flex-shrink-0 group-hover:bg-gradient-to-br group-hover:from-[#3B8BF5] group-hover:to-[#0055CC] transition-all duration-400">
+                                <i data-lucide="${icon}" class="w-6 h-6 text-[#0055CC] group-hover:text-white transition-colors duration-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-[17px] font-bold text-gray-900 group-hover:text-[#0055CC] transition-colors" style="font-family: 'Manrope', sans-serif;">${cat.name}</h3>
+                                <p class="text-[14px] text-gray-500 mt-0.5" style="font-family: 'Inter', sans-serif;">${cat.description || ''}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 flex-shrink-0">
+                            ${productCount > 0 ? `
+                            <span class="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-[13px] text-gray-500 font-medium">
+                                <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                                ${productCount} products
+                            </span>` : ''}
+                            <div class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center group-hover:bg-[#0055CC] group-hover:border-[#0055CC] transition-all duration-400">
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 group-hover:text-white transition-colors duration-400"></i>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+                
+                lucide.createIcons();
+            } catch (e) {
+                loading.innerHTML = '';
+                container.innerHTML = buildStaticCategories();
+                lucide.createIcons();
+            }
+
+            function buildStaticCategories() {
+                const staticCats = [
+                    { name: 'Orthopedic / Orthotics', desc: 'Braces for back, knee, ankle, wrist & more', icon: 'bone', count: 7 },
+                    { name: 'Emergency / Monitoring', desc: 'Medical monitoring equipment for home use', icon: 'activity', count: 4 },
+                    { name: 'Mobility Equipment', desc: 'Wheelchairs, walkers and mobility aids', icon: 'accessibility', count: 4 }
+                ];
+                return staticCats.map((cat, i) => `
+                    <a href="/products" class="group flex items-center justify-between bg-white rounded-[20px] border border-slate-100/80 shadow-[0_2px_16px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_30px_rgba(0,85,204,0.08)] hover:border-slate-200 transition-all duration-400 px-6 py-5 cursor-pointer">
+                        <div class="flex items-center gap-5">
+                            <div class="w-14 h-14 rounded-2xl bg-[#E8F2FF] flex items-center justify-center flex-shrink-0 group-hover:bg-gradient-to-br group-hover:from-[#3B8BF5] group-hover:to-[#0055CC] transition-all duration-400">
+                                <i data-lucide="${cat.icon}" class="w-6 h-6 text-[#0055CC] group-hover:text-white transition-colors duration-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-[17px] font-bold text-gray-900 group-hover:text-[#0055CC] transition-colors" style="font-family: 'Manrope', sans-serif;">${cat.name}</h3>
+                                <p class="text-[14px] text-gray-500 mt-0.5" style="font-family: 'Inter', sans-serif;">${cat.desc}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 flex-shrink-0">
+                            <span class="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-[13px] text-gray-500 font-medium">
+                                <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                                ${cat.count} products
+                            </span>
+                            <div class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center group-hover:bg-[#0055CC] group-hover:border-[#0055CC] transition-all duration-400">
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 group-hover:text-white transition-colors duration-400"></i>
+                            </div>
+                        </div>
+                    </a>
+                `).join('');
+            }
+        })();
+    </script>
+
+
     <!-- FAQ Section -->
     <section class="py-24 bg-gradient-to-br from-slate-50 via-blue-50/30 to-white relative overflow-hidden">
         <div class="absolute top-0 right-0 w-96 h-96 bg-[#00A3E0]/5 rounded-full blur-3xl"></div>
