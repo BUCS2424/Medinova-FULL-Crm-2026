@@ -31,7 +31,15 @@
   - Fixed LegalDocumentPage styling to MediNova blue
   - Fixed favicon wiring globally
   - Fixed StorageSettings.js + GeneralSettingsManager.js silent auth failures (settings save now works)
-- [x] **URL Audit & Fixes (2026-05-16)**:
+- [x] **Availity & Waystar Integration Wiring (2026-05-16)**:
+  - `InsuranceVerificationPage.js` created — unified eligibility hub with Availity/Waystar tabs, form, result panel, recent checks log, "not configured" state
+  - `/insurance-verification` route added to App.js
+  - Sidebar nav item `Insurance Verify` added to Layout.js — only appears when `availity_integration` OR `waystar_integration` feature toggle is ON
+  - `lead-check-eligibility-button` added to LeadDetailPage.js — modal pre-fills patient name/insurance from lead record, runs real-time check and updates lead status to `verifying_insurance`
+  - All Waystar endpoints secured with `Depends(verify_token)` JWT auth (previously config/status/eligibility/claims/logs were open)
+  - Log endpoint URL mismatch fixed (`/activity/logs` → `/logs`)
+
+
   - Fixed `/locations/michigan` (and any clean state slug) → was returning "Page Not Found" because `LocationDetailPage.js` built wrong API URL. Now normalizes to `durable-medical-equipment-in-{slug}.html` format
   - Fixed `/legal/terms-and-conditions` footer link → corrected to `/legal/terms-of-service` (matching actual DB slug)
   - Added missing HIPAA Notice + Accessibility footer links in `landing.html`

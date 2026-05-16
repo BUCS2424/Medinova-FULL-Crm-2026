@@ -228,17 +228,22 @@ export default function InsuranceVerificationPage() {
         </Button>
       </div>
 
-      {/* Status Banner — Not Configured */}
+      {/* Status Banner */}
       {!loadingStatus && !anyConfigured && (
         <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4" data-testid="not-configured-banner">
           <AlertTriangle className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" />
           <div>
-            <p className="font-medium text-amber-800">No integration configured</p>
+            <p className="font-medium text-amber-800">
+              {(availityStatus?.configured === false || waystarStatus?.configured === false)
+                ? 'Credentials not yet entered'
+                : 'No integration enabled'}
+            </p>
             <p className="text-sm text-amber-700 mt-0.5">
-              Enable Availity or Waystar in Features, then enter credentials in{' '}
+              Enter your API credentials in{' '}
               <a href="/admin-settings?tab=availity" className="underline font-medium hover:no-underline">Admin Settings → Availity</a>
               {' '}or{' '}
-              <a href="/admin-settings?tab=waystar" className="underline font-medium hover:no-underline">Waystar</a>.
+              <a href="/admin-settings?tab=waystar" className="underline font-medium hover:no-underline">Waystar</a>
+              {' '}to activate live eligibility checks.
             </p>
           </div>
         </div>
