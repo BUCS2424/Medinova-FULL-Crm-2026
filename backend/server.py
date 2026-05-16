@@ -17420,5 +17420,44 @@ except Exception as e:
     logger.error(f"Error loading Lead Intake Hub routes: {e}")
 
 
+# ─── Location Generator V2 ─────────────────────────────────────────────────
+try:
+    from routes.page_generators import build_router as _build_pg_router
+    from routes.public_pages import build_public_router as _build_public_router
+    from routes.seo_pages import build_seo_router as _build_seo_router
+    from services.component_namespace import api_ns_segment
+
+    _NS_SEG = api_ns_segment()  # "/v2" when namespace is "v2"
+
+    # Build routers with db + auth dependencies
+    _pg_router = _build_pg_router(
+        db,
+        require_perm_dep=get_current_user,
+        require_super_dep=require_roles(UserRole.SUPER_ADMIN),
+        get_user_dep=get_current_user,
+    )
+    _public_router = _build_public_router(db)
+    _seo_router = _build_seo_router(db)
+
+    # Admin API
+    app.include_router(_pg_router, prefix=f"/api{_NS_SEG}")
+
+    # Public pages — root + /api mirror
+    app.include_router(_public_router)
+    app.include_router(_public_router, prefix="/api")
+    app.include_router(_public_router, prefix=f"/api{_NS_SEG}/public")
+
+    # SEO: sitemap + robots
+    app.include_router(_seo_router)
+    app.include_router(_seo_router, prefix="/api")
+    app.include_router(_seo_router, prefix=f"/api{_NS_SEG}/public")
+
+    logger.info(f"Location Generator V2 routes loaded (namespace={_NS_SEG or '(root)'})")
+except ImportError as e:
+    logger.warning(f"Location Generator V2 not loaded: {e}")
+except Exception as e:
+    logger.error(f"Error loading Location Generator V2: {e}", exc_info=True)
+
+
 # Include router (MUST be at the end after all routes are defined)
 app.include_router(api_router)

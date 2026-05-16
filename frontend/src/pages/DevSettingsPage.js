@@ -66,7 +66,8 @@ import {
   Lock,
   Key,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  Star
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -88,6 +89,7 @@ const devMenuItems = [
   { id: 'site-rules', icon: FileText, label: 'Site Rules', description: 'Manage site rules by area' },
   { id: 'page-generator', icon: FileCode, label: 'SEO Location Generator', description: 'Generate SEO landing pages for all 50 states' },
   { id: 'location-generator', icon: MapPin, label: 'Location Generator', description: 'Generate state/county/city pages' },
+  { id: 'location-generator-v2', icon: MapPin, label: 'Location Generator V2', description: 'Programmatic SEO — 50 states × counties × cities', labelSuffix: <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 ml-1 inline-block" /> },
   { id: 'seo-tools', icon: Globe, label: 'SEO & Search Engines', description: 'Submit to Google, Bing & more' },
   { id: 'directory-submission', icon: Building, label: 'Directory Submission', description: 'Submit to free business directories' },
   { id: 'products', icon: Package, label: 'Products', description: 'Manage product catalog' },
@@ -859,7 +861,7 @@ export default function DevSettingsPage() {
             >
               <item.icon className="w-5 h-5 flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-sm truncate">{item.label}</p>
+                <p className="font-medium text-sm truncate flex items-center">{item.label}{item.labelSuffix}</p>
                 <p className={`text-xs truncate ${activeDevTool === item.id ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
                   {item.description}
                 </p>
@@ -2097,6 +2099,38 @@ export default function DevSettingsPage() {
       {/* Location Generator */}
       {activeDevTool === 'location-generator' && (
         <LocationGenerator />
+      )}
+
+      {/* Location Generator V2 — Programmatic SEO */}
+      {activeDevTool === 'location-generator-v2' && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+            <h2 className="text-xl font-semibold">Location Generator V2</h2>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Programmatic SEO engine — generates pages for every state, county, and city in the US.
+            Click <strong>Open Full Editor</strong> to create generators and bulk-generate thousands of location pages.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+              onClick={() => navigate('/dev-settings/page-generator')}
+              className="gap-2"
+              data-testid="open-loc-gen-v2-btn"
+            >
+              <FileCode className="h-4 w-4" />
+              Open Full Editor
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => window.open('/coverage-areas', '_blank')}
+              className="gap-2"
+            >
+              <Globe className="h-4 w-4" />
+              View Coverage Areas
+            </Button>
+          </div>
+        </div>
       )}
 
       {/* SEO & Search Engine Tools */}

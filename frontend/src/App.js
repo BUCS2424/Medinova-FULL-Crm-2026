@@ -51,6 +51,9 @@ import VideoRoomPage from "./pages/VideoRoomPage";
 import CampaignPage from "./pages/CampaignPage";
 import MedicareResourcesPage from "./pages/MedicareResourcesPage";
 import StayUpToDatePage from "./pages/StayUpToDatePage";
+import CoverageAreaPage from "./pages/CoverageAreaPage";
+import DevPageGenerator from "./pages/DevPageGenerator";
+import PageGeneratorEditor from "./pages/PageGeneratorEditor";
 
 // Components
 import Layout from "./components/Layout";
@@ -437,6 +440,37 @@ function AppRoutes() {
 
       {/* Legal Documents (Public) */}
       <Route path="/legal/:slug" element={<LegalDocumentPage />} />
+
+      {/* Location Generator V2 — Public coverage area pages */}
+      <Route path="/coverage-areas" element={<CoverageAreaPage />} />
+      <Route path="/coverage-areas/:product_slug" element={<CoverageAreaPage />} />
+      <Route path="/coverage-areas/:product_slug/:page_slug" element={<CoverageAreaPage />} />
+
+      {/* Location Generator V2 — Admin pages */}
+      <Route
+        path="/dev-settings/page-generator"
+        element={
+          <ProtectedRoute>
+            <DevPageGenerator />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dev-settings/page-generator/new"
+        element={
+          <ProtectedRoute>
+            <PageGeneratorEditor />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dev-settings/page-generator/:id"
+        element={
+          <ProtectedRoute>
+            <PageGeneratorEditor />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Default - show landing page */}
       <Route path="/" element={<LandingPage />} />
