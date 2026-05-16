@@ -645,8 +645,14 @@ Medicare Accredited
 </ul>
 </div>
 </div>
-<div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
+<div class="border-t border-gray-700 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-gray-400 text-sm">
 <p>&copy; 2025 MediNova Medical Supplies. All rights reserved.</p>
+<div class="flex flex-wrap gap-x-5 gap-y-2 justify-center">
+<a href="{SITE_DOMAIN}/legal/privacy-policy" class="hover:text-blue-400 transition-colors">Privacy Policy</a>
+<a href="{SITE_DOMAIN}/legal/terms-of-service" class="hover:text-blue-400 transition-colors">Terms of Service</a>
+<a href="{SITE_DOMAIN}/legal/hipaa-notice" class="hover:text-blue-400 transition-colors">HIPAA Notice</a>
+<a href="{SITE_DOMAIN}/legal/accessibility" class="hover:text-blue-400 transition-colors">Accessibility</a>
+</div>
 </div>
 </div>
 </footer>

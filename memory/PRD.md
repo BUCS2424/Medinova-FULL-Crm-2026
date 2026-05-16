@@ -31,7 +31,16 @@
   - Fixed LegalDocumentPage styling to MediNova blue
   - Fixed favicon wiring globally
   - Fixed StorageSettings.js + GeneralSettingsManager.js silent auth failures (settings save now works)
-- [x] **Landing Page Visual Overhaul (2026-05-16)**:
+- [x] **URL Audit & Fixes (2026-05-16)**:
+  - Fixed `/locations/michigan` (and any clean state slug) → was returning "Page Not Found" because `LocationDetailPage.js` built wrong API URL. Now normalizes to `durable-medical-equipment-in-{slug}.html` format
+  - Fixed `/legal/terms-and-conditions` footer link → corrected to `/legal/terms-of-service` (matching actual DB slug)
+  - Added missing HIPAA Notice + Accessibility footer links in `landing.html`
+  - Updated footer product links from generic `/products` to proper category slugs (`dme-orthopedic-orthotics`, `dme-mobility-equipment`, `dme-respiratory-equipment`, `dme-emergency-monitoring`)
+  - Added `Medicare Resources` to footer Quick Links
+  - Added legal links (Privacy, Terms, HIPAA, Accessibility) to location page template footer
+  - Fixed spinner color in `LocationDetailPage.js` from lime green to MediNova blue
+
+
   - Switched typography to **Figtree** (Google Fonts); CSS `--font-sans` variable overrides all inline font-family styles
   - Added full CSS design token system (`:root` `--mn-*` variables for color, shadow, radius, font)
   - Glassmorphism sticky nav with `backdrop-filter: blur(14px)` + scroll-triggered shadow (`mn-scrolled` class via JS)
