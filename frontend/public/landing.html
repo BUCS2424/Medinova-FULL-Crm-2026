@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1e3a5f">
+    
+    <!-- Primary SEO Meta Tags -->
+    <title>DME PROS | Medicare-Covered Medical Equipment - Nationwide Delivery</title>
+    <meta name="description" content="Get Medicare-covered durable medical equipment with free delivery. Back braces, knee braces, wheelchairs & more. HIPAA compliant, Medicare accredited supplier. Call (727) 966-7767.">
+    <meta name="author" content="DME PROS">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="keywords" content="Medicare DME, durable medical equipment, back braces, knee braces, wheelchairs, walkers, medical equipment nationwide delivery">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="DME PROS | Medicare-Covered Medical Equipment">
+    <meta property="og:description" content="Get back braces, knee braces, wheelchairs & more covered by Medicare. Free delivery to your door. HIPAA compliant, accredited supplier - Nationwide Delivery.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&h=630&fit=crop">
+    <meta property="og:image:alt" content="DME PROS medical equipment support team and patient care">
+    <meta property="og:url" content="https://dmepros.com">
+    <meta property="og:site_name" content="DME PROS">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="DME PROS | Medicare-Covered Medical Equipment">
+    <meta name="twitter:description" content="Get back braces, knee braces, wheelchairs & more covered by Medicare. Free delivery. HIPAA compliant, accredited supplier.">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&h=630&fit=crop">
+    <meta name="twitter:image:alt" content="DME PROS medical equipment support team and patient care">
+    <meta name="twitter:url" content="https://dmepros.com">
+    <meta name="twitter:site" content="@dmepros">
+
+    <!-- Additional SEO -->
+    <meta name="geo.region" content="US">
+    <meta name="geo.placename" content="Nationwide">
+    
+    <link rel="canonical" href="https://dmepros.com">
+    <script data-host="https://a2ganalytics.com" data-dnt="false" src="https://a2ganalytics.com/js/script.js" id="ZwSg9rf6GA" async defer></script>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#84CC16',
+                            600: '#65a30d',
+                            700: '#4d7c0f'
+                        },
+                        navy: {
+                            700: '#1e3a5f',
+                            800: '#172e4d',
+                            900: '#0f1f33'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        html { scroll-behavior: smooth; }
+        
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .animate-fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 1.5rem;
+            max-width: 700px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        
+        /* Form steps */
+        .step { display: none; }
+        .step.active { display: block; }
+        
+        /* Selection cards */
+        .selection-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .selection-card:hover {
+            border-color: #84CC16;
+            background: #f0fdf4;
+        }
+        .selection-card.selected {
+            border-color: #84CC16;
+            background: #dcfce7;
+        }
+
+        .mobile-drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+            z-index: 80;
+        }
+
+        .mobile-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: min(86vw, 360px);
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(14px);
+            border-left: 1px solid rgba(226,232,240,0.9);
+            box-shadow: -20px 0 50px rgba(15, 23, 42, 0.18);
+            transform: translateX(100%);
+            transition: transform 0.25s ease;
+            z-index: 90;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            gap: 1.5rem;
+        }
+
+        body.mobile-drawer-open .mobile-drawer-overlay {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        body.mobile-drawer-open .mobile-drawer {
+            transform: translateX(0);
+        }
+
+        /* Embedded mode for phased native migration */
+        body.embed-rest #landing-top-bar,
+        body.embed-rest #landing-header,
+        body.embed-rest #landing-hero {
+            display: none !important;
+        }
+    </style>
+    
+    <!-- Schema Markup -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "MedicalBusiness",
+        "name": "DME PROS",
+        "description": "Medicare-enrolled and accredited DME supplier providing durable medical equipment including back braces, knee braces, wheelchairs, walkers, and more with free delivery.",
+        "url": "https://dmepros.com",
+        "telephone": "+1-727-966-7767",
+        "email": "info@dmepros.com",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Nationwide Delivery",
+            "addressLocality": "USA",
+            "addressRegion": "All 50 States",
+            "addressCountry": "US"
+        }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "DME PROS",
+        "url": "https://dmepros.com",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://dmepros.com/products?search={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+</head>
+<body class="bg-white">
+    <script>
+        if (new URLSearchParams(window.location.search).get('embed') === 'rest') {
+            document.body.classList.add('embed-rest');
+        }
+    </script>
+    
+    <!-- Top Bar -->
+    <div id="landing-top-bar" class="bg-navy-700 text-white py-2.5 px-4">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between text-sm">
+            <div class="flex items-center gap-6 flex-wrap">
+                <a href="tel:7279667767" class="flex items-center gap-2 hover:text-primary-500 transition-colors">
+                    <i data-lucide="phone" class="w-4 h-4"></i>
+                    <span class="font-medium">(727) 966-7767</span>
+                </a>
+                <span class="hidden md:flex items-center gap-2 text-gray-300">
+                    <i data-lucide="map-pin" class="w-4 h-4"></i>
+                    <span>Nationwide Delivery</span>
+                </span>
+                <span class="hidden lg:flex items-center gap-2 text-gray-300">
+                    <i data-lucide="clock" class="w-4 h-4"></i>
+                    <span>Mon-Thu 9:30am - 5:30pm EST</span>
+                </span>
+            </div>
+            <a href="/login" class="flex items-center gap-2 hover:text-primary-500 transition-colors">
+                <i data-lucide="user" class="w-4 h-4"></i>
+                <span>Patient Login</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header id="landing-header" class="bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm py-4 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <a href="/" class="flex items-center gap-2" data-brand-logo-link data-default-href="/">
+                    <img data-brand-logo-image alt="DME PROS logo" class="h-[70px] max-w-[230px] object-contain hidden" />
+                    <span data-brand-logo-fallback class="text-2xl font-extrabold text-navy-700">DME</span>
+                    <span data-brand-logo-fallback class="text-2xl font-extrabold text-primary-500">PROS</span>
+                </a>
+                
+                <!-- Desktop Nav -->
+                <nav class="hidden lg:flex items-center gap-8">
+                    <a href="/products" class="text-navy-700 hover:text-primary-600 font-medium transition-colors">Products</a>
+                    <a href="/locations" class="text-navy-700 hover:text-primary-600 font-medium transition-colors">Coverage Areas</a>
+                    <a href="#about" class="text-navy-700 hover:text-primary-600 font-medium transition-colors">About</a>
+                    <a href="#contact" class="text-navy-700 hover:text-primary-600 font-medium transition-colors">Contact</a>
+                    <a href="#contact" class="bg-primary-500 hover:bg-primary-600 text-white px-6 py-2.5 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all">
+                        Get Started
+                    </a>
+                </nav>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="lg:hidden p-2 text-navy-700 hover:bg-gray-100 rounded-xl" aria-label="Open navigation menu" data-testid="landing-mobile-menu-button">
+                    <i data-lucide="menu" class="w-7 h-7"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div id="mobile-drawer-overlay" class="mobile-drawer-overlay lg:hidden"></div>
+    <aside id="mobile-drawer" class="mobile-drawer lg:hidden" aria-hidden="true" data-testid="landing-mobile-drawer">
+        <div class="flex items-start justify-between gap-4">
+            <a href="/" class="flex items-center gap-2" data-brand-logo-link data-default-href="/" data-testid="landing-mobile-menu-logo-link">
+                <img data-brand-logo-image alt="DME PROS logo" class="h-[70px] max-w-[230px] object-contain hidden" data-testid="landing-mobile-menu-logo-image" />
+                <span data-brand-logo-fallback class="text-2xl font-extrabold text-navy-700">DME</span>
+                <span data-brand-logo-fallback class="text-2xl font-extrabold text-primary-500">PROS</span>
+            </a>
+            <button id="mobile-menu-close" type="button" class="p-2 rounded-xl text-navy-700 hover:bg-gray-100" aria-label="Close navigation menu" data-testid="landing-mobile-menu-close-button">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Nationwide delivery, Medicare coordination, and fast eligibility checks.</p>
+        </div>
+        <nav class="flex flex-col gap-2" aria-label="Mobile navigation" data-testid="landing-mobile-menu-nav">
+            <a href="/products" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-navy-700 hover:bg-primary-50 hover:text-primary-700" data-testid="landing-mobile-menu-link-products">
+                <span>Products</span><i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+            <a href="/locations" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-navy-700 hover:bg-primary-50 hover:text-primary-700" data-testid="landing-mobile-menu-link-service-areas">
+                <span>Coverage Areas</span><i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+            <a href="#about" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-navy-700 hover:bg-primary-50 hover:text-primary-700" data-testid="landing-mobile-menu-link-about">
+                <span>About</span><i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+            <a href="#contact" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-navy-700 hover:bg-primary-50 hover:text-primary-700" data-testid="landing-mobile-menu-link-contact">
+                <span>Contact</span><i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+            <a href="/login" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-navy-700 hover:bg-primary-50 hover:text-primary-700" data-testid="landing-mobile-menu-link-login">
+                <span>Patient Login</span><i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+        </nav>
+        <div class="mt-auto space-y-3 border-t border-gray-200 pt-6">
+            <a href="tel:7279667767" class="flex w-full items-center justify-center gap-2 rounded-2xl border border-gray-200 px-4 py-3 font-semibold text-navy-700 hover:bg-primary-50 hover:text-primary-700" data-testid="landing-mobile-menu-call-button">
+                <i data-lucide="phone" class="w-4 h-4"></i>
+                (727) 966-7767
+            </a>
+            <a href="#contact" class="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary-500 px-4 py-3 font-semibold text-white hover:bg-primary-600" data-testid="landing-mobile-menu-primary-cta">
+                Get Started
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Hero Section -->
+    <section id="landing-hero" class="relative bg-gradient-to-br from-primary-50 via-white to-primary-50/30 py-16 md:py-24 overflow-hidden">
+        <!-- Background elements -->
+        <div class="absolute top-20 left-10 w-72 h-72 bg-primary-200/30 rounded-full blur-3xl animate-float"></div>
+        <div class="absolute bottom-20 right-10 w-96 h-96 bg-primary-100/40 rounded-full blur-3xl animate-float" style="animation-delay: 1s;"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 relative">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <!-- Content -->
+                <div class="space-y-8 animate-fade-in-up">
+                    <!-- Badge -->
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 border border-primary-200 rounded-full text-primary-700 text-sm font-medium">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        HIPAA Compliant Platform
+                    </div>
+
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+                        <span class="text-navy-700">Your Partner for</span>
+                        <span class="text-primary-500 block">Quality DME</span>
+                        <span class="text-navy-700 block">Solutions</span>
+                    </h1>
+                    
+                    <p class="text-lg md:text-xl text-gray-600 leading-relaxed">
+                        We deliver Medicare-covered durable medical equipment directly to your door. From back braces to wheelchairs, we handle everything—insurance verification, paperwork, and <span class="font-semibold text-primary-600">free nationwide shipping</span>.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button onclick="openEligibilityModal()" class="group bg-primary-500 hover:bg-primary-600 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                            Get Started Free
+                            <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+                        <a href="tel:7279667767" class="border-2 border-gray-300 hover:border-primary-500 text-navy-700 px-8 py-4 text-lg font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors">
+                            <i data-lucide="play" class="w-5 h-5"></i>
+                            Call Us
+                        </a>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="flex flex-wrap items-center gap-8 pt-4">
+                        <div class="text-center">
+                            <p class="text-3xl font-bold text-navy-700">500+</p>
+                            <p class="text-gray-500 text-sm">Active Patients</p>
+                        </div>
+                        <div class="w-px h-12 bg-gray-200"></div>
+                        <div class="text-center">
+                            <p class="text-3xl font-bold text-primary-500">99.9%</p>
+                            <p class="text-gray-500 text-sm">Satisfaction</p>
+                        </div>
+                        <div class="w-px h-12 bg-gray-200"></div>
+                        <div class="text-center">
+                            <p class="text-3xl font-bold text-navy-700">50</p>
+                            <p class="text-gray-500 text-sm">States Covered</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image -->
+                <div class="relative">
+                    <div class="relative z-10 rounded-3xl overflow-hidden shadow-2xl">
+                        <img src="https://customer-assets.emergentagent.com/job_7965af6d-d9f9-48a9-9447-d2e9a0ead878/artifacts/e812a763_durable-medical-equipment-wheelchair.jpg" 
+                             alt="Person using a wheelchair" 
+                             class="w-full h-auto object-cover">
+                    </div>
+                    
+                    <!-- Stats Card -->
+                    <div class="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl p-5 border border-gray-100 z-20 animate-float">
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 bg-primary-500 rounded-xl flex items-center justify-center shadow-lg">
+                                <i data-lucide="zap" class="w-7 h-7 text-white"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Real-time</p>
+                                <p class="text-lg font-bold text-navy-700">Sync</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Badge -->
+                    <div class="absolute -top-4 -right-4 bg-primary-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg z-20">
+                        AI Powered
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust Bar -->
+    <section class="py-6 bg-gray-50 border-y border-gray-100">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex flex-wrap justify-center items-center gap-8 md:gap-16">
+                <div class="flex items-center gap-2 text-gray-600">
+                    <i data-lucide="lock" class="w-5 h-5 text-primary-500"></i>
+                    <span class="font-medium">End-to-End Encrypted</span>
+                </div>
+                <div class="flex items-center gap-2 text-gray-600">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-primary-500"></i>
+                    <span class="font-medium">HIPAA Compliant</span>
+                </div>
+                <div class="flex items-center gap-2 text-gray-600">
+                    <i data-lucide="users" class="w-5 h-5 text-primary-500"></i>
+                    <span class="font-medium">Medicare Accredited</span>
+                </div>
+                <div class="flex items-center gap-2 text-gray-600">
+                    <i data-lucide="file-check" class="w-5 h-5 text-primary-500"></i>
+                    <span class="font-medium">Full Audit Trail</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 rounded-full text-primary-700 text-sm font-medium mb-4">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    Powerful Features
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-navy-700 mb-4">Everything You <span class="text-primary-500">Need</span></h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Comprehensive solutions designed specifically for Medicare beneficiaries seeking quality medical equipment.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white rounded-2xl p-8 border border-gray-100 hover:shadow-xl hover:border-primary-200 transition-all group">
+                    <div class="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary-500 transition-colors">
+                        <i data-lucide="shield" class="w-7 h-7 text-primary-600 group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-navy-700 mb-3">DME Product Matching</h3>
+                    <p class="text-gray-600">We help patients and caregivers choose the right braces, wheelchairs, walkers, and mobility products, then guide each order from qualification to delivery.</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-8 border border-gray-100 hover:shadow-xl hover:border-primary-200 transition-all group">
+                    <div class="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary-500 transition-colors">
+                        <i data-lucide="globe" class="w-7 h-7 text-primary-600 group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-navy-700 mb-3">Nationwide Coverage</h3>
+                    <p class="text-gray-600">We serve all 50 US states with fast, free delivery directly to your doorstep.</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-8 border border-gray-100 hover:shadow-xl hover:border-primary-200 transition-all group">
+                    <div class="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary-500 transition-colors">
+                        <i data-lucide="users" class="w-7 h-7 text-primary-600 group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-navy-700 mb-3">Expert Support</h3>
+                    <p class="text-gray-600">Our bilingual specialists handle all paperwork, insurance verification, and follow-ups for you.</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-8 border border-gray-100 hover:shadow-xl hover:border-primary-200 transition-all group">
+                    <div class="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary-500 transition-colors">
+                        <i data-lucide="stethoscope" class="w-7 h-7 text-primary-600 group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-navy-700 mb-3">Doctor Coordination</h3>
+                    <p class="text-gray-600">We work directly with your physician to obtain prescriptions and required documentation.</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-8 border border-gray-100 hover:shadow-xl hover:border-primary-200 transition-all group">
+                    <div class="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary-500 transition-colors">
+                        <i data-lucide="clipboard-check" class="w-7 h-7 text-primary-600 group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-navy-700 mb-3">Insurance Processing</h3>
+                    <p class="text-gray-600">Complete insurance verification and claims processing—we handle all the complex paperwork.</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-8 border border-gray-100 hover:shadow-xl hover:border-primary-200 transition-all group">
+                    <div class="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary-500 transition-colors">
+                        <i data-lucide="truck" class="w-7 h-7 text-primary-600 group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-navy-700 mb-3">Free Delivery</h3>
+                    <p class="text-gray-600">Fast, free shipping on all orders with tracking and delivery confirmation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-20 bg-gradient-to-br from-primary-50 to-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 rounded-full text-primary-700 text-sm font-medium mb-4">
+                    <i data-lucide="trending-up" class="w-4 h-4"></i>
+                    Platform Stats
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-navy-700 mb-4">Built for <span class="text-primary-500">Scale</span></h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Everything you need to get quality medical equipment, all in one powerful platform.</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="bg-white rounded-2xl p-8 text-center border border-gray-100 shadow-sm">
+                    <p class="text-4xl md:text-5xl font-bold text-navy-700">17</p>
+                    <p class="text-gray-500 mt-2">DME Categories</p>
+                </div>
+                <div class="bg-white rounded-2xl p-8 text-center border border-gray-100 shadow-sm">
+                    <p class="text-4xl md:text-5xl font-bold text-primary-500">146+</p>
+                    <p class="text-gray-500 mt-2">Products</p>
+                </div>
+                <div class="bg-white rounded-2xl p-8 text-center border border-gray-100 shadow-sm">
+                    <p class="text-4xl md:text-5xl font-bold text-navy-700">10</p>
+                    <p class="text-gray-500 mt-2">Suppliers</p>
+                </div>
+                <div class="bg-white rounded-2xl p-8 text-center border border-gray-100 shadow-sm">
+                    <p class="text-4xl md:text-5xl font-bold text-primary-500">34K+</p>
+                    <p class="text-gray-500 mt-2">Coverage Areas</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 rounded-full text-primary-700 text-sm font-medium mb-4">
+                        About DME PROS
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-navy-700 mb-6">Trusted by Thousands of Medicare Beneficiaries</h2>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        At DME PROS, we believe everyone deserves access to quality medical equipment without the hassle. Our team of dedicated specialists works tirelessly to ensure you receive the equipment you need, when you need it.
+                    </p>
+                    <p class="text-gray-600 mb-8 leading-relaxed">
+                        We've streamlined the entire process—from initial consultation to delivery—so you can focus on what matters most: your health and well-being.
+                    </p>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="check" class="w-5 h-5 text-primary-600"></i>
+                            </div>
+                            <span class="font-medium text-navy-700">Medicare Accredited</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="check" class="w-5 h-5 text-primary-600"></i>
+                            </div>
+                            <span class="font-medium text-navy-700">HIPAA Compliant</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="check" class="w-5 h-5 text-primary-600"></i>
+                            </div>
+                            <span class="font-medium text-navy-700">Free Nationwide Shipping</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="check" class="w-5 h-5 text-primary-600"></i>
+                            </div>
+                            <span class="font-medium text-navy-700">Bilingual Support</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1631815588090-d4bfec5b1ccb?w=600&h=400&fit=crop" 
+                         alt="Medical equipment" 
+                         class="rounded-2xl shadow-2xl w-full">
+                    <div class="absolute -bottom-6 -right-6 bg-white rounded-xl shadow-xl p-4 border border-gray-100">
+                        <p class="text-4xl font-bold text-primary-500">10+</p>
+                        <p class="text-gray-500 text-sm">Years Experience</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-gradient-to-br from-primary-50 to-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid lg:grid-cols-2 gap-12">
+                <!-- Contact Info -->
+                <div>
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 rounded-full text-primary-700 text-sm font-medium mb-4">
+                        Get In Touch
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-navy-700 mb-6">Ready to Get Started?</h2>
+                    <p class="text-gray-600 mb-8">Our team is ready to help you get the medical equipment you need. Contact us today for a free eligibility check.</p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="map-pin" class="w-6 h-6 text-primary-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-navy-700 mb-1">Service Area</h4>
+                                <p class="text-gray-600">Nationwide Delivery<br>Serving All 50 States</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="phone" class="w-6 h-6 text-primary-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-navy-700 mb-1">Phone</h4>
+                                <a href="tel:7279667767" class="text-gray-600 hover:text-primary-600">(727) 966-7767</a>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="mail" class="w-6 h-6 text-primary-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-navy-700 mb-1">Email</h4>
+                                <a href="mailto:info@dmepros.com" class="text-gray-600 hover:text-primary-600">info@dmepros.com</a>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="clock" class="w-6 h-6 text-primary-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-navy-700 mb-1">Business Hours</h4>
+                                <p class="text-gray-600">Monday - Thursday: 9:30am - 5:30pm EST</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contact Form -->
+                <div class="bg-white rounded-2xl p-8 border border-gray-200 shadow-lg">
+                    <h3 class="text-2xl font-bold text-navy-700 mb-6">Contact Us Today</h3>
+                    <form id="contact-form" class="space-y-6" data-testid="landing-contact-form">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                            <input type="text" name="name" required placeholder="John Doe" data-testid="landing-contact-name-input" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input type="email" name="email" required placeholder="john@example.com" data-testid="landing-contact-email-input" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                                <input type="tel" name="phone" required placeholder="(555) 123-4567" data-testid="landing-contact-phone-input" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                            <textarea name="message" rows="4" placeholder="How can we help you?" data-testid="landing-contact-message-input" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors resize-none"></textarea>
+                        </div>
+                        
+                        <!-- Consent Checkboxes -->
+                        <div class="p-4 bg-gray-50 rounded-lg space-y-3">
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" name="consent_contact" required data-testid="landing-contact-consent-contact-checkbox" class="w-4 h-4 mt-0.5 text-primary-500 rounded border-gray-300 focus:ring-primary-500">
+                                <span class="text-xs text-gray-600"><strong>Consent to Contact:</strong> I agree to be contacted by DME PROS via phone, email, or text message regarding my inquiry.</span>
+                            </label>
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" name="consent_tcpa" required data-testid="landing-contact-consent-tcpa-checkbox" class="w-4 h-4 mt-0.5 text-primary-500 rounded border-gray-300 focus:ring-primary-500">
+                                <span class="text-xs text-gray-600"><strong>TCPA Consent:</strong> I consent to receive automated calls and texts. Message & data rates may apply. Consent is not required for purchase.</span>
+                            </label>
+                        </div>
+
+                        <div class="hidden" aria-hidden="true">
+                            <label for="landing-contact-website">Leave this field empty</label>
+                            <input id="landing-contact-website" type="text" name="website" tabindex="-1" autocomplete="off" data-testid="landing-contact-honeypot-input">
+                        </div>
+                        
+                        <button type="submit" data-testid="landing-contact-submit-button" class="w-full bg-primary-500 hover:bg-primary-600 text-white py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="send" class="w-5 h-5"></i>
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-navy-700 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16 mb-12">
+                <!-- Company Info -->
+                <div class="lg:pr-8">
+                    <div class="flex items-center gap-2 mb-6">
+                        <span class="text-2xl font-extrabold text-white">DME</span>
+                        <span class="text-2xl font-extrabold text-primary-500">PROS</span>
+                    </div>
+                    <p class="text-gray-400 mb-6 leading-relaxed">Your trusted partner for Medicare-covered durable medical equipment with nationwide delivery.</p>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="font-semibold mb-6">Quick Links</h4>
+                    <ul class="space-y-4 text-gray-400">
+                        <li><a href="/products" class="hover:text-primary-400 transition-colors">Products</a></li>
+                        <li><a href="/locations" class="hover:text-primary-400 transition-colors">Coverage Areas</a></li>
+                        <li><a href="#about" class="hover:text-primary-400 transition-colors">About Us</a></li>
+                        <li><a href="#contact" class="hover:text-primary-400 transition-colors">Contact Us</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Products -->
+                <div>
+                    <h4 class="font-semibold mb-6">Our Products</h4>
+                    <ul class="space-y-4 text-gray-400">
+                        <li><a href="/products" class="hover:text-primary-400 transition-colors">Back Braces</a></li>
+                        <li><a href="/products" class="hover:text-primary-400 transition-colors">Knee Braces</a></li>
+                        <li><a href="/products" class="hover:text-primary-400 transition-colors">Wheelchairs</a></li>
+                        <li><a href="/products" class="hover:text-primary-400 transition-colors">Walkers</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact -->
+                <div>
+                    <h4 class="font-semibold mb-6">Contact</h4>
+                    <ul class="space-y-4 text-gray-400">
+                        <li><a href="tel:7279667767" class="hover:text-primary-400 transition-colors">(727) 966-7767</a></li>
+                        <li><a href="mailto:info@dmepros.com" class="hover:text-primary-400 transition-colors">info@dmepros.com</a></li>
+                        <li>Nationwide Delivery</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-gray-400 text-sm">
+                <p>&copy; 2025 DME PROS. All rights reserved.</p>
+                <div class="flex items-center gap-6">
+                    <a href="/legal/privacy-policy" class="hover:text-primary-400 transition-colors">Privacy Policy</a>
+                    <a href="/legal/terms-and-conditions" class="hover:text-primary-400 transition-colors">Terms of Service</a>
+                    <a href="/login" class="hover:text-primary-400 transition-colors flex items-center gap-1">
+                        <i data-lucide="lock" class="w-3 h-3"></i>
+                        Admin
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Eligibility Modal -->
+    <div id="eligibility-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 480px;">
+            <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-navy-700">Check Your Eligibility</h2>
+                    <p class="text-gray-500 text-xs">Answer a few quick questions</p>
+                </div>
+                <button onclick="closeEligibilityModal()" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i data-lucide="x" class="w-5 h-5 text-gray-400"></i>
+                </button>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="px-4 pt-3 pb-2 bg-primary-50">
+                <div class="flex items-center justify-between mb-1.5">
+                    <span id="eligibility-step-text" class="text-xs font-medium text-gray-600">Step 1 of 4</span>
+                    <span id="eligibility-percent-text" class="text-xs font-medium text-primary-600">25% complete</span>
+                </div>
+                <div class="w-full h-2 bg-primary-100 rounded-full overflow-hidden">
+                    <div id="eligibility-progress-bar" class="h-full bg-primary-500 rounded-full transition-all duration-300" style="width: 25%"></div>
+                </div>
+            </div>
+            
+            <form id="eligibility-form" class="p-4" data-testid="landing-eligibility-form">
+                <!-- Step 1: Pain Location -->
+                <div class="step active" data-step="1">
+                    <h3 class="text-base font-semibold text-navy-700 mb-4">Where is your pain?</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="selection-card p-3" data-value="back" onclick="selectOption(this, 'painLocation')">
+                            <h4 class="font-semibold text-center text-sm">Back</h4>
+                            <p class="text-xs text-gray-500 text-center">Upper or lower back</p>
+                        </div>
+                        <div class="selection-card p-3" data-value="knee" onclick="selectOption(this, 'painLocation')">
+                            <h4 class="font-semibold text-center text-sm">Knee</h4>
+                            <p class="text-xs text-gray-500 text-center">Joint pain</p>
+                        </div>
+                        <div class="selection-card p-3" data-value="wrist" onclick="selectOption(this, 'painLocation')">
+                            <h4 class="font-semibold text-center text-sm">Wrist</h4>
+                            <p class="text-xs text-gray-500 text-center">Wrist or hand</p>
+                        </div>
+                        <div class="selection-card p-3" data-value="other" onclick="selectOption(this, 'painLocation')">
+                            <h4 class="font-semibold text-center text-sm">Other</h4>
+                            <p class="text-xs text-gray-500 text-center">Other equipment</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Insurance -->
+                <div class="step" data-step="2">
+                    <h3 class="text-base font-semibold text-navy-700 mb-4">What insurance do you have?</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="selection-card p-4" data-value="medicare" onclick="selectOption(this, 'insuranceType')">
+                            <h4 class="font-semibold text-sm text-center">Medicare</h4>
+                        </div>
+                        <div class="selection-card p-4" data-value="private" onclick="selectOption(this, 'insuranceType')">
+                            <h4 class="font-semibold text-sm text-center">Private</h4>
+                        </div>
+                        <div class="selection-card p-4" data-value="medicaid" onclick="selectOption(this, 'insuranceType')">
+                            <h4 class="font-semibold text-sm text-center">Medicaid</h4>
+                        </div>
+                        <div class="selection-card p-4" data-value="other" onclick="selectOption(this, 'insuranceType')">
+                            <h4 class="font-semibold text-sm text-center">Other</h4>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Doctor -->
+                <div class="step" data-step="3">
+                    <h3 class="text-base font-semibold text-navy-700 mb-4">Do you have a doctor?</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="selection-card p-4" data-value="yes" onclick="selectOption(this, 'hasDoctor')">
+                            <h4 class="font-semibold text-sm text-center">Yes</h4>
+                        </div>
+                        <div class="selection-card p-4" data-value="no" onclick="selectOption(this, 'hasDoctor')">
+                            <h4 class="font-semibold text-sm text-center">No</h4>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 4: Contact -->
+                <div class="step" data-step="4">
+                    <h3 class="text-base font-semibold text-navy-700 mb-3">Your Information</h3>
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="text" name="firstName" required placeholder="First Name" data-testid="landing-eligibility-first-name-input" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
+                            <input type="text" name="lastName" required placeholder="Last Name" data-testid="landing-eligibility-last-name-input" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
+                        </div>
+                        <input type="tel" name="phone" required placeholder="Phone Number" data-testid="landing-eligibility-phone-input" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
+                        <input type="email" name="email" placeholder="Email (optional)" data-testid="landing-eligibility-email-input" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
+                        <input type="text" name="zipCode" required placeholder="ZIP Code" data-testid="landing-eligibility-zip-input" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
+                        <div class="hidden" aria-hidden="true">
+                            <label for="landing-eligibility-website">Leave this field empty</label>
+                            <input id="landing-eligibility-website" type="text" name="website" tabindex="-1" autocomplete="off" data-testid="landing-eligibility-honeypot-input">
+                        </div>
+                        
+                        <!-- Consent Checkboxes -->
+                        <div class="mt-4 p-3 bg-gray-50 rounded-lg space-y-3">
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" name="consent_contact" required data-testid="landing-eligibility-consent-contact-checkbox" class="w-4 h-4 mt-0.5 text-primary-500 rounded border-gray-300 focus:ring-primary-500">
+                                <span class="text-xs text-gray-600"><strong>Consent to Contact:</strong> I agree to be contacted by DME PROS via phone, email, or text message regarding my medical equipment inquiry.</span>
+                            </label>
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" name="consent_tcpa" required data-testid="landing-eligibility-consent-tcpa-checkbox" class="w-4 h-4 mt-0.5 text-primary-500 rounded border-gray-300 focus:ring-primary-500">
+                                <span class="text-xs text-gray-600"><strong>TCPA Consent:</strong> I consent to receive automated calls and texts at the number provided. Message & data rates may apply. Consent is not a condition of purchase.</span>
+                            </label>
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" name="consent_hipaa" required data-testid="landing-eligibility-consent-hipaa-checkbox" class="w-4 h-4 mt-0.5 text-primary-500 rounded border-gray-300 focus:ring-primary-500">
+                                <span class="text-xs text-gray-600"><strong>HIPAA Authorization:</strong> I authorize DME PROS to use and share my health information with my healthcare providers and insurance company as needed to process my equipment request.</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Success -->
+                <div class="step" data-step="5">
+                    <div class="text-center py-6">
+                        <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="check-circle-2" class="w-8 h-8 text-primary-500"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-navy-700 mb-3">Thank You!</h3>
+                        <p class="text-gray-600 text-sm mb-4">We'll contact you within 24 hours.</p>
+                        <button type="button" onclick="closeEligibilityModal()" class="bg-primary-500 text-white px-6 py-2 rounded-lg font-semibold text-sm">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Navigation -->
+                <div class="flex justify-between mt-4 pt-4 border-t border-gray-200" id="form-nav">
+                    <button type="button" onclick="prevStep()" data-testid="landing-eligibility-back-button" class="px-4 py-2 border border-gray-300 rounded-lg font-medium text-sm" id="prev-btn" style="visibility: hidden;">Back</button>
+                    <button type="button" onclick="nextStep()" data-testid="landing-eligibility-next-button" class="px-4 py-2 bg-primary-500 text-white rounded-lg font-medium text-sm" id="next-btn">Next</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+        
+        const setMobileDrawerState = (isOpen) => {
+            document.body.classList.toggle('mobile-drawer-open', isOpen);
+            document.getElementById('mobile-drawer')?.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+        };
+
+        document.getElementById('mobile-menu-btn')?.addEventListener('click', function() {
+            setMobileDrawerState(true);
+        });
+        document.getElementById('mobile-menu-close')?.addEventListener('click', function() {
+            setMobileDrawerState(false);
+        });
+        document.getElementById('mobile-drawer-overlay')?.addEventListener('click', function() {
+            setMobileDrawerState(false);
+        });
+        document.querySelectorAll('#mobile-drawer a').forEach((link) => {
+            link.addEventListener('click', function() {
+                setMobileDrawerState(false);
+            });
+        });
+        
+        const leadsApiEndpoint = '/api/public/leads';
+        
+        // Eligibility Modal
+        let currentStep = 1;
+        const formData = {};
+
+        function primeFormStartTime(formId) {
+            const form = document.getElementById(formId);
+            if (form && !form.dataset.startedAt) {
+                form.dataset.startedAt = Date.now().toString();
+            }
+        }
+
+        function getSubmissionDuration(formId) {
+            const form = document.getElementById(formId);
+            const startedAt = Number(form?.dataset?.startedAt || Date.now());
+            return Math.max(0, Date.now() - startedAt);
+        }
+
+        function splitFullName(fullName) {
+            const parts = fullName.trim().split(/\s+/).filter(Boolean);
+            const firstName = parts[0] || '';
+            const lastName = parts.length > 1 ? parts.slice(1).join(' ') : 'Unknown';
+            return { firstName, lastName };
+        }
+        
+        function openEligibilityModal() {
+            document.getElementById('eligibility-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            primeFormStartTime('eligibility-form');
+        }
+        
+        function closeEligibilityModal() {
+            document.getElementById('eligibility-modal').classList.remove('active');
+            document.body.style.overflow = '';
+            currentStep = 1;
+            showStep(1);
+            const form = document.getElementById('eligibility-form');
+            if (form) {
+                form.reset();
+                form.dataset.startedAt = Date.now().toString();
+            }
+        }
+
+        window.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                setMobileDrawerState(false);
+            }
+        });
+        
+        function showStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.querySelector(`[data-step="${step}"]`).classList.add('active');
+            
+            document.getElementById('prev-btn').style.visibility = step === 1 ? 'hidden' : 'visible';
+            document.getElementById('next-btn').textContent = step === 4 ? 'Submit' : 'Next';
+            document.getElementById('form-nav').style.display = step === 5 ? 'none' : 'flex';
+            
+            const percent = Math.round((step / 4) * 100);
+            document.getElementById('eligibility-step-text').textContent = `Step ${step} of 4`;
+            document.getElementById('eligibility-percent-text').textContent = `${percent}% complete`;
+            document.getElementById('eligibility-progress-bar').style.width = `${percent}%`;
+            
+            lucide.createIcons();
+        }
+        
+        function selectOption(el, field) {
+            el.parentElement.querySelectorAll('.selection-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            formData[field] = el.dataset.value;
+        }
+        
+        async function submitEligibilityLead(form) {
+            const payload = {
+                firstName: form.firstName.value.trim(),
+                lastName: form.lastName.value.trim(),
+                phone: form.phone.value.trim(),
+                email: form.email.value.trim(),
+                zipCode: form.zipCode.value.trim(),
+                painLocation: formData.painLocation,
+                insuranceType: formData.insuranceType,
+                hasDoctor: formData.hasDoctor,
+                formType: 'eligibility_modal',
+                consentContact: form.consent_contact.checked,
+                consentTcpa: form.consent_tcpa.checked,
+                consentHipaa: form.consent_hipaa.checked,
+                consentLanguage: 'Consent to Contact, TCPA Consent, and HIPAA Authorization accepted via landing eligibility modal.',
+                website: form.website.value.trim(),
+                submissionDuration: getSubmissionDuration('eligibility-form')
+            };
+
+            const response = await fetch(leadsApiEndpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || 'Unable to submit eligibility form.');
+            }
+        }
+
+        async function nextStep() {
+            if (currentStep < 4) {
+                currentStep++;
+                showStep(currentStep);
+            } else if (currentStep === 4) {
+                const form = document.getElementById('eligibility-form');
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+                try {
+                    await submitEligibilityLead(form);
+                    currentStep = 5;
+                    showStep(5);
+                } catch (error) {
+                    alert(error.message || 'Something went wrong. Please try again.');
+                }
+            }
+        }
+        
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+        
+        // Contact form
+        document.getElementById('contact-form')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!this.checkValidity()) {
+                this.reportValidity();
+                return;
+            }
+
+            const { firstName, lastName } = splitFullName(this.name.value);
+            const payload = {
+                firstName,
+                lastName,
+                phone: this.phone.value.trim(),
+                email: this.email.value.trim(),
+                message: this.message.value.trim(),
+                formType: 'contact_form',
+                consentContact: this.consent_contact.checked,
+                consentTcpa: this.consent_tcpa.checked,
+                consentLanguage: 'Consent to Contact and TCPA Consent accepted via landing contact form.',
+                website: this.website.value.trim(),
+                submissionDuration: getSubmissionDuration('contact-form')
+            };
+
+            fetch(leadsApiEndpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(async (response) => {
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.detail || 'Unable to submit contact form.');
+                }
+                alert('Thank you! We will contact you shortly.');
+                this.reset();
+                this.dataset.startedAt = Date.now().toString();
+            })
+            .catch((error) => {
+                alert(error.message || 'Something went wrong. Please try again.');
+            });
+        });
+
+        function applyBranding(branding) {
+            if (!branding) return;
+            const version = branding.branding_version;
+            const logoUrl = branding.logo_url;
+            const logoLink = branding.logo_link_url || '/';
+            const faviconUrl = branding.favicon_url;
+
+            const appendVersion = (url) => {
+                if (!url) return null;
+                if (!version) return url;
+                const separator = url.includes('?') ? '&' : '?';
+                return `${url}${separator}v=${encodeURIComponent(version)}`;
+            };
+
+            document.querySelectorAll('[data-brand-logo-link]').forEach((anchor) => {
+                anchor.setAttribute('href', logoLink);
+            });
+
+            document.querySelectorAll('[data-brand-logo-image]').forEach((logoImage) => {
+                if (logoUrl) {
+                    logoImage.setAttribute('src', appendVersion(logoUrl));
+                    logoImage.classList.remove('hidden');
+                } else {
+                    logoImage.classList.add('hidden');
+                }
+            });
+
+            document.querySelectorAll('[data-brand-logo-fallback]').forEach((node) => {
+                node.style.display = logoUrl ? 'none' : '';
+            });
+
+            if (faviconUrl) {
+                const rels = ['icon', 'shortcut icon', 'apple-touch-icon'];
+                rels.forEach((rel) => {
+                    let tag = document.querySelector(`link[rel="${rel}"]`);
+                    if (!tag) {
+                        tag = document.createElement('link');
+                        tag.setAttribute('rel', rel);
+                        document.head.appendChild(tag);
+                    }
+                    tag.setAttribute('href', appendVersion(faviconUrl));
+                });
+            }
+        }
+
+        async function loadBranding() {
+            try {
+                const res = await fetch('/api/public/site-branding', { cache: 'no-store' });
+                if (!res.ok) return;
+                const branding = await res.json();
+                applyBranding(branding);
+            } catch (e) {
+                // keep fallback branding
+            }
+        }
+
+        loadBranding();
+        primeFormStartTime('contact-form');
+        primeFormStartTime('eligibility-form');
+    </script>
+</body>
+</html>

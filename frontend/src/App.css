@@ -1,0 +1,221 @@
+/* Main App Styles - DME CRM */
+
+/* Sidebar styles */
+.sidebar {
+    @apply fixed left-0 top-0 h-full w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700;
+    @apply flex flex-col z-40;
+    transition: width 0.2s ease-in-out;
+}
+
+.sidebar.collapsed {
+    @apply w-16;
+}
+
+.sidebar-header {
+    @apply h-16 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-700;
+}
+
+.sidebar.collapsed .sidebar-header {
+    @apply px-2 justify-center;
+}
+
+.sidebar-nav {
+    @apply flex-1 py-4 px-3 overflow-y-auto;
+}
+
+.sidebar.collapsed .sidebar-nav {
+    @apply px-2;
+}
+
+.sidebar-footer {
+    @apply p-4 border-t border-slate-200 dark:border-slate-700;
+}
+
+.sidebar.collapsed .sidebar-footer {
+    @apply p-2;
+}
+
+/* Main content */
+.main-content {
+    @apply ml-64 min-h-screen;
+    transition: margin-left 0.2s ease-in-out;
+}
+
+.main-content.sidebar-collapsed {
+    @apply ml-16;
+}
+
+.page-header {
+    @apply sticky top-0 z-30 h-16 flex items-center justify-between px-6;
+    @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-md;
+    @apply border-b border-slate-200 dark:border-slate-700;
+}
+
+.page-content {
+    @apply p-6;
+}
+
+/* Bento Grid Dashboard */
+.bento-grid {
+    @apply grid gap-4;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto;
+}
+
+.bento-item {
+    @apply rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900;
+    @apply p-6 transition-shadow duration-200 hover:shadow-md;
+}
+
+.bento-item.span-2 {
+    grid-column: span 2;
+}
+
+.bento-item.span-3 {
+    grid-column: span 3;
+}
+
+.bento-item.span-4 {
+    grid-column: span 4;
+}
+
+.bento-item.row-span-2 {
+    grid-row: span 2;
+}
+
+/* Form styles */
+.form-section {
+    @apply space-y-4 p-6 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900;
+}
+
+.form-row {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+/* Modal/Dialog enhancements */
+.dialog-content {
+    @apply max-h-[85vh] overflow-y-auto;
+}
+
+/* Lead Pipeline specific */
+.pipeline-container {
+    @apply flex gap-4 overflow-x-auto pb-4;
+    min-height: calc(100vh - 200px);
+}
+
+/* Login page */
+.login-container {
+    @apply min-h-screen flex;
+}
+
+.login-form-section {
+    @apply flex-1 flex items-center justify-center p-8 bg-gradient-to-br from-lime-50 via-white to-slate-50;
+}
+
+.login-hero-section {
+    @apply hidden lg:flex flex-1 items-center justify-center relative;
+    @apply bg-gradient-to-br from-lime-50 via-white to-slate-50;
+}
+
+.login-hero-section::before {
+    content: '';
+    @apply absolute inset-0 opacity-70;
+    background: radial-gradient(circle at top left, rgba(132, 204, 22, 0.14), transparent 28%), radial-gradient(circle at bottom right, rgba(30, 58, 95, 0.1), transparent 24%);
+}
+
+/* Table actions */
+.table-actions {
+    @apply flex items-center gap-2;
+}
+
+/* Empty states */
+.empty-state {
+    @apply flex flex-col items-center justify-center py-16 text-center;
+}
+
+.empty-state-icon {
+    @apply w-16 h-16 mb-4 text-slate-300 dark:text-slate-600;
+}
+
+/* Search input */
+.search-input-wrapper {
+    @apply relative;
+}
+
+.search-input-wrapper svg {
+    @apply absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400;
+}
+
+.search-input-wrapper input {
+    @apply pl-10;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .sidebar {
+        @apply -translate-x-full;
+    }
+    
+    .sidebar.open {
+        @apply translate-x-0;
+    }
+    
+    .sidebar.collapsed {
+        @apply w-64; /* Reset to full width on mobile when open */
+    }
+    
+    .main-content {
+        @apply ml-0;
+    }
+    
+    .main-content.sidebar-collapsed {
+        @apply ml-0;
+    }
+    
+    .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .bento-item.span-3,
+    .bento-item.span-4 {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 640px) {
+    .bento-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .bento-item.span-2,
+    .bento-item.span-3,
+    .bento-item.span-4 {
+        grid-column: span 1;
+    }
+    
+    .page-content {
+        @apply p-4;
+    }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    @apply w-2 h-2;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-slate-100 dark:bg-slate-800;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 dark:bg-slate-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400 dark:bg-slate-500;
+}
+
+/* Focus ring override */
+.focus-visible\:ring-primary:focus-visible {
+    @apply ring-2 ring-offset-2 ring-primary/50;
+}
