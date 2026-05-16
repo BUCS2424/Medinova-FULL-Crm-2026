@@ -57,7 +57,12 @@ export default function StorageSettings() {
     setLoading(true);
     try {
       const [settingsRes, statusRes] = await Promise.all([
-        axios.get(`${API_URL}/api/dev/settings/storage`, { headers: getHeaders() }).catch(() => ({ data: {} })),
+        axios.get(`${API_URL}/api/dev/settings/storage`, { headers: getHeaders() }).catch((err) => {
+          if (err?.response?.status === 401 || err?.response?.status === 403) {
+            toast.error('Session expired. Please log in again.');
+          }
+          return { data: {} };
+        }),
         axios.get(`${API_URL}/api/storage/status`, { headers: getHeaders() }).catch(() => ({ data: { configured: false, connected: false } }))
       ]);
 
@@ -65,12 +70,12 @@ export default function StorageSettings() {
         setStorageSettings(prev => ({ ...prev, ...settingsRes.data }));
         const hasStorageData = !!(settingsRes.data.endpoint || settingsRes.data.bucket_name);
         setHasData(hasStorageData);
-        // If no data, start in edit mode
         if (!hasStorageData) {
           setEditMode(true);
         }
       } else {
-        setEditMode(true);
+        // Only open edit mode if no prior data was loaded
+        if (!hasData) setEditMode(true);
       }
 
       setConnectionStatus(statusRes.data);
@@ -95,10 +100,11 @@ export default function StorageSettings() {
       toast.success('Storage settings saved and locked');
       setEditMode(false);
       setHasData(true);
-      fetchStorageSettings(); // Refresh to get connection status
+      fetchStorageSettings(); // Refresh to confirm persistence
     } catch (error) {
-      console.error('Error saving storage settings:', error);
-      toast.error(error.response?.data?.detail || 'Failed to save storage settings');
+      const msg = error?.response?.data?.detail || error?.message || 'Failed to save storage settings';
+      toast.error(msg);
+      console.error('Storage save error:', error?.response?.data || error);
     } finally {
       setSaving(false);
     }

@@ -113,13 +113,21 @@ export default function GeneralSettingsManager() {
     fetchAllSettings();
   }, []);
 
+  const safeGet = (url) =>
+    axios.get(url, { headers: getHeaders() }).catch((err) => {
+      if (err?.response?.status === 401 || err?.response?.status === 403) {
+        toast.error('Session expired. Please log in again.');
+      }
+      return { data: {}, _failed: true };
+    });
+
   const fetchAllSettings = async () => {
     setLoading(true);
     try {
       const [siteRes, emailRes, codeRes, messagesRes] = await Promise.all([
-        axios.get(`${API_URL}/api/dev/settings/site`, { headers: getHeaders() }).catch(() => ({ data: {} })),
-        axios.get(`${API_URL}/api/dev/settings/email`, { headers: getHeaders() }).catch(() => ({ data: {} })),
-        axios.get(`${API_URL}/api/dev/settings/custom-code`, { headers: getHeaders() }).catch(() => ({ data: {} })),
+        safeGet(`${API_URL}/api/dev/settings/site`),
+        safeGet(`${API_URL}/api/dev/settings/email`),
+        safeGet(`${API_URL}/api/dev/settings/custom-code`),
         axios.get(`${API_URL}/api/dev/settings/system-messages`, { headers: getHeaders() }).catch(() => ({ data: [] })),
       ]);
 
@@ -244,11 +252,15 @@ export default function GeneralSettingsManager() {
     setSaving(prev => ({ ...prev, email: true }));
     try {
       await axios.post(`${API_URL}/api/dev/settings/email`, emailSettings, { headers: getHeaders() });
-      toast.success('Email settings saved');
+      toast.success('Email settings saved & locked');
       setEditMode(prev => ({ ...prev, email: false }));
       setHasData(prev => ({ ...prev, email: true }));
+      // Refresh from server to confirm persistence
+      await fetchAllSettings();
     } catch (error) {
-      toast.error('Failed to save email settings');
+      const msg = error?.response?.data?.detail || error?.message || 'Failed to save email settings';
+      toast.error(msg);
+      console.error('Email save error:', error?.response?.data || error);
     } finally {
       setSaving(prev => ({ ...prev, email: false }));
     }
@@ -666,7 +678,7 @@ export default function GeneralSettingsManager() {
                   </div>
                   <div className="space-y-2">
                     <Label>From Name</Label>
-                    <Input value={emailSettings.from_name} onChange={(e) => setEmailSettings(prev => ({ ...prev, from_name: e.target.value }))} placeholder="DME PROS" data-testid="from-name-input" />
+                    <Input value={emailSettings.from_name} onChange={(e) => setEmailSettings(prev => ({ ...prev, from_name: e.target.value }))} placeholder="MediNova Medical Supplies" data-testid="from-name-input" />
                   </div>
                 </div>
 
