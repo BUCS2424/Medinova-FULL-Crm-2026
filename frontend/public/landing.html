@@ -1153,105 +1153,176 @@
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="py-24 bg-gradient-to-br from-slate-50 via-blue-50/30 to-white relative overflow-hidden">
-        <div class="absolute bottom-0 left-0 w-80 h-80 bg-[#0055CC]/5 rounded-full blur-3xl"></div>
-        <div class="absolute top-20 right-0 w-96 h-96 bg-[#00A3E0]/5 rounded-full blur-3xl"></div>
-        <div class="max-w-7xl mx-auto px-4 relative">
-            <div class="text-center mb-16">
-                <div class="inline-flex items-center gap-2 px-4 py-2 bg-[#0055CC]/10 rounded-full text-[#0055CC] text-sm font-semibold mb-4">
-                    Get In Touch
+    <section id="contact" class="relative overflow-hidden bg-[#F0F4FF]">
+        <!-- Subtle dot-pattern overlay -->
+        <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle, #0055CC 1px, transparent 1px); background-size: 28px 28px;"></div>
+
+        <div class="relative max-w-7xl mx-auto px-4">
+            <!-- Section Header -->
+            <div class="text-center pt-24 pb-14">
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-[#0055CC]/10 rounded-full text-[#0055CC] text-sm font-semibold mb-5">
+                    <i data-lucide="headphones" class="w-4 h-4"></i>
+                    Contact Us
                 </div>
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Ready to <span class="gradient-text">Get Started?</span></h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">Our team is ready to help you get the medical equipment you need. Contact us today for a free eligibility check.</p>
+                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+                    Ready to <span class="gradient-text">Get Started?</span>
+                </h2>
+                <p class="text-gray-500 text-base md:text-lg max-w-xl mx-auto leading-relaxed">
+                    Our team is ready to help you get the medical equipment you need.<br class="hidden md:block">
+                    Contact us today for a free eligibility check.
+                </p>
             </div>
-            <div class="grid lg:grid-cols-2 gap-12">
-                <!-- Contact Info Cards -->
-                <div class="grid sm:grid-cols-2 gap-5">
-                    <div class="bg-white rounded-2xl shadow-lg shadow-gray-200/50 hover:shadow-xl transition-all p-6 card-hover group">
-                        <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0055CC]/10 to-[#00A3E0]/10 flex items-center justify-center flex-shrink-0 group-hover:from-[#0055CC] group-hover:to-[#00A3E0] transition-all">
-                                <i data-lucide="map-pin" class="w-6 h-6 text-[#0055CC] group-hover:text-white transition-colors"></i>
+
+            <!-- Two-column card -->
+            <div class="pb-24">
+                <div class="rounded-3xl overflow-hidden shadow-2xl shadow-blue-900/10 flex flex-col lg:flex-row">
+
+                    <!-- LEFT: Dark Info Panel -->
+                    <div class="lg:w-[42%] bg-gradient-to-br from-[#003FA3] via-[#0055CC] to-[#0070E0] relative p-10 md:p-12 flex flex-col justify-between">
+                        <!-- Decorative circles -->
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/3 translate-x-1/3 pointer-events-none"></div>
+                        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/3 -translate-x-1/3 pointer-events-none"></div>
+
+                        <div class="relative">
+                            <!-- Heading -->
+                            <h3 class="text-2xl md:text-3xl font-extrabold text-white leading-snug mb-3">
+                                Let's Get You the<br>Equipment You Need
+                            </h3>
+                            <p class="text-blue-200 text-sm leading-relaxed mb-10">
+                                Fill out the form and one of our specialists will reach out within one business day.
+                            </p>
+
+                            <!-- Contact Details -->
+                            <div class="space-y-6">
+                                <!-- Address -->
+                                <div class="flex items-start gap-4">
+                                    <div class="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center flex-shrink-0">
+                                        <i data-lucide="map-pin" class="w-5 h-5 text-white"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-white/50 text-xs font-semibold uppercase tracking-widest mb-0.5">Address</p>
+                                        <p class="text-white font-medium text-sm">Waterford, MI 48327</p>
+                                    </div>
+                                </div>
+                                <!-- Phone -->
+                                <div class="flex items-start gap-4">
+                                    <div class="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center flex-shrink-0">
+                                        <i data-lucide="phone" class="w-5 h-5 text-white"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-white/50 text-xs font-semibold uppercase tracking-widest mb-0.5">Phone</p>
+                                        <a href="tel:2488864363" class="text-white font-medium text-sm hover:text-blue-200 transition-colors">(248) 886-4-DME (4363)</a>
+                                    </div>
+                                </div>
+                                <!-- Email -->
+                                <div class="flex items-start gap-4">
+                                    <div class="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center flex-shrink-0">
+                                        <i data-lucide="mail" class="w-5 h-5 text-white"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-white/50 text-xs font-semibold uppercase tracking-widest mb-0.5">Email</p>
+                                        <a href="mailto:info@medinova.com" class="text-white font-medium text-sm hover:text-blue-200 transition-colors">info@medinova.com</a>
+                                    </div>
+                                </div>
+                                <!-- Hours -->
+                                <div class="flex items-start gap-4">
+                                    <div class="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center flex-shrink-0">
+                                        <i data-lucide="clock" class="w-5 h-5 text-white"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-white/50 text-xs font-semibold uppercase tracking-widest mb-0.5">Business Hours</p>
+                                        <p class="text-white font-medium text-sm leading-relaxed">Mon–Fri: 8:30am – 6:00pm EST<br>Sat: 9:00am – 2:00pm EST<br>Sunday: Closed</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <h4 class="font-bold text-gray-900 mb-1">Address</h4>
-                                <p class="text-gray-600 text-sm">Waterford, MI 48327</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-2xl shadow-lg shadow-gray-200/50 hover:shadow-xl transition-all p-6 card-hover group">
-                        <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0055CC]/10 to-[#00A3E0]/10 flex items-center justify-center flex-shrink-0 group-hover:from-[#0055CC] group-hover:to-[#00A3E0] transition-all">
-                                <i data-lucide="phone" class="w-6 h-6 text-[#0055CC] group-hover:text-white transition-colors"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-gray-900 mb-1">Phone</h4>
-                                <a href="tel:2488864363" class="text-[#00A3E0] hover:text-[#0055CC] transition-colors font-medium">(248) 886-4-DME (4363)</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-2xl shadow-lg shadow-gray-200/50 hover:shadow-xl transition-all p-6 card-hover group">
-                        <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0055CC]/10 to-[#00A3E0]/10 flex items-center justify-center flex-shrink-0 group-hover:from-[#0055CC] group-hover:to-[#00A3E0] transition-all">
-                                <i data-lucide="mail" class="w-6 h-6 text-[#0055CC] group-hover:text-white transition-colors"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-gray-900 mb-1">Email</h4>
-                                <a href="mailto:info@medinova.com" class="text-[#00A3E0] hover:text-[#0055CC] transition-colors font-medium">info@medinova.com</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-2xl shadow-lg shadow-gray-200/50 hover:shadow-xl transition-all p-6 card-hover group">
-                        <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0055CC]/10 to-[#00A3E0]/10 flex items-center justify-center flex-shrink-0 group-hover:from-[#0055CC] group-hover:to-[#00A3E0] transition-all">
-                                <i data-lucide="clock" class="w-6 h-6 text-[#0055CC] group-hover:text-white transition-colors"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-gray-900 mb-1">Business Hours</h4>
-                                <p class="text-gray-600 text-sm">Mon-Fri 8:30am - 6:00pm EST<br>Sat 9:00am - 2:00pm EST<br>Sunday: Closed</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Contact Form -->
-                <div class="bg-white rounded-3xl p-8 border-0 shadow-xl shadow-gray-200/50">
-                    <h3 class="text-2xl font-bold text-gray-900 mb-6">Send Us a Message</h3>
-                    <form id="contact-form" class="space-y-5" data-testid="landing-contact-form">
-                        <div>
-                            <input type="text" name="name" required placeholder="Full Name" data-testid="landing-contact-name-input" class="w-full h-14 px-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00A3E0] focus:border-[#00A3E0] transition-colors text-base">
-                        </div>
-                        <div>
-                            <input type="email" name="email" required placeholder="Email Address" data-testid="landing-contact-email-input" class="w-full h-14 px-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00A3E0] focus:border-[#00A3E0] transition-colors text-base">
-                        </div>
-                        <div>
-                            <input type="tel" name="phone" required placeholder="Phone Number" data-testid="landing-contact-phone-input" class="w-full h-14 px-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00A3E0] focus:border-[#00A3E0] transition-colors text-base">
-                        </div>
-                        <div>
-                            <textarea name="message" rows="4" placeholder="How can we help you?" data-testid="landing-contact-message-input" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00A3E0] focus:border-[#00A3E0] transition-colors resize-none text-base"></textarea>
-                        </div>
-                        
-                        <!-- Consent Checkboxes -->
-                        <div class="p-4 bg-gray-50 rounded-lg space-y-3">
-                            <label class="flex items-start gap-2 cursor-pointer">
-                                <input type="checkbox" name="consent_contact" required data-testid="landing-contact-consent-contact-checkbox" class="w-4 h-4 mt-0.5 text-[#0055CC] rounded border-gray-300 focus:ring-[#0055CC]">
-                                <span class="text-xs text-gray-600"><strong>Consent to Contact:</strong> I agree to be contacted by MediNova Medical Supplies via phone, email, or text message regarding my inquiry.</span>
-                            </label>
-                            <label class="flex items-start gap-2 cursor-pointer">
-                                <input type="checkbox" name="consent_tcpa" required data-testid="landing-contact-consent-tcpa-checkbox" class="w-4 h-4 mt-0.5 text-[#0055CC] rounded border-gray-300 focus:ring-[#0055CC]">
-                                <span class="text-xs text-gray-600"><strong>TCPA Consent:</strong> I consent to receive automated calls and texts. Message & data rates may apply. Consent is not required for purchase.</span>
-                            </label>
                         </div>
 
-                        <div class="hidden" aria-hidden="true">
-                            <label for="landing-contact-website">Leave this field empty</label>
-                            <input id="landing-contact-website" type="text" name="website" tabindex="-1" autocomplete="off" data-testid="landing-contact-honeypot-input">
+                        <!-- Trust strip -->
+                        <div class="relative mt-10 pt-8 border-t border-white/15">
+                            <div class="flex flex-wrap gap-4">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="shield-check" class="w-4 h-4 text-blue-200"></i>
+                                    <span class="text-blue-100 text-xs font-medium">HIPAA Compliant</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="check-circle" class="w-4 h-4 text-blue-200"></i>
+                                    <span class="text-blue-100 text-xs font-medium">Medicare Enrolled</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="zap" class="w-4 h-4 text-blue-200"></i>
+                                    <span class="text-blue-100 text-xs font-medium">Same-Day Response</span>
+                                </div>
+                            </div>
                         </div>
-                        
-                        <button type="submit" data-testid="landing-contact-submit-button" class="w-full h-14 bg-gradient-to-r from-[#0055CC] to-[#00A3E0] hover:from-[#004299] hover:to-[#0090C9] text-white rounded-xl font-bold shadow-lg shadow-blue-500/30 hover:shadow-xl transition-all flex items-center justify-center gap-2 text-lg btn-glow">
-                            <i data-lucide="send" class="w-5 h-5"></i>
-                            Send Message
-                        </button>
-                    </form>
+                    </div>
+
+                    <!-- RIGHT: Form Panel -->
+                    <div class="lg:w-[58%] bg-white p-10 md:p-12">
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-extrabold text-gray-900 mb-1">Send Us a Message</h3>
+                            <p class="text-gray-400 text-sm">We'll respond within one business day.</p>
+                        </div>
+                        <form id="contact-form" class="space-y-5" data-testid="landing-contact-form">
+                            <!-- Name & Email row -->
+                            <div class="grid sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Full Name <span class="text-red-400">*</span></label>
+                                    <input type="text" name="name" required placeholder="Jane Smith" data-testid="landing-contact-name-input"
+                                        class="w-full h-12 px-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0055CC]/30 focus:border-[#0055CC] focus:bg-white transition-all text-sm text-gray-800 placeholder-gray-400">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Email Address <span class="text-red-400">*</span></label>
+                                    <input type="email" name="email" required placeholder="jane@example.com" data-testid="landing-contact-email-input"
+                                        class="w-full h-12 px-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0055CC]/30 focus:border-[#0055CC] focus:bg-white transition-all text-sm text-gray-800 placeholder-gray-400">
+                                </div>
+                            </div>
+                            <!-- Phone -->
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Phone Number <span class="text-red-400">*</span></label>
+                                <input type="tel" name="phone" required placeholder="(248) 000-0000" data-testid="landing-contact-phone-input"
+                                    class="w-full h-12 px-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0055CC]/30 focus:border-[#0055CC] focus:bg-white transition-all text-sm text-gray-800 placeholder-gray-400">
+                            </div>
+                            <!-- Message -->
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">How Can We Help?</label>
+                                <textarea name="message" rows="4" placeholder="Tell us about the equipment you need or any questions about Medicare coverage..." data-testid="landing-contact-message-input"
+                                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0055CC]/30 focus:border-[#0055CC] focus:bg-white transition-all resize-none text-sm text-gray-800 placeholder-gray-400 leading-relaxed"></textarea>
+                            </div>
+
+                            <!-- Consent Checkboxes -->
+                            <div class="rounded-xl border border-gray-100 bg-gray-50/60 p-4 space-y-3">
+                                <label class="flex items-start gap-3 cursor-pointer group">
+                                    <input type="checkbox" name="consent_contact" required data-testid="landing-contact-consent-contact-checkbox"
+                                        class="w-4 h-4 mt-0.5 flex-shrink-0 accent-[#0055CC] rounded border-gray-300 focus:ring-[#0055CC]">
+                                    <span class="text-xs text-gray-500 leading-relaxed group-hover:text-gray-700 transition-colors">
+                                        <strong class="text-gray-700">Consent to Contact:</strong> I agree to be contacted by MediNova Medical Supplies via phone, email, or text message regarding my inquiry.
+                                    </span>
+                                </label>
+                                <div class="border-t border-gray-200"></div>
+                                <label class="flex items-start gap-3 cursor-pointer group">
+                                    <input type="checkbox" name="consent_tcpa" required data-testid="landing-contact-consent-tcpa-checkbox"
+                                        class="w-4 h-4 mt-0.5 flex-shrink-0 accent-[#0055CC] rounded border-gray-300 focus:ring-[#0055CC]">
+                                    <span class="text-xs text-gray-500 leading-relaxed group-hover:text-gray-700 transition-colors">
+                                        <strong class="text-gray-700">TCPA Consent:</strong> I consent to receive automated calls and texts. Message &amp; data rates may apply. Consent is not required for purchase.
+                                    </span>
+                                </label>
+                            </div>
+
+                            <!-- Honeypot -->
+                            <div class="hidden" aria-hidden="true">
+                                <label for="landing-contact-website">Leave this field empty</label>
+                                <input id="landing-contact-website" type="text" name="website" tabindex="-1" autocomplete="off" data-testid="landing-contact-honeypot-input">
+                            </div>
+
+                            <!-- Submit -->
+                            <button type="submit" data-testid="landing-contact-submit-button"
+                                class="w-full h-14 bg-gradient-to-r from-[#0055CC] to-[#0090D0] hover:from-[#004299] hover:to-[#007BB5] text-white rounded-xl font-bold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-200 flex items-center justify-center gap-2.5 text-base tracking-wide">
+                                <i data-lucide="send" class="w-5 h-5"></i>
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+
                 </div>
             </div>
         </div>
