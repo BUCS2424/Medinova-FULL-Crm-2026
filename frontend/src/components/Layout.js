@@ -298,19 +298,18 @@ export const Layout = ({ children }) => {
                   {versionedDashboardLogoUrl ? (
                     <img
                       src={versionedDashboardLogoUrl}
-                      alt="DME PROS logo"
+                      alt="MediNova logo"
                       className="h-10 max-w-[170px] object-contain"
                       data-testid="dashboard-top-logo-image"
                     />
                   ) : (
                     <>
-                      <span className="font-extrabold text-lg text-navy-700">DME</span>
-                      <span className="font-extrabold text-lg text-lime-500">PROS</span>
+                      <img src="/images/medinova/logo.webp" alt="MediNova" className="h-10 max-w-[170px] object-contain" />
                     </>
                   )}
                 </a>
               ) : (
-                <div className="w-8 h-8 rounded-lg bg-lime-500 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-[#0055CC] flex items-center justify-center flex-shrink-0">
                   <Shield className="w-5 h-5 text-white" />
                 </div>
               )}
@@ -580,7 +579,7 @@ export const Layout = ({ children }) => {
                     data-testid="dashboard-bottom-logo-image"
                   />
                 ) : (
-                  <span className="text-xs font-bold tracking-wide text-muted-foreground">DME PROS</span>
+                  <span className="text-xs font-bold tracking-wide text-muted-foreground">MediNova</span>
                 )}
               </a>
             )}

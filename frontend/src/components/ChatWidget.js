@@ -373,7 +373,7 @@ export default function ChatWidget() {
                   <>
                     <Bot className="w-16 h-16 mx-auto text-amber-500 mb-2" />
                     <h4 className="font-semibold text-lg">Hi! I&apos;m Joffry 👋</h4>
-                    <p className="text-sm text-gray-500">Your virtual assistant at DME PROS</p>
+                    <p className="text-sm text-gray-500">Your virtual assistant at MediNova</p>
                   </>
                 )}
               </div>

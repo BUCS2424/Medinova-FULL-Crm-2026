@@ -93,12 +93,7 @@ export default function LoginPage() {
                   data-testid="login-brand-logo-image"
                 />
               ) : (
-                <>
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl font-extrabold text-navy-700">DME</span>
-                    <span className="text-2xl font-extrabold text-lime-500">PROS</span>
-                  </div>
-                </>
+                <img src="/images/medinova/logo.webp" alt="MediNova Medical Supplies" className="h-10 max-w-[200px] object-contain" />
               )}
             </div>
             <p className="text-muted-foreground">HIPAA-Compliant Patient Management</p>
@@ -264,35 +259,35 @@ export default function LoginPage() {
       {/* Hero Section */}
       <div className="login-hero-section">
         <div className="relative z-10 text-center text-navy-700 px-8 max-w-lg">
-          <h2 className="text-3xl font-bold mb-6">Streamline Your <span className="whitespace-nowrap text-lime-500">Patient Experience</span></h2>
+          <h2 className="text-3xl font-bold mb-6">Streamline Your <span className="whitespace-nowrap gradient-text">Patient Experience</span></h2>
           <p className="text-slate-600 mb-8">
             Trust & Manage your billing, orders, deliveries, and all around DME experience with us, to get the job done right.
           </p>
           
           <div className="grid grid-cols-2 gap-4 text-left">
             <div className="flex items-start gap-3 p-4 rounded-xl bg-white border border-primary-100 shadow-sm">
-              <Users className="w-5 h-5 text-lime-400 mt-0.5" />
+              <Users className="w-5 h-5 text-[#00A3E0] mt-0.5" />
               <div>
                 <h3 className="font-semibold text-sm">Patient Management</h3>
                 <p className="text-xs text-slate-500">Secure patient records with audit trails</p>
               </div>
             </div>
             <div className="flex items-start gap-3 p-4 rounded-xl bg-white border border-primary-100 shadow-sm">
-              <Activity className="w-5 h-5 text-lime-400 mt-0.5" />
+              <Activity className="w-5 h-5 text-[#00A3E0] mt-0.5" />
               <div>
                 <h3 className="font-semibold text-sm">Easy Communication</h3>
                 <p className="text-xs text-slate-500">Send and receive messages about your updates</p>
               </div>
             </div>
             <div className="flex items-start gap-3 p-4 rounded-xl bg-white border border-primary-100 shadow-sm">
-              <FileText className="w-5 h-5 text-lime-400 mt-0.5" />
+              <FileText className="w-5 h-5 text-[#00A3E0] mt-0.5" />
               <div>
                 <h3 className="font-semibold text-sm">Order Tracking</h3>
                 <p className="text-xs text-slate-500">Full order lifecycle management</p>
               </div>
             </div>
             <div className="flex items-start gap-3 p-4 rounded-xl bg-white border border-primary-100 shadow-sm">
-              <Shield className="w-5 h-5 text-lime-400 mt-0.5" />
+              <Shield className="w-5 h-5 text-[#00A3E0] mt-0.5" />
               <div>
                 <h3 className="font-semibold text-sm">HIPAA Compliant</h3>
                 <p className="text-xs text-slate-500">Complete audit log tracking</p>

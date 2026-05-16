@@ -1,4 +1,11 @@
-/* Main App Styles - DME CRM */
+/* Main App Styles - MediNova DME CRM */
+
+.gradient-text {
+    background: linear-gradient(135deg, #0055CC, #00A3E0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
 
 /* Sidebar styles */
 .sidebar {
@@ -109,18 +116,18 @@
 }
 
 .login-form-section {
-    @apply flex-1 flex items-center justify-center p-8 bg-gradient-to-br from-lime-50 via-white to-slate-50;
+    @apply flex-1 flex items-center justify-center p-8 bg-gradient-to-br from-blue-50 via-white to-slate-50;
 }
 
 .login-hero-section {
     @apply hidden lg:flex flex-1 items-center justify-center relative;
-    @apply bg-gradient-to-br from-lime-50 via-white to-slate-50;
+    @apply bg-gradient-to-br from-blue-50 via-white to-slate-50;
 }
 
 .login-hero-section::before {
     content: '';
     @apply absolute inset-0 opacity-70;
-    background: radial-gradient(circle at top left, rgba(132, 204, 22, 0.14), transparent 28%), radial-gradient(circle at bottom right, rgba(30, 58, 95, 0.1), transparent 24%);
+    background: radial-gradient(circle at top left, rgba(0, 85, 204, 0.14), transparent 28%), radial-gradient(circle at bottom right, rgba(0, 163, 224, 0.1), transparent 24%);
 }
 
 /* Table actions */

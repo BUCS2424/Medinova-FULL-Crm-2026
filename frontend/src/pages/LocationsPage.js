@@ -25,7 +25,7 @@ import {
 import { PublicBrandLogo } from '../components/PublicBrandLogo';
 import { PublicMobileMenu } from '../components/PublicMobileMenu';
 
-const SITE_URL = 'https://dmepros.com';
+const SITE_URL = 'https://medinovadme.com';
 const OG_IMAGE = 'https://customer-assets.emergentagent.com/job_7965af6d-d9f9-48a9-9447-d2e9a0ead878/artifacts/e812a763_durable-medical-equipment-wheelchair.jpg';
 
 // US Regions for filtering
@@ -176,17 +176,17 @@ export default function LocationsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Helmet>
-        <title>DME PROS | Medicare-covered Durable Medical Equipment Service Areas</title>
-        <meta name="description" content="DME PROS delivers Medicare-covered durable medical equipment to all 50 states. Find your state to check eligibility and get free delivery." />
+        <title>MediNova Medical Supplies | Medicare-covered Durable Medical Equipment Service Areas</title>
+        <meta name="description" content="MediNova Medical Supplies delivers Medicare-covered durable medical equipment to all 50 states. Find your state to check eligibility and get free delivery." />
         <link rel="canonical" href={`${SITE_URL}/locations`} />
-        <meta property="og:title" content="DME PROS Service Areas | Medicare-covered DME Nationwide" />
-        <meta property="og:description" content="Explore DME PROS service areas across all 50 states, including county and city coverage pages for Medicare-covered equipment delivery." />
+        <meta property="og:title" content="MediNova Medical Supplies Service Areas | Medicare-covered DME Nationwide" />
+        <meta property="og:description" content="Explore MediNova Medical Supplies service areas across all 50 states, including county and city coverage pages for Medicare-covered equipment delivery." />
         <meta property="og:url" content={`${SITE_URL}/locations`} />
         <meta property="og:type" content="website" />
         <meta property="og:image" content={OG_IMAGE} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="DME PROS Service Areas | Medicare-covered DME Nationwide" />
-        <meta name="twitter:description" content="Explore DME PROS service areas across all 50 states, including county and city coverage pages for Medicare-covered equipment delivery." />
+        <meta name="twitter:title" content="MediNova Medical Supplies Service Areas | Medicare-covered DME Nationwide" />
+        <meta name="twitter:description" content="Explore MediNova Medical Supplies service areas across all 50 states, including county and city coverage pages for Medicare-covered equipment delivery." />
         <meta name="twitter:image" content={OG_IMAGE} />
         <script type="application/ld+json">
           {JSON.stringify({

@@ -40,7 +40,7 @@ export default function CampaignPage() {
 
             // Update the page title
             if (campaign.title) {
-              modified = modified.replace(/<title>[^<]*<\/title>/, `<title>${campaign.title} | DME PROS</title>`);
+              modified = modified.replace(/<title>[^<]*<\/title>/, `<title>${campaign.title} | MediNova</title>`);
             }
 
             // Inject UTM params into all form submissions

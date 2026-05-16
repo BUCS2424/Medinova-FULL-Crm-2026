@@ -12,7 +12,7 @@ import { PublicBrandLogo } from './PublicBrandLogo';
 export const PublicMobileMenu = ({
   pageKey,
   items,
-  title = 'Explore DME PROS',
+  title = 'Explore MediNova',
   description = 'Medicare-covered medical equipment with nationwide delivery and support.',
   primaryHref = '/#contact',
   primaryLabel = 'Get Started',

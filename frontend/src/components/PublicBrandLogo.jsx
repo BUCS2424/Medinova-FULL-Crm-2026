@@ -20,19 +20,13 @@ export const PublicBrandLogo = ({
       {versionedLogoUrl ? (
         <img
           src={versionedLogoUrl}
-          alt="DME PROS logo"
+          alt="MediNova Medical Supplies logo"
           className="h-[70px] max-w-[230px] object-contain"
           data-testid={`${testIdPrefix}-image`}
         />
       ) : (
         <>
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-lime-400 to-lime-600 flex items-center justify-center shadow-lg shadow-lime-500/20 transition-transform group-hover:scale-105">
-            <Shield className="w-6 h-6 text-white" />
-          </div>
-          <div data-testid={`${testIdPrefix}-fallback`}>
-            <div className="text-xl font-extrabold text-slate-900 leading-none">DME PROS</div>
-            <div className="text-xs text-slate-500 mt-1">{subtitle}</div>
-          </div>
+          <img src="/images/medinova/logo.webp" alt="MediNova Medical Supplies" className="h-[55px] max-w-[230px] object-contain" />
         </>
       )}
     </a>

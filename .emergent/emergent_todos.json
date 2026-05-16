@@ -1,38 +1,50 @@
 [
   {
-    "content": "Phase 1: Copy backend files (server.py, routes/, models/, services/, utils/, templates/, config.py, data files, audio_prompts/)",
+    "content": "Download and place MediNova assets (logo, hero image)",
     "status": "completed"
   },
   {
-    "content": "Phase 2: Copy frontend files (src/App.js, App.css, components/, pages/, contexts/, hooks/, utils/, index files)",
+    "content": "Update landing.html - full MediNova theme (blue gradient, hero, benefits, about, FAQ, testimonials, contact, footer)",
     "status": "completed"
   },
   {
-    "content": "Phase 3: Copy frontend public files and config files (tailwind, craco, postcss, etc.)",
+    "content": "Update LandingPage.js meta tags - MediNova branding",
     "status": "completed"
   },
   {
-    "content": "Phase 4: Install missing backend dependencies",
+    "content": "Update App.css - color scheme from lime/navy to blue gradient",
     "status": "completed"
   },
   {
-    "content": "Phase 5: Install missing frontend dependencies",
+    "content": "Update index.css CSS variables - primary from lime to blue",
     "status": "completed"
   },
   {
-    "content": "Phase 6: Configure environment variables and restart services",
+    "content": "Update tailwind.config.js - remap lime palette to blue",
     "status": "completed"
   },
   {
-    "content": "Phase 7: Verify backend starts without errors",
+    "content": "Update Layout.js - sidebar MediNova logo and branding",
     "status": "completed"
   },
   {
-    "content": "Phase 8: Verify frontend compiles without errors",
+    "content": "Update LoginPage.js - MediNova logo and blue accents",
     "status": "completed"
   },
   {
-    "content": "Phase 9: End-to-end testing with testing agent",
+    "content": "Update index.html - MediNova page title and SEO meta",
+    "status": "completed"
+  },
+  {
+    "content": "Update all DME PROS text references to MediNova across components",
+    "status": "completed"
+  },
+  {
+    "content": "Update PublicBrandLogo.jsx fallback to MediNova logo",
+    "status": "completed"
+  },
+  {
+    "content": "Verify compilation and visual test",
     "status": "completed"
   }
 ]

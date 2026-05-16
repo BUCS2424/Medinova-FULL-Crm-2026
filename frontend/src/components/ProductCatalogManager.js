@@ -281,8 +281,8 @@ export default function ProductCatalogManager() {
 
   // Generate SEO content for a product
   const generateSEOContent = (productName, categoryName) => {
-    const title = `${productName} | Medicare-Covered DME | DME PROS`;
-    const description = `Get Medicare-covered ${productName.toLowerCase()} from DME PROS. Free delivery, insurance verification, and expert support. ${categoryName} equipment for home health care.`;
+    const title = `${productName} | Medicare-Covered DME | MediNova Medical Supplies`;
+    const description = `Get Medicare-covered ${productName.toLowerCase()} from MediNova Medical Supplies. Free delivery, insurance verification, and expert support. ${categoryName} equipment for home health care.`;
     const keywords = `${productName.toLowerCase()}, Medicare ${productName.toLowerCase()}, DME ${productName.toLowerCase()}, ${categoryName.toLowerCase()}, medical equipment, durable medical equipment`;
     
     return { meta_title: title, meta_description: description, meta_keywords: keywords };
@@ -350,7 +350,7 @@ export default function ProductCatalogManager() {
             name: prod.name,
             slug: slug,
             short_description: prod.short_description,
-            full_description: `${prod.name} available through DME PROS. ${prod.short_description}. Medicare-covered with free delivery and expert support.`,
+            full_description: `${prod.name} available through MediNova Medical Supplies. ${prod.short_description}. Medicare-covered with free delivery and expert support.`,
             features: ['Medicare covered', 'Free delivery', 'Insurance verification', 'Expert support'],
             benefits: ['Improved quality of life', 'Professional fitting', 'Ongoing support'],
             enabled: true,
@@ -902,7 +902,7 @@ export default function ProductCatalogManager() {
                     <Input 
                       value={newProduct.meta_title}
                       onChange={(e) => setNewProduct({ ...newProduct, meta_title: e.target.value })}
-                      placeholder="Product Name | Medicare-Covered DME | DME PROS"
+                      placeholder="Product Name | Medicare-Covered DME | MediNova"
                     />
                   </div>
                   <div>
@@ -910,7 +910,7 @@ export default function ProductCatalogManager() {
                     <Textarea 
                       value={newProduct.meta_description}
                       onChange={(e) => setNewProduct({ ...newProduct, meta_description: e.target.value })}
-                      placeholder="Get Medicare-covered product from DME PROS..."
+                      placeholder="Get Medicare-covered product from MediNova..."
                       rows={2}
                     />
                   </div>
