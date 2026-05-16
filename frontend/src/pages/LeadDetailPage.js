@@ -304,7 +304,7 @@ export default function LeadDetailPage() {
           </style>
         </head>
         <body>
-          <h1>DME PROS Lead Sheet</h1>
+          <h1>MediNova Lead Sheet</h1>
           <p class="sub">Generated ${new Date().toLocaleString()}</p>
 
           <div class="section">

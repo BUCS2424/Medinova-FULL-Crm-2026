@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
-const SITE_URL = 'https://dmepros.com';
+const SITE_URL = 'https://medinovadme.com';
 
 // Default product images by category
 const defaultProductImages = {
@@ -73,11 +73,11 @@ function RequestInfoModal({ isOpen, onClose, product }) {
 
   // Consent language constants for audit trail
   const CONSENT_LANGUAGE = {
-    contact: "I consent to be contacted by DME PROS via phone, text, or email regarding my equipment request. I understand I may receive automated calls or text messages at the number provided.",
-    hipaa: "I authorize DME PROS to obtain and share my health information with my physician and insurance company for the purpose of processing this request.",
+    contact: "I consent to be contacted by MediNova Medical Supplies via phone, text, or email regarding my equipment request. I understand I may receive automated calls or text messages at the number provided.",
+    hipaa: "I authorize MediNova Medical Supplies to obtain and share my health information with my physician and insurance company for the purpose of processing this request.",
     insurance: "I understand that equipment coverage is subject to insurance verification and approval, and I may be responsible for any costs not covered by my insurance.",
-    sms: "I consent to receive SMS text messages from DME PROS for appointment reminders, order updates, and promotional messages. Message and data rates may apply. Text STOP to opt out.",
-    tcpa: "By providing my phone number and checking this box, I give express written consent under the Telephone Consumer Protection Act (TCPA) to receive calls and texts, including those made using an automatic telephone dialing system or prerecorded voice, from DME PROS or its representatives."
+    sms: "I consent to receive SMS text messages from MediNova Medical Supplies for appointment reminders, order updates, and promotional messages. Message and data rates may apply. Text STOP to opt out.",
+    tcpa: "By providing my phone number and checking this box, I give express written consent under the Telephone Consumer Protection Act (TCPA) to receive calls and texts, including those made using an automatic telephone dialing system or prerecorded voice, from MediNova Medical Supplies or its representatives."
   };
   const CONSENT_VERSION = "1.2";
 
@@ -410,7 +410,7 @@ function RequestInfoModal({ isOpen, onClose, product }) {
 }
 
 export default function ProductDetailPage() {
-  const { productSlug } = useParams();
+  const { productSlug, categorySlug } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -471,7 +471,7 @@ export default function ProductDetailPage() {
     "sku": product.sku,
     "brand": {
       "@type": "Brand",
-      "name": "DME PROS"
+      "name": "MediNova Medical Supplies"
     },
     "offers": {
       "@type": "Offer",
@@ -481,7 +481,7 @@ export default function ProductDetailPage() {
       "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       "seller": {
         "@type": "Organization",
-        "name": "DME PROS"
+        "name": "MediNova Medical Supplies"
       }
     },
     "aggregateRating": {
@@ -502,26 +502,26 @@ export default function ProductDetailPage() {
     <>
       {/* SEO Meta Tags */}
       <Helmet>
-        <title>{product.meta_title || `${product.name} | Medicare-Covered DME | DME PROS`}</title>
+        <title>{product.meta_title || `${product.name} | Medicare-Covered DME | MediNova Medical Supplies`}</title>
         <meta name="description" content={product.meta_description || product.short_description} />
         <meta name="keywords" content={product.meta_keywords || `${product.name}, Medicare DME, medical equipment`} />
         <meta name="robots" content="index, follow, max-image-preview:large" />
-        <link rel="canonical" href={`${SITE_URL}/products/${product.slug}`} />
+        <link rel="canonical" href={categorySlug ? `${SITE_URL}/products/${categorySlug}/${product.slug}` : `${SITE_URL}/products/${product.slug}`} />
         
         {/* Open Graph */}
         <meta property="og:title" content={product.name} />
         <meta property="og:description" content={product.short_description} />
         <meta property="og:image" content={product.image_url || getDefaultImage()} />
         <meta property="og:type" content="product" />
-        <meta property="og:url" content={`${SITE_URL}/products/${product.slug}`} />
-        <meta property="og:site_name" content="DME PROS" />
+        <meta property="og:url" content={categorySlug ? `${SITE_URL}/products/${categorySlug}/${product.slug}` : `${SITE_URL}/products/${product.slug}`} />
+        <meta property="og:site_name" content="MediNova Medical Supplies" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={product.name} />
         <meta name="twitter:description" content={product.short_description} />
         <meta name="twitter:image" content={product.image_url || getDefaultImage()} />
-        <meta name="twitter:url" content={`${SITE_URL}/products/${product.slug}`} />
+        <meta name="twitter:url" content={categorySlug ? `${SITE_URL}/products/${categorySlug}/${product.slug}` : `${SITE_URL}/products/${product.slug}`} />
         
         {/* Structured Data */}
         <script type="application/ld+json">
@@ -542,12 +542,12 @@ export default function ProductDetailPage() {
                   <a href="/medicare-resources" className="hover:text-navy-700 transition-colors">Resources</a>
                 </nav>
                 <a 
-                  href="tel:7279667767" 
+                  href="tel:2488864363" 
                   className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-lime-500 to-lime-600 hover:from-lime-600 hover:to-lime-700 px-4 py-2 rounded-xl font-medium transition-all shadow-lg"
                   data-testid="product-detail-call-button"
                 >
                   <Phone className="w-4 h-4" />
-                  (727) 966-7767
+                  (248) 886-4-DME
                 </a>
                 <div className="lg:hidden">
                   <PublicMobileMenu
@@ -571,10 +571,12 @@ export default function ProductDetailPage() {
               <Link to="/" className="text-lime-600 hover:text-lime-700">Home</Link>
               <ChevronRight className="w-4 h-4 text-gray-400" />
               <Link to="/products" className="text-lime-600 hover:text-lime-700">Products</Link>
-              {product.category && (
+              {(product.category || categorySlug) && (
                 <>
                   <ChevronRight className="w-4 h-4 text-gray-400" />
-                  <Link to="/products" className="text-lime-600 hover:text-lime-700">{product.category.name}</Link>
+                  <Link to={`/products/category/${categorySlug || product.category?.slug || ''}`} className="text-lime-600 hover:text-lime-700">
+                    {product.category?.name || product.category_name || categorySlug}
+                  </Link>
                 </>
               )}
               <ChevronRight className="w-4 h-4 text-gray-400" />
@@ -694,8 +696,8 @@ export default function ProductDetailPage() {
               {/* Phone CTA */}
               <div className="text-center">
                 <span className="text-gray-500">or call us directly</span>
-                <a href="tel:7279667767" className="block text-2xl font-bold text-lime-600 hover:text-lime-700 mt-1">
-                  (727) 966-7767
+                <a href="tel:2488864363" className="block text-2xl font-bold text-lime-600 hover:text-lime-700 mt-1">
+                  (248) 886-4-DME
                 </a>
               </div>
             </div>
@@ -755,7 +757,7 @@ export default function ProductDetailPage() {
         <footer className="bg-navy-900 text-white py-12 mt-16">
           <div className="max-w-7xl mx-auto px-4 text-center">
             <p className="text-gray-400">
-              © {new Date().getFullYear()} DME PROS. Medicare-Accredited DME Supplier.
+              © {new Date().getFullYear()} MediNova Medical Supplies. Medicare-Accredited DME Supplier.
             </p>
           </div>
         </footer>

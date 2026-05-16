@@ -126,7 +126,19 @@ function AppRoutes() {
         element={<ProductCatalogPage />}
       />
       
-      {/* Individual Product Detail Page (SEO) */}
+      {/* Category Page (SEO - /products/:categorySlug) */}
+      <Route
+        path="/products/category/:categorySlug"
+        element={<ProductCatalogPage />}
+      />
+
+      {/* Individual Product Detail Page (SEO - /products/:categorySlug/:productSlug) */}
+      <Route
+        path="/products/:categorySlug/:productSlug"
+        element={<ProductDetailPage />}
+      />
+
+      {/* Legacy Individual Product Detail Page (SEO) */}
       <Route
         path="/products/:productSlug"
         element={<ProductDetailPage />}

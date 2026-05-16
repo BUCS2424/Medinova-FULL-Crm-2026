@@ -184,24 +184,24 @@ export default function MedicareResourcesPage() {
   return (
     <div className="min-h-screen bg-white">
       <Helmet>
-        <title>Medicare DME Resources & Education | DME PROS</title>
+        <title>Medicare DME Resources & Education | MediNova Medical Supplies</title>
         <meta
           name="description"
-          content="Explore trusted Medicare DME resources, patient rights information, state help programs, and educational guides curated by DME PROS."
+          content="Explore trusted Medicare DME resources, patient rights information, state help programs, and educational guides curated by MediNova Medical Supplies."
         />
         <link rel="canonical" href={`${SITE_DOMAIN}/medicare-resources`} />
-        <meta property="og:title" content="Medicare DME Resources & Education | DME PROS" />
+        <meta property="og:title" content="Medicare DME Resources & Education | MediNova Medical Supplies" />
         <meta
           property="og:description"
-          content="Explore trusted Medicare DME resources, patient rights information, state help programs, and educational guides curated by DME PROS."
+          content="Explore trusted Medicare DME resources, patient rights information, state help programs, and educational guides curated by MediNova Medical Supplies."
         />
         <meta property="og:url" content={`${SITE_DOMAIN}/medicare-resources`} />
         <meta property="og:type" content="article" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Medicare DME Resources & Education | DME PROS" />
+        <meta name="twitter:title" content="Medicare DME Resources & Education | MediNova Medical Supplies" />
         <meta
           name="twitter:description"
-          content="Explore trusted Medicare DME resources, patient rights information, state help programs, and educational guides curated by DME PROS."
+          content="Explore trusted Medicare DME resources, patient rights information, state help programs, and educational guides curated by MediNova Medical Supplies."
         />
         <script type="application/ld+json">
           {JSON.stringify({
@@ -210,10 +210,10 @@ export default function MedicareResourcesPage() {
             name: 'Medicare DME Resources & Education',
             url: `${SITE_DOMAIN}/medicare-resources`,
             description:
-              'Trusted Medicare DME resources, patient rights information, state help programs, and educational guides curated by DME PROS.',
+              'Trusted Medicare DME resources, patient rights information, state help programs, and educational guides curated by MediNova Medical Supplies.',
             publisher: {
               '@type': 'Organization',
-              name: 'DME PROS',
+              name: 'MediNova Medical Supplies',
               url: SITE_DOMAIN,
             },
           })}
@@ -222,8 +222,8 @@ export default function MedicareResourcesPage() {
       {/* Top Bar */}
       <div className="bg-navy-700 text-white py-2.5 px-4">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between text-sm">
-          <a href="tel:7279667767" className="flex items-center gap-2 hover:text-lime-400">
-            <Phone className="w-4 h-4" /><span className="font-medium">(727) 966-7767</span>
+          <a href="tel:2488864363" className="flex items-center gap-2 hover:text-lime-400">
+            <Phone className="w-4 h-4" /><span className="font-medium">(248) 886-4-DME</span>
           </a>
           <a href="/" className="flex items-center gap-2 hover:text-lime-400">Back to Home</a>
         </div>
@@ -356,8 +356,8 @@ export default function MedicareResourcesPage() {
           <h2 className="text-3xl md:text-4xl font-bold text-navy-700 mb-6">Need Help Understanding Your Coverage?</h2>
           <p className="text-gray-600 text-lg mb-8">Our specialists are ready to answer your questions and help you get the Medicare-covered equipment you need.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="tel:7279667767" className="bg-gradient-to-r from-lime-500 to-lime-600 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg inline-flex items-center justify-center gap-2">
-              <Phone className="w-5 h-5" />(727) 966-7767
+            <a href="tel:2488864363" className="bg-gradient-to-r from-lime-500 to-lime-600 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg inline-flex items-center justify-center gap-2">
+              <Phone className="w-5 h-5" />(248) 886-4-DME
             </a>
             <a href="/#contact" className="border-2 border-gray-200 bg-white text-navy-700 px-8 py-4 text-lg font-semibold rounded-xl inline-flex items-center justify-center gap-2 hover:border-primary-200 hover:bg-primary-50 transition-colors">
               Request Information <ArrowRight className="w-5 h-5" />
@@ -382,12 +382,12 @@ export default function MedicareResourcesPage() {
       <footer className="bg-gradient-to-br from-navy-900 to-navy-800 text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 mb-8">
-            <div><h3 className="text-xl font-bold mb-4">DME PROS</h3><p className="text-gray-400 text-sm">Medicare-accredited DME supplier serving patients nationwide.</p></div>
+            <div><h3 className="text-xl font-bold mb-4">MediNova Medical Supplies</h3><p className="text-gray-400 text-sm">Medicare-accredited DME supplier serving patients nationwide.</p></div>
             <div><h4 className="font-semibold mb-4">Quick Links</h4><ul className="space-y-2 text-gray-400 text-sm"><li><a href="/" className="hover:text-white">Home</a></li><li><a href="/products" className="hover:text-white">Products</a></li><li><a href="/locations/" className="hover:text-white">Coverage Areas</a></li><li><a href="/medicare-resources" className="hover:text-lime-400 text-lime-400">Medicare Resources</a></li></ul></div>
-            <div><h4 className="font-semibold mb-4">Contact</h4><ul className="space-y-2 text-gray-400 text-sm"><li><a href="tel:7279667767" className="hover:text-white">(727) 966-7767</a></li><li><a href="mailto:info@dmepros.com" className="hover:text-white">info@dmepros.com</a></li></ul></div>
+            <div><h4 className="font-semibold mb-4">Contact</h4><ul className="space-y-2 text-gray-400 text-sm"><li><a href="tel:2488864363" className="hover:text-white">(248) 886-4-DME</a></li><li><a href="mailto:info@dmepros.com" className="hover:text-white">info@dmepros.com</a></li></ul></div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
-            <p>&copy; 2025 DME PROS. All Rights Reserved.</p>
+            <p>&copy; 2025 MediNova Medical Supplies. All Rights Reserved.</p>
           </div>
         </div>
       </footer>

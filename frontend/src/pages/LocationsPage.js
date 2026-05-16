@@ -192,13 +192,13 @@ export default function LocationsPage() {
           {JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'CollectionPage',
-            name: 'DME PROS Service Areas',
+            name: 'MediNova Medical Supplies Service Areas',
             url: `${SITE_URL}/locations`,
             description:
-              'Explore nationwide DME delivery coverage areas from DME PROS, including state, county, and city service pages.',
+              'Explore nationwide DME delivery coverage areas from MediNova Medical Supplies, including state, county, and city service pages.',
             isPartOf: {
               '@type': 'WebSite',
-              name: 'DME PROS',
+              name: 'MediNova Medical Supplies',
               url: SITE_URL,
             },
           })}
@@ -216,12 +216,12 @@ export default function LocationsPage() {
                 <a href="/medicare-resources" className="hover:text-white transition-colors">Resources</a>
               </nav>
               <a 
-                href="tel:7279667767" 
+                href="tel:2488864363" 
                 className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-lime-500 to-lime-600 hover:from-lime-600 hover:to-lime-700 px-5 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30"
                 data-testid="locations-page-call-button"
               >
                 <Phone className="w-4 h-4" />
-                (727) 966-7767
+                (248) 886-4-DME
               </a>
               {patientPortalEnabled && (
                 <a 
@@ -237,7 +237,7 @@ export default function LocationsPage() {
                   pageKey="locations-page"
                   items={menuItems}
                   title="Browse Coverage Areas"
-                  description="Find your state, county, or city and connect with the DME PROS team fast."
+                  description="Find your state, county, or city and connect with the MediNova Medical Supplies team fast."
                   primaryHref="/#contact"
                   primaryLabel="Check Eligibility"
                 />
@@ -726,11 +726,11 @@ export default function LocationsPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="tel:7279667767"
+                href="tel:2488864363"
                 className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-lime-500 to-lime-600 hover:from-lime-600 hover:to-lime-700 text-white font-semibold px-8 py-4 rounded-xl transition-all text-lg shadow-lg shadow-amber-500/20"
               >
                 <Phone className="w-5 h-5" />
-                Call (727) 966-7767
+                Call (248) 886-4-DME
               </a>
               <Link
                 to="/products"
@@ -752,7 +752,7 @@ export default function LocationsPage() {
               {versionedLogoUrl ? (
                 <img
                   src={versionedLogoUrl}
-                  alt="DME PROS logo"
+                  alt="MediNova Medical Supplies logo"
                   className="h-10 max-w-[160px] object-contain"
                   data-testid="locations-page-footer-logo-image"
                 />
@@ -762,7 +762,7 @@ export default function LocationsPage() {
                     <Shield className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-bold">DME PROS</h3>
+                    <h3 className="font-bold">MediNova Medical Supplies</h3>
                     <p className="text-sm text-gray-400">Medicare DME Supplier</p>
                   </div>
                 </>
@@ -783,7 +783,7 @@ export default function LocationsPage() {
               </Link>
             </div>
             <p className="text-sm text-gray-500">
-              © {new Date().getFullYear()} DME PROS. All rights reserved.
+              © {new Date().getFullYear()} MediNova Medical Supplies. All rights reserved.
             </p>
           </div>
         </div>

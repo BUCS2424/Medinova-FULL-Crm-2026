@@ -574,7 +574,7 @@ export const Layout = ({ children }) => {
                 {versionedDashboardLogoUrl ? (
                   <img
                     src={versionedDashboardLogoUrl}
-                    alt="DME PROS logo"
+                    alt="MediNova logo"
                     className="h-8 max-w-[140px] object-contain"
                     data-testid="dashboard-bottom-logo-image"
                   />

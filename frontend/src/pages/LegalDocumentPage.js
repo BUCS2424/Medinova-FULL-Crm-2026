@@ -58,7 +58,7 @@ export default function LegalDocumentPage() {
       if (res.data.meta_title) {
         window.document.title = res.data.meta_title;
       } else {
-        window.document.title = `${res.data.title} | DME PROS`;
+        window.document.title = `${res.data.title} | MediNova Medical Supplies`;
       }
     } catch (err) {
       setError(err.response?.data?.detail || 'Document not found');
@@ -409,7 +409,7 @@ function Header() {
             <span className="text-white font-bold text-lg">M</span>
           </div>
           <div>
-            <span className="text-xl font-bold text-navy-700">DME PROS</span>
+            <span className="text-xl font-bold text-navy-700">MediNova Medical Supplies</span>
             <p className="text-xs text-slate-500">Medical Equipment Solutions</p>
           </div>
         </Link>
@@ -447,7 +447,7 @@ function Footer({ links = [], currentSlug }) {
                 <span className="text-white font-bold text-lg">M</span>
               </div>
               <div>
-                <span className="text-xl font-bold">DME PROS</span>
+                <span className="text-xl font-bold">MediNova Medical Supplies</span>
                 <p className="text-xs text-slate-400">Medical Equipment Solutions</p>
               </div>
             </div>
@@ -509,7 +509,7 @@ function Footer({ links = [], currentSlug }) {
         {/* Bottom Bar */}
         <div className="border-t border-slate-700 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-slate-500 text-sm">
-            © {new Date().getFullYear()} DME PROS. All rights reserved.
+            © {new Date().getFullYear()} MediNova Medical Supplies. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-2 text-slate-500 text-sm">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
 import TestimonialsSection from '../components/TestimonialsSection';
@@ -47,7 +47,7 @@ import {
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
-const SITE_URL = 'https://dmepros.com';
+const SITE_URL = 'https://medinovadme.com';
 const OG_IMAGE = 'https://customer-assets.emergentagent.com/job_7965af6d-d9f9-48a9-9447-d2e9a0ead878/artifacts/e812a763_durable-medical-equipment-wheelchair.jpg';
 
 // Category icons mapping
@@ -349,13 +349,13 @@ function RequestInfoModal({ isOpen, onClose, product, categoryName }) {
                   <label className="flex items-start gap-2 cursor-pointer">
                     <input type="checkbox" checked={formData.consentContact} onChange={(e) => setFormData({ ...formData, consentContact: e.target.checked })}
                       className="w-4 h-4 mt-0.5 text-lime-500 rounded border-gray-300 focus:ring-lime-500" />
-                    <span className="text-xs text-gray-700"><strong>Consent to Contact:</strong> I consent to be contacted by DME PROS via phone, text, or email regarding my equipment request.</span>
+                    <span className="text-xs text-gray-700"><strong>Consent to Contact:</strong> I consent to be contacted by MediNova Medical Supplies via phone, text, or email regarding my equipment request.</span>
                   </label>
                   
                   <label className="flex items-start gap-2 cursor-pointer">
                     <input type="checkbox" checked={formData.consentHipaa} onChange={(e) => setFormData({ ...formData, consentHipaa: e.target.checked })}
                       className="w-4 h-4 mt-0.5 text-lime-500 rounded border-gray-300 focus:ring-lime-500" />
-                    <span className="text-xs text-gray-700"><strong>HIPAA / PHI Permission:</strong> I authorize DME PROS to obtain and share my health information with my physician and insurance company for the purpose of processing this request.</span>
+                    <span className="text-xs text-gray-700"><strong>HIPAA / PHI Permission:</strong> I authorize MediNova Medical Supplies to obtain and share my health information with my physician and insurance company for the purpose of processing this request.</span>
                   </label>
                   
                   <label className="flex items-start gap-2 cursor-pointer">
@@ -471,7 +471,7 @@ function CategoryCard({ category, onClick, index }) {
 }
 
 // Premium Product Card
-function ProductCard({ product, categoryName, onRequestInfo }) {
+function ProductCard({ product, categoryName, categorySlug, onRequestInfo }) {
   const colors = categoryColors[categoryName] || { gradient: 'from-gray-500 to-gray-600', bg: 'bg-gray-500/10', glow: 'shadow-gray-500/25', accent: 'text-gray-500' };
   const defaultImage = defaultProductImages[categoryName] || 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=300&fit=crop';
 
@@ -481,7 +481,7 @@ function ProductCard({ product, categoryName, onRequestInfo }) {
       data-testid={`product-card-${product.slug}`}
     >
       {/* Image */}
-      <Link to={`/products/${product.slug}`} className="block relative aspect-square overflow-hidden">
+      <Link to={categorySlug ? `/products/${categorySlug}/${product.slug}` : `/products/${product.slug}`} className="block relative aspect-square overflow-hidden">
         <img 
           src={product.image_url || defaultImage}
           alt={product.name}
@@ -519,7 +519,7 @@ function ProductCard({ product, categoryName, onRequestInfo }) {
 
       {/* Content */}
       <div className="p-5">
-        <Link to={`/products/${product.slug}`}>
+        <Link to={categorySlug ? `/products/${categorySlug}/${product.slug}` : `/products/${product.slug}`}>
           <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-lime-600 transition-colors line-clamp-2 min-h-[3.5rem]">
             {product.name}
           </h3>
@@ -573,6 +573,8 @@ function StatCard({ icon: Icon, value, label, gradient }) {
 }
 
 export default function ProductCatalogPage() {
+  const { categorySlug } = useParams();
+  const navigate = useNavigate();
   const [catalog, setCatalog] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -584,6 +586,18 @@ export default function ProductCatalogPage() {
   useEffect(() => {
     fetchCatalog();
   }, []);
+
+  // Auto-select category from URL slug
+  useEffect(() => {
+    if (categorySlug && catalog.length > 0) {
+      const found = catalog.find(c => c.slug === categorySlug);
+      if (found) {
+        setSelectedCategory(found);
+      }
+    } else if (!categorySlug) {
+      setSelectedCategory(null);
+    }
+  }, [categorySlug, catalog]);
 
   const fetchCatalog = async () => {
     try {
@@ -614,7 +628,7 @@ export default function ProductCatalogPage() {
           p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           p.short_description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           p.sku?.toLowerCase().includes(searchTerm.toLowerCase())
-        ).map(p => ({ ...p, categoryName: cat.name })) || []
+        ).map(p => ({ ...p, categoryName: cat.name, categorySlug: cat.slug })) || []
       )
     : [];
 
@@ -657,38 +671,48 @@ export default function ProductCatalogPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary-50/40 via-white to-gray-50">
       <Helmet>
-        <title>DME PROS Products | Medicare-covered Medical Equipment Catalog</title>
+        <title>{selectedCategory ? `${selectedCategory.name} | MediNova Medical Supplies` : 'MediNova Products | Medicare-covered Medical Equipment Catalog'}</title>
         <meta
           name="description"
-          content="Browse Medicare-covered DME products from DME PROS, including mobility equipment, braces, respiratory support, hospital beds, and more."
+          content={selectedCategory 
+            ? `Browse ${selectedCategory.name} from MediNova Medical Supplies. ${selectedCategory.description || 'Medicare-covered durable medical equipment with free delivery.'}`
+            : 'Browse Medicare-covered DME products from MediNova Medical Supplies, including mobility equipment, braces, respiratory support, hospital beds, and more.'
+          }
         />
-        <link rel="canonical" href={`${SITE_URL}/products`} />
-        <meta property="og:title" content="DME PROS Products | Medicare-covered Medical Equipment Catalog" />
+        <link rel="canonical" href={selectedCategory ? `${SITE_URL}/products/category/${selectedCategory.slug}` : `${SITE_URL}/products`} />
+        <meta property="og:title" content={selectedCategory ? `${selectedCategory.name} | MediNova Medical Supplies` : 'MediNova Products | Medicare-covered Medical Equipment Catalog'} />
         <meta
           property="og:description"
-          content="Browse Medicare-covered DME products from DME PROS, including mobility equipment, braces, respiratory support, hospital beds, and more."
+          content={selectedCategory 
+            ? `Browse ${selectedCategory.name} from MediNova Medical Supplies. ${selectedCategory.description || 'Medicare-covered durable medical equipment with free delivery.'}`
+            : 'Browse Medicare-covered DME products from MediNova Medical Supplies, including mobility equipment, braces, respiratory support, hospital beds, and more.'
+          }
         />
-        <meta property="og:url" content={`${SITE_URL}/products`} />
+        <meta property="og:url" content={selectedCategory ? `${SITE_URL}/products/category/${selectedCategory.slug}` : `${SITE_URL}/products`} />
         <meta property="og:type" content="website" />
         <meta property="og:image" content={OG_IMAGE} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="DME PROS Products | Medicare-covered Medical Equipment Catalog" />
+        <meta name="twitter:title" content={selectedCategory ? `${selectedCategory.name} | MediNova Medical Supplies` : 'MediNova Products | Medicare-covered Medical Equipment Catalog'} />
         <meta
           name="twitter:description"
-          content="Browse Medicare-covered DME products from DME PROS, including mobility equipment, braces, respiratory support, hospital beds, and more."
+          content={selectedCategory 
+            ? `Browse ${selectedCategory.name} from MediNova Medical Supplies. ${selectedCategory.description || 'Medicare-covered durable medical equipment with free delivery.'}`
+            : 'Browse Medicare-covered DME products from MediNova Medical Supplies, including mobility equipment, braces, respiratory support, hospital beds, and more.'
+          }
         />
         <meta name="twitter:image" content={OG_IMAGE} />
         <script type="application/ld+json">
           {JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'CollectionPage',
-            name: 'DME PROS Product Catalog',
-            url: `${SITE_URL}/products`,
-            description:
-              'Browse Medicare-covered DME products from DME PROS, including mobility equipment, braces, respiratory support, hospital beds, and more.',
+            name: selectedCategory ? `${selectedCategory.name} - MediNova Medical Supplies` : 'MediNova Product Catalog',
+            url: selectedCategory ? `${SITE_URL}/products/category/${selectedCategory.slug}` : `${SITE_URL}/products`,
+            description: selectedCategory
+              ? `Browse ${selectedCategory.name} from MediNova Medical Supplies. ${selectedCategory.description || ''}`
+              : 'Browse Medicare-covered DME products from MediNova Medical Supplies, including mobility equipment, braces, respiratory support, hospital beds, and more.',
             isPartOf: {
               '@type': 'WebSite',
-              name: 'DME PROS',
+              name: 'MediNova Medical Supplies',
               url: SITE_URL,
             },
           })}
@@ -708,9 +732,9 @@ export default function ProductCatalogPage() {
                 <a href="/locations" className="hover:text-navy-700 transition-colors">Coverage Areas</a>
                 <a href="/medicare-resources" className="hover:text-navy-700 transition-colors">Resources</a>
               </div>
-              <a href="tel:7279667767" className="hidden md:flex items-center gap-2 bg-gradient-to-r from-lime-500 to-lime-600 hover:from-lime-600 hover:to-lime-700 px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-lime-500/30 hover:shadow-lime-500/50 hover:scale-105">
+              <a href="tel:2488864363" className="hidden md:flex items-center gap-2 bg-gradient-to-r from-lime-500 to-lime-600 hover:from-lime-600 hover:to-lime-700 px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-lime-500/30 hover:shadow-lime-500/50 hover:scale-105">
                 <Phone className="w-4 h-4" />
-                (727) 966-7767
+                (248) 886-4-DME
               </a>
               <a href="/login" className="hidden md:inline-flex text-slate-600 hover:text-navy-700 transition-colors">Portal</a>
               <div className="lg:hidden">
@@ -788,7 +812,7 @@ export default function ProductCatalogPage() {
         {selectedCategory && (
           <div className="relative z-10 max-w-7xl mx-auto px-4 py-12">
             <button
-              onClick={() => setSelectedCategory(null)}
+              onClick={() => navigate('/products')}
               className="flex items-center gap-2 text-lime-600 hover:text-lime-700 font-medium mb-6 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -843,6 +867,7 @@ export default function ProductCatalogPage() {
                   key={product.id} 
                   product={product} 
                   categoryName={product.categoryName}
+                  categorySlug={product.categorySlug}
                   onRequestInfo={(p) => handleRequestInfo(p, product.categoryName)}
                 />
               ))}
@@ -884,7 +909,7 @@ export default function ProductCatalogPage() {
                     key={category.id}
                     category={category}
                     index={index}
-                    onClick={() => setSelectedCategory(category)}
+                    onClick={() => navigate(`/products/category/${category.slug}`)}
                   />
                 ))
               )}
@@ -917,6 +942,7 @@ export default function ProductCatalogPage() {
                     key={product.id} 
                     product={product}
                     categoryName={selectedCategory.name}
+                    categorySlug={selectedCategory.slug}
                     onRequestInfo={(p) => handleRequestInfo(p, selectedCategory.name)}
                   />
                 ))
@@ -961,10 +987,10 @@ export default function ProductCatalogPage() {
               Call us today to check your eligibility and get equipment delivered to your door.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="tel:7279667767"
+              <a href="tel:2488864363"
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-lime-500 to-lime-600 hover:from-lime-600 hover:to-lime-700 text-white font-bold px-8 py-4 rounded-xl transition-all shadow-lg shadow-lime-500/30 hover:shadow-lime-500/50 hover:scale-105 text-lg">
                 <Phone className="w-5 h-5" />
-                Call (727) 966-7767
+                Call (248) 886-4-DME
               </a>
               <button
                 onClick={() => { setSelectedProduct(null); setModalOpen(true); }}
@@ -989,7 +1015,7 @@ export default function ProductCatalogPage() {
                 <Shield className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-bold">DME PROS</h3>
+                <h3 className="font-bold">MediNova Medical Supplies</h3>
                 <p className="text-sm text-gray-400">Medicare DME Supplier</p>
               </div>
             </div>
@@ -999,7 +1025,7 @@ export default function ProductCatalogPage() {
               <Link to="/locations" className="hover:text-white transition-colors">Coverage Areas</Link>
               <Link to="/write-review" className="hover:text-white transition-colors">Write a Review</Link>
             </div>
-            <p className="text-sm text-gray-500">© {new Date().getFullYear()} DME PROS</p>
+            <p className="text-sm text-gray-500">© {new Date().getFullYear()} MediNova Medical Supplies</p>
           </div>
         </div>
       </footer>

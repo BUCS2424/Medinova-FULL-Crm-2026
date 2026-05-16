@@ -813,7 +813,7 @@
                     const productCount = productCounts[cat.id] || 0;
                     const icon = getIconForCategory(cat.name);
                     const card = document.createElement('a');
-                    card.href = '/products';
+                    card.href = `/products/category/${cat.slug}`;
                     card.className = 'group flex items-center justify-between bg-white rounded-[20px] border border-slate-100/80 shadow-[0_2px_16px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_30px_rgba(0,85,204,0.08)] hover:border-slate-200 transition-all duration-400 px-6 py-5 cursor-pointer';
                     card.style.animationDelay = `${index * 0.08}s`;
                     card.innerHTML = `
