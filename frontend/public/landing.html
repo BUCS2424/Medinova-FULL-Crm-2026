@@ -312,8 +312,7 @@
             <div class="flex items-center justify-between">
                 <!-- Logo -->
                 <a href="/" class="flex items-center gap-2" data-brand-logo-link data-default-href="/">
-                    <img data-brand-logo-image alt="MediNova logo" class="h-[70px] max-w-[230px] object-contain hidden" />
-                    <img src="/images/medinova/logo.webp" alt="MediNova Medical Supplies" class="h-[55px] max-w-[230px] object-contain" data-brand-logo-fallback />
+                    <img data-brand-logo-image src="/images/medinova/logo.webp" alt="MediNova Medical Supplies logo" class="h-[70px] max-w-[230px] object-contain" />
                 </a>
                 
                 <!-- Desktop Nav -->
@@ -343,8 +342,7 @@
     <aside id="mobile-drawer" class="mobile-drawer lg:hidden" aria-hidden="true" data-testid="landing-mobile-drawer">
         <div class="flex items-start justify-between gap-4">
             <a href="/" class="flex items-center gap-2" data-brand-logo-link data-default-href="/" data-testid="landing-mobile-menu-logo-link">
-                <img data-brand-logo-image alt="MediNova logo" class="h-[50px] max-w-[200px] object-contain hidden" data-testid="landing-mobile-menu-logo-image" />
-                <img src="/images/medinova/logo.webp" alt="MediNova Medical Supplies" class="h-[45px] max-w-[200px] object-contain" data-brand-logo-fallback />
+                <img data-brand-logo-image src="/images/medinova/logo.webp" alt="MediNova Medical Supplies logo" class="h-[50px] max-w-[200px] object-contain" data-testid="landing-mobile-menu-logo-image" />
             </a>
             <button id="mobile-menu-close" type="button" class="p-2 rounded-xl text-gray-700 hover:bg-gray-100" aria-label="Close navigation menu" data-testid="landing-mobile-menu-close-button">
                 <i data-lucide="x" class="w-6 h-6"></i>
@@ -1335,7 +1333,7 @@
                 <!-- Company Info -->
                 <div class="lg:pr-8">
                     <div class="flex items-center gap-2 mb-6">
-                        <img src="/images/medinova/logo.webp" alt="MediNova" class="h-10 object-contain brightness-0 invert opacity-90" />
+                        <img data-brand-logo-image data-logo-style="footer" src="/images/medinova/logo.webp" alt="MediNova" class="h-10 object-contain brightness-0 invert opacity-90" />
                     </div>
                     <p class="text-gray-400 mb-6 leading-relaxed">Your trusted partner for Medicare-covered durable medical equipment with nationwide delivery.</p>
                 </div>
@@ -1757,15 +1755,20 @@
             document.querySelectorAll('[data-brand-logo-image]').forEach((logoImage) => {
                 if (logoUrl) {
                     logoImage.setAttribute('src', appendVersion(logoUrl));
-                    logoImage.classList.remove('hidden');
-                } else {
-                    logoImage.classList.add('hidden');
                 }
+                logoImage.style.display = '';
             });
 
             document.querySelectorAll('[data-brand-logo-fallback]').forEach((node) => {
-                node.style.display = logoUrl ? 'none' : '';
+                node.style.display = 'none';
             });
+
+            // Wire favicon from branding settings
+            if (branding.favicon_url) {
+                let link = document.querySelector("link[rel~='icon']");
+                if (!link) { link = document.createElement('link'); link.rel = 'icon'; document.head.appendChild(link); }
+                link.href = appendVersion(branding.favicon_url);
+            }
 
             if (faviconUrl) {
                 const rels = ['icon', 'shortcut icon', 'apple-touch-icon'];

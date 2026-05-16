@@ -295,7 +295,7 @@ export const Layout = ({ children }) => {
                   className="flex items-center gap-2"
                   data-testid="dashboard-top-logo-link"
                 >
-                  {versionedDashboardLogoUrl ? (
+                {versionedDashboardLogoUrl ? (
                     <img
                       src={versionedDashboardLogoUrl}
                       alt="MediNova logo"
@@ -303,9 +303,7 @@ export const Layout = ({ children }) => {
                       data-testid="dashboard-top-logo-image"
                     />
                   ) : (
-                    <>
-                      <img src="/images/medinova/logo.webp" alt="MediNova" className="h-10 max-w-[170px] object-contain" />
-                    </>
+                    <img src={branding.dashboard_logo_url || branding.logo_url || '/images/medinova/logo.webp'} alt="MediNova logo" className="h-10 max-w-[170px] object-contain" data-testid="dashboard-top-logo-image" />
                   )}
                 </a>
               ) : (
@@ -579,7 +577,7 @@ export const Layout = ({ children }) => {
                     data-testid="dashboard-bottom-logo-image"
                   />
                 ) : (
-                  <span className="text-xs font-bold tracking-wide text-muted-foreground">MediNova</span>
+                  <img src={branding.dashboard_logo_url || branding.logo_url || '/images/medinova/logo.webp'} alt="MediNova logo" className="h-8 max-w-[140px] object-contain" data-testid="dashboard-bottom-logo-image" />
                 )}
               </a>
             )}

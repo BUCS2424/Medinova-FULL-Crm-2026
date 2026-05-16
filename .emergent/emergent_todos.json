@@ -1,14 +1,18 @@
 [
   {
-    "content": "Fix all DME PROS references in server.py (email, CORS, site URL, AI assistant, templates)",
+    "content": "Fix PublicBrandLogo.jsx + Layout.js - single img using versionedLogoUrl with no hardcoded fallback",
     "status": "completed"
   },
   {
-    "content": "Fix all DME PROS references in frontend src/ files",
+    "content": "Fix landing.html - wire all 3 logo instances (header, mobile, footer) to loadBranding()",
     "status": "completed"
   },
   {
-    "content": "Fix DME PROS references in location_page.py template",
-    "status": "completed"
+    "content": "Fix location_page.py - wire footer logo to loadBranding()",
+    "status": "in_progress"
+  },
+  {
+    "content": "Fix server.py coverage areas page - wire all logos to loadBranding()",
+    "status": "pending"
   }
 ]

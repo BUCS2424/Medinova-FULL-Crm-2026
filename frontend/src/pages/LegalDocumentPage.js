@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import { useBranding } from '../contexts/BrandingContext';
 import { 
   Loader2,
   ArrowLeft,
@@ -24,13 +25,13 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 // Document type icons and colors
 const DOC_TYPE_CONFIG = {
-  terms: { icon: Scale, color: 'from-blue-500 to-blue-600', bg: 'bg-blue-50', text: 'text-blue-700' },
-  privacy: { icon: Shield, color: 'from-purple-500 to-purple-600', bg: 'bg-purple-50', text: 'text-purple-700' },
-  hipaa: { icon: Lock, color: 'from-red-500 to-red-600', bg: 'bg-red-50', text: 'text-red-700' },
-  accessibility: { icon: Accessibility, color: 'from-green-500 to-green-600', bg: 'bg-green-50', text: 'text-green-700' },
-  refund: { icon: RotateCcw, color: 'from-cyan-500 to-cyan-600', bg: 'bg-cyan-50', text: 'text-cyan-700' },
-  cookie: { icon: FileText, color: 'from-lime-500 to-lime-600', bg: 'bg-lime-50', text: 'text-lime-700' },
-  other: { icon: FileCheck, color: 'from-slate-500 to-slate-600', bg: 'bg-slate-50', text: 'text-slate-700' }
+  terms:         { icon: Scale,         color: 'from-[#004299] to-[#0070E0]', bg: 'bg-blue-50',  text: 'text-[#0055CC]' },
+  privacy:       { icon: Shield,        color: 'from-[#003FA3] to-[#0055CC]', bg: 'bg-blue-50',  text: 'text-[#0055CC]' },
+  hipaa:         { icon: Lock,          color: 'from-[#002D80] to-[#0055CC]', bg: 'bg-blue-50',  text: 'text-[#0055CC]' },
+  accessibility: { icon: Accessibility, color: 'from-[#0055CC] to-[#0090D0]', bg: 'bg-blue-50',  text: 'text-[#0055CC]' },
+  refund:        { icon: RotateCcw,     color: 'from-[#003FA3] to-[#0070E0]', bg: 'bg-blue-50',  text: 'text-[#0055CC]' },
+  cookie:        { icon: FileText,      color: 'from-[#004299] to-[#0090D0]', bg: 'bg-blue-50',  text: 'text-[#0055CC]' },
+  other:         { icon: FileCheck,     color: 'from-[#0055CC] to-[#00A3E0]', bg: 'bg-blue-50',  text: 'text-[#0055CC]' },
 };
 
 export default function LegalDocumentPage() {
@@ -83,7 +84,7 @@ export default function LegalDocumentPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-10 h-10 animate-spin text-lime-500 mx-auto mb-4" />
+          <Loader2 className="w-10 h-10 animate-spin text-[#0055CC] mx-auto mb-4" />
           <p className="text-slate-600">Loading document...</p>
         </div>
       </div>
@@ -105,7 +106,7 @@ export default function LegalDocumentPage() {
             <p className="text-slate-600 mb-8">{error}</p>
             <Link 
               to="/"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-lime-500 to-lime-600 hover:from-lime-600 hover:to-lime-700 text-white px-6 py-3 rounded-xl font-medium shadow-md hover:shadow-lg transition-all"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-[#0055CC] to-[#0090D0] hover:from-[#004299] hover:to-[#007BB5] text-white px-6 py-3 rounded-xl font-medium shadow-md hover:shadow-lg transition-all"
             >
               <ArrowLeft className="w-4 h-4" /> Back to Home
             </Link>
@@ -337,22 +338,22 @@ export default function LegalDocumentPage() {
             </article>
 
             {/* Contact Section */}
-            <div className="bg-gradient-to-r from-slate-50 to-slate-100 border-t px-6 md:px-10 py-8">
+            <div className="bg-gradient-to-r from-slate-50 to-blue-50 border-t px-6 md:px-10 py-8">
               <h3 className="font-bold text-navy-700 mb-4">Questions About This Document?</h3>
               <p className="text-slate-600 mb-6">
                 If you have any questions or concerns regarding this document, please don't hesitate to contact us.
               </p>
               <div className="flex flex-wrap gap-4">
-                <a 
-                  href="tel:7279667767" 
-                  className="inline-flex items-center gap-2 bg-white border border-slate-200 hover:border-lime-300 hover:bg-lime-50 px-4 py-2 rounded-lg text-slate-700 hover:text-lime-700 transition-all"
+                <a
+                  href="tel:2488864363"
+                  className="inline-flex items-center gap-2 bg-white border border-slate-200 hover:border-[#0055CC] hover:bg-blue-50 px-4 py-2 rounded-lg text-slate-700 hover:text-[#0055CC] transition-all"
                 >
                   <Phone className="w-4 h-4" />
                   (248) 886-4-DME (4363)
                 </a>
-                <a 
-                  href="mailto:info@medinovadme.com" 
-                  className="inline-flex items-center gap-2 bg-white border border-slate-200 hover:border-lime-300 hover:bg-lime-50 px-4 py-2 rounded-lg text-slate-700 hover:text-lime-700 transition-all"
+                <a
+                  href="mailto:info@medinovadme.com"
+                  className="inline-flex items-center gap-2 bg-white border border-slate-200 hover:border-[#0055CC] hover:bg-blue-50 px-4 py-2 rounded-lg text-slate-700 hover:text-[#0055CC] transition-all"
                 >
                   <Mail className="w-4 h-4" />
                   info@medinovadme.com
@@ -373,17 +374,17 @@ export default function LegalDocumentPage() {
                     <Link 
                       key={doc.id}
                       to={`/legal/${doc.slug}`}
-                      className="group bg-white border border-slate-200 hover:border-lime-300 hover:shadow-md rounded-xl p-4 transition-all flex items-center gap-3"
+                      className="group bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md rounded-xl p-4 transition-all flex items-center gap-3"
                     >
                       <div className={`p-2 ${config.bg} rounded-lg group-hover:scale-110 transition-transform`}>
                         <Icon className={`w-5 h-5 ${config.text}`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-navy-700 truncate group-hover:text-lime-600 transition-colors">
+                        <h4 className="font-medium text-navy-700 truncate group-hover:text-[#0055CC] transition-colors">
                           {doc.title}
                         </h4>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-lime-500 group-hover:translate-x-1 transition-all" />
+                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#0055CC] group-hover:translate-x-1 transition-all" />
                     </Link>
                   );
                 })}
@@ -401,30 +402,25 @@ export default function LegalDocumentPage() {
 
 // Header Component
 function Header() {
+  const { branding, versionedLogoUrl } = useBranding();
+  const logoSrc = versionedLogoUrl || branding.logo_url || '/images/medinova/logo.webp';
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 bg-gradient-to-br from-lime-500 to-lime-600 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-            <span className="text-white font-bold text-lg">M</span>
-          </div>
-          <div>
-            <span className="text-xl font-bold text-navy-700">MediNova Medical Supplies</span>
-            <p className="text-xs text-slate-500">Medical Equipment Solutions</p>
-          </div>
+          <img src={logoSrc} alt="MediNova Medical Supplies logo" className="h-[56px] max-w-[200px] object-contain" data-testid="legal-header-logo" />
         </Link>
-        
         <div className="flex items-center gap-4">
-          <a 
-            href="tel:7279667767" 
-            className="hidden md:flex items-center gap-2 text-slate-600 hover:text-lime-600 transition-colors"
+          <a
+            href="tel:2488864363"
+            className="hidden md:flex items-center gap-2 text-slate-600 hover:text-[#0055CC] transition-colors"
           >
             <Phone className="w-4 h-4" />
             <span className="text-sm font-medium">(248) 886-4-DME</span>
           </a>
-          <Link 
+          <Link
             to="/"
-            className="bg-gradient-to-r from-lime-500 to-lime-600 hover:from-lime-600 hover:to-lime-700 text-white px-5 py-2 rounded-xl font-medium shadow-md hover:shadow-lg transition-all text-sm"
+            className="bg-gradient-to-r from-[#0055CC] to-[#0090D0] hover:from-[#004299] hover:to-[#007BB5] text-white px-5 py-2 rounded-xl font-medium shadow-md hover:shadow-lg transition-all text-sm"
           >
             Check Eligibility
           </Link>
@@ -436,38 +432,34 @@ function Header() {
 
 // Footer Component
 function Footer({ links = [], currentSlug }) {
+  const { branding, versionedLogoUrl } = useBranding();
+  const logoSrc = versionedLogoUrl || branding.logo_url || '/images/medinova/logo.webp';
   return (
-    <footer className="bg-gradient-to-br from-navy-900 to-navy-800 text-white py-12">
+    <footer className="bg-gradient-to-br from-[#001A4D] via-[#002D80] to-[#003FA3] text-white py-12">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           {/* Company Info */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-lime-500 to-lime-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">M</span>
-              </div>
-              <div>
-                <span className="text-xl font-bold">MediNova Medical Supplies</span>
-                <p className="text-xs text-slate-400">Medical Equipment Solutions</p>
-              </div>
+              <img src={logoSrc} alt="MediNova Medical Supplies" className="h-10 max-w-[160px] object-contain brightness-0 invert opacity-90" data-testid="legal-footer-logo" />
             </div>
             <p className="text-slate-400 text-sm max-w-sm">
-              Your trusted partner for Medicare-covered durable medical equipment. 
+              Your trusted partner for Medicare-covered durable medical equipment.
               Quality braces, wheelchairs, and supplies delivered to your door.
             </p>
           </div>
-          
+
           {/* Legal Links */}
           <div>
-            <h4 className="font-semibold mb-4 text-lime-400">Legal</h4>
+            <h4 className="font-semibold mb-4 text-blue-300">Legal</h4>
             <ul className="space-y-2">
               {links.map(doc => (
                 <li key={doc.id}>
-                  <Link 
+                  <Link
                     to={`/legal/${doc.slug}`}
                     className={`text-sm transition-colors ${
-                      doc.slug === currentSlug 
-                        ? 'text-lime-400 font-medium' 
+                      doc.slug === currentSlug
+                        ? 'text-blue-300 font-medium'
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >
@@ -477,13 +469,13 @@ function Footer({ links = [], currentSlug }) {
               ))}
             </ul>
           </div>
-          
+
           {/* Contact */}
           <div>
-            <h4 className="font-semibold mb-4 text-lime-400">Contact</h4>
+            <h4 className="font-semibold mb-4 text-blue-300">Contact</h4>
             <ul className="space-y-3 text-sm text-slate-400">
               <li>
-                <a href="tel:7279667767" className="flex items-center gap-2 hover:text-white transition-colors">
+                <a href="tel:2488864363" className="flex items-center gap-2 hover:text-white transition-colors">
                   <Phone className="w-4 h-4" />
                   (248) 886-4-DME (4363)
                 </a>
@@ -496,28 +488,28 @@ function Footer({ links = [], currentSlug }) {
               </li>
               <li className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 mt-0.5" />
-                <span>Nationwide Delivery</span>
+                <span>Waterford, MI 48327 — Nationwide Delivery</span>
               </li>
               <li className="flex items-center gap-2">
                 <Clock className="w-4 h-4" />
-                Mon-Fri: 9AM - 5PM EST
+                Mon–Fri: 8:30am – 6:00pm EST
               </li>
             </ul>
           </div>
         </div>
-        
+
         {/* Bottom Bar */}
-        <div className="border-t border-slate-700 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-slate-500 text-sm">
             © {new Date().getFullYear()} MediNova Medical Supplies. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-2 text-slate-500 text-sm">
-              <Shield className="w-4 h-4 text-green-500" />
+              <Shield className="w-4 h-4 text-green-400" />
               HIPAA Compliant
             </span>
             <span className="flex items-center gap-2 text-slate-500 text-sm">
-              <Lock className="w-4 h-4 text-green-500" />
+              <Lock className="w-4 h-4 text-green-400" />
               Secure & Encrypted
             </span>
           </div>
