@@ -326,6 +326,26 @@
     </script>
 </head>
 <body class="bg-[#F6FAFF]">
+    <!-- ====== IFRAME BREAKOUT ====== -->
+    <!-- When this page is embedded in the React iframe at /, intercept all
+         path-based link clicks and navigate the TOP window instead so the
+         browser address bar and React router update correctly. -->
+    <script>
+    (function() {
+        if (window.self === window.top) return; // not inside an iframe, nothing to do
+        document.addEventListener('click', function(e) {
+            var el = e.target.closest('a[href]');
+            if (!el) return;
+            var href = el.getAttribute('href');
+            // Only intercept internal path links (not anchors, tel:, mailto:, external)
+            if (href && href.startsWith('/') && !href.startsWith('//')) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.top.location.href = href;
+            }
+        }, true);
+    })();
+    </script>
     <script>
         if (new URLSearchParams(window.location.search).get('embed') === 'rest') {
             document.body.classList.add('embed-rest');

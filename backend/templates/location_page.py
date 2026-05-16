@@ -144,7 +144,7 @@ def generate_full_location_page_html(
         if links:
             sibling_links_html = f'''<section class="py-12 bg-gray-50">
 <div class="max-w-7xl mx-auto px-4">
-<h2 class="text-xl font-bold text-navy-700 mb-4">Also Serving Nearby</h2>
+<h2 class="text-xl font-bold text-[#0B2A5B] mb-4">Also Serving Nearby</h2>
 <p class="text-gray-600 mb-4">MediNova Medical Supplies delivers to these communities in {county_name if county_name else state_name}:</p>
 <div class="flex flex-wrap gap-3">
 {" ".join(links)}
@@ -161,21 +161,25 @@ def generate_full_location_page_html(
         for i, county in enumerate(counties[:24]):
             cty_slug = slugify(county) + "-" + state_slug
             sample_cities = cities[i*6:(i+1)*6] if cities else []
-            city_links = "".join([f'<a href="{SITE_DOMAIN}/locations/durable-medical-equipment-in-{slugify(c)}-{state_slug}.html" class="text-sm text-gray-500 hover:text-blue-600">{c}</a>' for c in sample_cities[:4]])
-            
-            cards.append(f'''<a href="{SITE_DOMAIN}/locations/durable-medical-equipment-in-{cty_slug}.html" class="group block bg-white rounded-xl p-5 border border-gray-200 hover:border-lime-400 hover:shadow-md transition-all">
-<div class="flex items-center justify-between mb-2">
-<h3 class="font-semibold text-navy-700 group-hover:text-blue-600">{county}</h3>
-<svg class="w-4 h-4 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            # Use <span> tags (not <a>) for cities since they are inside an <a> card — nested anchors are invalid HTML
+            city_tags = "".join([
+                f'<span class="text-sm text-gray-500">{c}</span>'
+                for c in sample_cities[:4]
+            ])
+
+            cards.append(f'''<a href="{SITE_DOMAIN}/locations/durable-medical-equipment-in-{cty_slug}.html" class="group block bg-white rounded-xl p-5 border border-[#D9E6F7] hover:border-[#0055CC] hover:shadow-md transition-shadow duration-200">
+<div class="flex items-center justify-between mb-3">
+<h3 class="font-semibold text-[#0B2A5B] text-sm group-hover:text-[#0055CC] transition-colors">{county}</h3>
+<svg class="w-4 h-4 text-gray-400 group-hover:text-[#0055CC] group-hover:translate-x-0.5 transition-all flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
 </div>
-<div class="flex flex-wrap gap-x-3 gap-y-1">{city_links}</div>
+<div class="flex flex-wrap gap-x-2 gap-y-1">{city_tags}</div>
 </a>''')
-        
-        coverage_section = f'''<section class="py-16 bg-white">
+
+        coverage_section = f'''<section class="py-16 bg-[#F6FAFF]">
 <div class="max-w-7xl mx-auto px-4">
 <div class="text-center mb-10">
-<span class="inline-block px-4 py-1.5 bg-lime-100 text-blue-700 rounded-full text-sm font-medium mb-4">Service Area</span>
-<h2 class="text-3xl font-bold text-navy-700 mb-3">Delivering Across {loc_name}</h2>
+<span class="inline-block px-4 py-1.5 bg-[#E8F2FF] text-[#0055CC] rounded-full text-sm font-medium mb-4">Service Area</span>
+<h2 class="text-3xl font-bold text-[#0B2A5B] mb-3">Delivering Across {loc_name}</h2>
 <p class="text-gray-600">Select your county for local delivery information.</p>
 </div>
 <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -183,19 +187,19 @@ def generate_full_location_page_html(
 </div>
 </div>
 </section>'''
-    
+
     elif loc_type == "county" and cities:
         # Show cities in this county with internal links
         city_cards = []
         for city in cities[:20]:
             city_slug = slugify(city) + "-" + state_slug
-            city_cards.append(f'<a href="{SITE_DOMAIN}/locations/durable-medical-equipment-in-{city_slug}.html" class="bg-white rounded-lg p-4 border border-gray-200 hover:border-lime-400 hover:shadow-sm transition-all text-center"><span class="font-medium text-navy-700 hover:text-blue-600">{city}</span></a>')
-        
-        coverage_section = f'''<section class="py-16 bg-white">
+            city_cards.append(f'<a href="{SITE_DOMAIN}/locations/durable-medical-equipment-in-{city_slug}.html" class="bg-white rounded-xl p-4 border border-[#D9E6F7] hover:border-[#0055CC] hover:shadow-sm transition-shadow duration-200 text-center block"><span class="font-medium text-[#0B2A5B] hover:text-[#0055CC] text-sm">{city}</span></a>')
+
+        coverage_section = f'''<section class="py-16 bg-[#F6FAFF]">
 <div class="max-w-7xl mx-auto px-4">
 <div class="text-center mb-10">
-<span class="inline-block px-4 py-1.5 bg-lime-100 text-blue-700 rounded-full text-sm font-medium mb-4">Local Delivery</span>
-<h2 class="text-3xl font-bold text-navy-700 mb-3">Cities We Serve in {loc_name}</h2>
+<span class="inline-block px-4 py-1.5 bg-[#E8F2FF] text-[#0055CC] rounded-full text-sm font-medium mb-4">Local Delivery</span>
+<h2 class="text-3xl font-bold text-[#0B2A5B] mb-3">Cities We Serve in {loc_name}</h2>
 <p class="text-gray-600">Click your city for local information.</p>
 </div>
 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
@@ -209,17 +213,17 @@ def generate_full_location_page_html(
     # ============================================
     default_products = '''<div class="grid md:grid-cols-3 gap-6">
 <div class="bg-white rounded-xl p-6 border border-gray-200">
-<h3 class="font-semibold text-navy-700 mb-2">Back Braces</h3>
+<h3 class="font-semibold text-[#0B2A5B] mb-2">Back Braces</h3>
 <p class="text-gray-600 text-sm mb-4">Support for lower back pain, post-surgery recovery, and spinal conditions.</p>
 <a href="tel:2488864363" class="text-blue-600 font-medium text-sm hover:underline">Check Eligibility</a>
 </div>
 <div class="bg-white rounded-xl p-6 border border-gray-200">
-<h3 class="font-semibold text-navy-700 mb-2">Knee Braces</h3>
+<h3 class="font-semibold text-[#0B2A5B] mb-2">Knee Braces</h3>
 <p class="text-gray-600 text-sm mb-4">Stability and relief for arthritis, injuries, and post-operative care.</p>
 <a href="tel:2488864363" class="text-blue-600 font-medium text-sm hover:underline">Check Eligibility</a>
 </div>
 <div class="bg-white rounded-xl p-6 border border-gray-200">
-<h3 class="font-semibold text-navy-700 mb-2">Mobility Aids</h3>
+<h3 class="font-semibold text-[#0B2A5B] mb-2">Mobility Aids</h3>
 <p class="text-gray-600 text-sm mb-4">Wheelchairs, walkers, and rollators for improved independence.</p>
 <a href="tel:2488864363" class="text-blue-600 font-medium text-sm hover:underline">Check Eligibility</a>
 </div>
@@ -230,8 +234,8 @@ def generate_full_location_page_html(
     products_section = f'''<section class="py-16 bg-gray-50">
 <div class="max-w-7xl mx-auto px-4">
 <div class="text-center mb-10">
-<span class="inline-block px-4 py-1.5 bg-lime-100 text-blue-700 rounded-full text-sm font-medium mb-4">Equipment</span>
-<h2 class="text-3xl font-bold text-navy-700 mb-3">Medicare-Covered DME</h2>
+<span class="inline-block px-4 py-1.5 bg-[#E8F2FF] text-blue-700 rounded-full text-sm font-medium mb-4">Equipment</span>
+<h2 class="text-3xl font-bold text-[#0B2A5B] mb-3">Medicare-Covered DME</h2>
 <p class="text-gray-600">Quality equipment delivered to {loc_name}.</p>
 </div>
 {products_content}
@@ -414,7 +418,7 @@ body.mobile-drawer-open .mobile-drawer{{transform:translateX(0)}}
 <body class="bg-white">
 
 <!-- Top Bar -->
-<div class="bg-navy-700 text-white py-2.5 px-4">
+<div class="bg-[#0B2A5B] text-white py-2.5 px-4">
 <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between text-sm">
 <div class="flex items-center gap-6">
 <a href="tel:2488864363" class="flex items-center gap-2 hover:text-blue-400">
@@ -440,10 +444,10 @@ body.mobile-drawer-open .mobile-drawer{{transform:translateX(0)}}
 <img data-brand-logo-image src="/images/medinova/logo.webp" alt="MediNova Medical Supplies logo" class="h-[60px] max-w-[200px] object-contain" />
 </a>
 <nav class="hidden md:flex items-center gap-4 text-sm">
-{f'<span class="text-gray-500">{breadcrumb}<span class="text-navy-700 font-medium">{loc_name}</span></span>' if breadcrumb else ''}
-<a href="#contact" class="bg-blue-500 hover:bg-lime-600 text-white px-5 py-2 rounded-lg font-semibold">Get Started</a>
+{f'<span class="text-gray-500">{breadcrumb}<span class="text-[#0B2A5B] font-medium">{loc_name}</span></span>' if breadcrumb else ''}
+<a href="#contact" class="bg-blue-500 hover:bg-[#004299] text-white px-5 py-2 rounded-lg font-semibold">Get Started</a>
 </nav>
-<button id="mobile-menu-btn" type="button" class="md:hidden p-2 rounded-xl text-navy-700 hover:bg-gray-100" aria-label="Open navigation menu" data-testid="location-mobile-menu-button"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+<button id="mobile-menu-btn" type="button" class="md:hidden p-2 rounded-xl text-[#0B2A5B] hover:bg-gray-100" aria-label="Open navigation menu" data-testid="location-mobile-menu-button"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
 </div>
 </header>
 
@@ -453,26 +457,26 @@ body.mobile-drawer-open .mobile-drawer{{transform:translateX(0)}}
 <a href="{SITE_DOMAIN}/" class="flex items-center gap-2" data-brand-logo-link data-default-href="{SITE_DOMAIN}/" data-testid="location-mobile-menu-logo-link">
 <img data-brand-logo-image src="/images/medinova/logo.webp" alt="MediNova Medical Supplies logo" class="h-[55px] max-w-[180px] object-contain" data-testid="location-mobile-menu-logo-image" />
 </a>
-<button id="mobile-menu-close" type="button" class="p-2 rounded-xl text-navy-700 hover:bg-gray-100" aria-label="Close navigation menu" data-testid="location-mobile-menu-close-button"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+<button id="mobile-menu-close" type="button" class="p-2 rounded-xl text-[#0B2A5B] hover:bg-gray-100" aria-label="Close navigation menu" data-testid="location-mobile-menu-close-button"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
 </div>
 <p class="text-sm text-gray-500">Serving {region_name} with Medicare-covered DME delivery and fast support.</p>
 <nav class="flex flex-col gap-2" aria-label="Mobile navigation" data-testid="location-mobile-menu-nav">
-<a href="{SITE_DOMAIN}/" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-navy-700 hover:bg-blue-50 hover:text-blue-700" data-testid="location-mobile-menu-link-home"><span>Home</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
-<a href="{SITE_DOMAIN}/products" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-navy-700 hover:bg-blue-50 hover:text-blue-700" data-testid="location-mobile-menu-link-products"><span>Products</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
-<a href="{SITE_DOMAIN}/locations" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-navy-700 hover:bg-blue-50 hover:text-blue-700" data-testid="location-mobile-menu-link-service-areas"><span>Coverage Areas</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
-<a href="#contact" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-navy-700 hover:bg-blue-50 hover:text-blue-700" data-testid="location-mobile-menu-link-contact"><span>Contact</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
+<a href="{SITE_DOMAIN}/" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-[#0B2A5B] hover:bg-blue-50 hover:text-blue-700" data-testid="location-mobile-menu-link-home"><span>Home</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
+<a href="{SITE_DOMAIN}/products" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-[#0B2A5B] hover:bg-blue-50 hover:text-blue-700" data-testid="location-mobile-menu-link-products"><span>Products</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
+<a href="{SITE_DOMAIN}/locations" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-[#0B2A5B] hover:bg-blue-50 hover:text-blue-700" data-testid="location-mobile-menu-link-service-areas"><span>Coverage Areas</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
+<a href="#contact" class="flex items-center justify-between rounded-2xl bg-gray-100/80 px-4 py-3 font-medium text-[#0B2A5B] hover:bg-blue-50 hover:text-blue-700" data-testid="location-mobile-menu-link-contact"><span>Contact</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
 </nav>
 <div class="mt-auto space-y-3 border-t border-gray-200 pt-6">
-<a href="tel:2488864363" class="flex w-full items-center justify-center gap-2 rounded-2xl border border-gray-200 px-4 py-3 font-semibold text-navy-700 hover:bg-blue-50 hover:text-blue-700" data-testid="location-mobile-menu-call-button"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>(248) 886-4-DME (4363)</a>
-<a href="#contact" class="flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-500 px-4 py-3 font-semibold text-white hover:bg-lime-600" data-testid="location-mobile-menu-primary-cta">{cta_text}<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
+<a href="tel:2488864363" class="flex w-full items-center justify-center gap-2 rounded-2xl border border-gray-200 px-4 py-3 font-semibold text-[#0B2A5B] hover:bg-blue-50 hover:text-blue-700" data-testid="location-mobile-menu-call-button"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>(248) 886-4-DME (4363)</a>
+<a href="#contact" class="flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-500 px-4 py-3 font-semibold text-white hover:bg-[#004299]" data-testid="location-mobile-menu-primary-cta">{cta_text}<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
 </div>
 </aside>
 
 <!-- Hero -->
-<section class="relative bg-gradient-to-br from-navy-700 via-navy-800 to-navy-900 py-16 md:py-20 overflow-hidden">
+<section class="relative bg-gradient-to-br from-[#0B2A5B] via-[#0A1F44] to-[#06122B] py-16 md:py-20 overflow-hidden">
 <div class="absolute inset-0 opacity-10">
-<div class="absolute top-10 left-10 w-64 h-64 bg-lime-400 rounded-full blur-3xl"></div>
-<div class="absolute bottom-10 right-10 w-80 h-80 bg-lime-300 rounded-full blur-3xl"></div>
+<div class="absolute top-10 left-10 w-64 h-64 bg-[#0055CC]/20 rounded-full blur-3xl"></div>
+<div class="absolute bottom-10 right-10 w-80 h-80 bg-[#00A3E0]/20 rounded-full blur-3xl"></div>
 </div>
 <div class="max-w-7xl mx-auto px-4 relative">
 <div class="max-w-3xl">
@@ -483,7 +487,7 @@ Medicare Accredited
 <h1 class="text-4xl md:text-5xl font-bold text-white leading-tight mb-6">{headline}</h1>
 <p class="text-lg text-gray-300 mb-8 leading-relaxed">{intro_text}</p>
 <div class="flex flex-col sm:flex-row gap-4 mb-8">
-<button onclick="openModal()" class="group bg-blue-500 hover:bg-lime-400 text-white px-8 py-4 text-lg font-semibold rounded-xl flex items-center justify-center gap-2">
+<button onclick="openModal()" class="group bg-blue-500 hover:bg-[#0055CC]/20 text-white px-8 py-4 text-lg font-semibold rounded-xl flex items-center justify-center gap-2">
 {cta_text}
 <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
 </button>
@@ -506,31 +510,31 @@ Medicare Accredited
 <div class="max-w-7xl mx-auto px-4">
 <div class="grid md:grid-cols-4 gap-6 text-center">
 <div class="p-6">
-<div class="w-12 h-12 bg-lime-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+<div class="w-12 h-12 bg-[#E8F2FF] rounded-xl flex items-center justify-center mx-auto mb-4">
 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
 </div>
-<h3 class="font-semibold text-navy-700 mb-1">Medicare Accepted</h3>
+<h3 class="font-semibold text-[#0B2A5B] mb-1">Medicare Accepted</h3>
 <p class="text-gray-600 text-sm">Most equipment covered at no cost.</p>
 </div>
 <div class="p-6">
-<div class="w-12 h-12 bg-lime-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+<div class="w-12 h-12 bg-[#E8F2FF] rounded-xl flex items-center justify-center mx-auto mb-4">
 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
 </div>
-<h3 class="font-semibold text-navy-700 mb-1">Free Delivery</h3>
+<h3 class="font-semibold text-[#0B2A5B] mb-1">Free Delivery</h3>
 <p class="text-gray-600 text-sm">Shipped to your door in {loc_name}.</p>
 </div>
 <div class="p-6">
-<div class="w-12 h-12 bg-lime-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+<div class="w-12 h-12 bg-[#E8F2FF] rounded-xl flex items-center justify-center mx-auto mb-4">
 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
 </div>
-<h3 class="font-semibold text-navy-700 mb-1">Easy Paperwork</h3>
+<h3 class="font-semibold text-[#0B2A5B] mb-1">Easy Paperwork</h3>
 <p class="text-gray-600 text-sm">We handle insurance and doctors.</p>
 </div>
 <div class="p-6">
-<div class="w-12 h-12 bg-lime-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+<div class="w-12 h-12 bg-[#E8F2FF] rounded-xl flex items-center justify-center mx-auto mb-4">
 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
 </div>
-<h3 class="font-semibold text-navy-700 mb-1">Expert Support</h3>
+<h3 class="font-semibold text-[#0B2A5B] mb-1">Expert Support</h3>
 <p class="text-gray-600 text-sm">Bilingual team ready to help.</p>
 </div>
 </div>
@@ -548,21 +552,21 @@ Medicare Accredited
 <div class="max-w-7xl mx-auto px-4">
 <div class="grid lg:grid-cols-2 gap-12 items-center">
 <div>
-<span class="inline-block px-4 py-1.5 bg-lime-100 text-blue-700 rounded-full text-sm font-medium mb-4">About MediNova Medical Supplies</span>
-<h2 class="text-3xl font-bold text-navy-700 mb-6">Your {loc_name} DME Partner</h2>
+<span class="inline-block px-4 py-1.5 bg-[#E8F2FF] text-blue-700 rounded-full text-sm font-medium mb-4">About MediNova Medical Supplies</span>
+<h2 class="text-3xl font-bold text-[#0B2A5B] mb-6">Your {loc_name} DME Partner</h2>
 <p class="text-gray-600 mb-6">{about_text}</p>
 <div class="grid grid-cols-2 gap-4">
-<div class="flex items-center gap-3"><div class="w-8 h-8 bg-lime-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><span class="text-sm font-medium text-navy-700">Licensed</span></div>
-<div class="flex items-center gap-3"><div class="w-8 h-8 bg-lime-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><span class="text-sm font-medium text-navy-700">HIPAA Compliant</span></div>
-<div class="flex items-center gap-3"><div class="w-8 h-8 bg-lime-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><span class="text-sm font-medium text-navy-700">Nationwide</span></div>
-<div class="flex items-center gap-3"><div class="w-8 h-8 bg-lime-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><span class="text-sm font-medium text-navy-700">Bilingual</span></div>
+<div class="flex items-center gap-3"><div class="w-8 h-8 bg-[#E8F2FF] rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><span class="text-sm font-medium text-[#0B2A5B]">Licensed</span></div>
+<div class="flex items-center gap-3"><div class="w-8 h-8 bg-[#E8F2FF] rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><span class="text-sm font-medium text-[#0B2A5B]">HIPAA Compliant</span></div>
+<div class="flex items-center gap-3"><div class="w-8 h-8 bg-[#E8F2FF] rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><span class="text-sm font-medium text-[#0B2A5B]">Nationwide</span></div>
+<div class="flex items-center gap-3"><div class="w-8 h-8 bg-[#E8F2FF] rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><span class="text-sm font-medium text-[#0B2A5B]">Bilingual</span></div>
 </div>
 </div>
 <div class="bg-blue-50 rounded-2xl p-8 text-center">
 <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
 </div>
-<p class="text-xl font-bold text-navy-700 mb-1">Proudly Serving</p>
+<p class="text-xl font-bold text-[#0B2A5B] mb-1">Proudly Serving</p>
 <p class="text-blue-600 font-semibold">{loc_name}</p>
 </div>
 </div>
@@ -570,12 +574,12 @@ Medicare Accredited
 </section>
 
 <!-- CTA -->
-<section class="py-16 bg-navy-700">
+<section class="py-16 bg-[#0B2A5B]">
 <div class="max-w-3xl mx-auto px-4 text-center">
 <h2 class="text-3xl font-bold text-white mb-6">Ready to Get Started?</h2>
 <p class="text-gray-300 mb-8">Check your eligibility in 60 seconds. We'll handle the rest.</p>
 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-<button onclick="openModal()" class="bg-blue-500 hover:bg-lime-400 text-white px-8 py-4 text-lg font-semibold rounded-xl">{cta_text}</button>
+<button onclick="openModal()" class="bg-blue-500 hover:bg-[#0055CC]/20 text-white px-8 py-4 text-lg font-semibold rounded-xl">{cta_text}</button>
 <a href="tel:2488864363" class="border-2 border-white/30 text-white px-8 py-4 text-lg font-semibold rounded-xl">(248) 886-4-DME (4363)</a>
 </div>
 </div>
@@ -585,16 +589,16 @@ Medicare Accredited
 <section id="contact" class="py-16 bg-gray-50">
 <div class="max-w-xl mx-auto px-4">
 <div class="text-center mb-8">
-<h2 class="text-2xl font-bold text-navy-700 mb-2">Contact Us</h2>
+<h2 class="text-2xl font-bold text-[#0B2A5B] mb-2">Contact Us</h2>
 <p class="text-gray-600">We'll get back to you within 24 hours.</p>
 </div>
 <form id="contact-form" class="bg-white rounded-xl p-6 shadow-sm border border-gray-200" data-testid="location-contact-form">
 <div class="grid grid-cols-2 gap-4 mb-4">
-<input type="text" name="firstName" required placeholder="First Name" data-testid="location-contact-first-name-input" class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
-<input type="text" name="lastName" required placeholder="Last Name" data-testid="location-contact-last-name-input" class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
+<input type="text" name="firstName" required placeholder="First Name" data-testid="location-contact-first-name-input" class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0055CC] focus:border-lime-500">
+<input type="text" name="lastName" required placeholder="Last Name" data-testid="location-contact-last-name-input" class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0055CC] focus:border-lime-500">
 </div>
-<input type="tel" name="phone" required placeholder="Phone Number" data-testid="location-contact-phone-input" class="w-full mb-4 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
-<textarea name="message" rows="3" placeholder="What equipment do you need?" data-testid="location-contact-message-input" class="w-full mb-4 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500 resize-none"></textarea>
+<input type="tel" name="phone" required placeholder="Phone Number" data-testid="location-contact-phone-input" class="w-full mb-4 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0055CC] focus:border-lime-500">
+<textarea name="message" rows="3" placeholder="What equipment do you need?" data-testid="location-contact-message-input" class="w-full mb-4 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0055CC] focus:border-lime-500 resize-none"></textarea>
 <div class="p-3 bg-gray-50 rounded-lg space-y-2 mb-4">
 <label class="flex items-start gap-2 cursor-pointer">
 <input type="checkbox" name="consent_contact" required data-testid="location-contact-consent-contact-checkbox" class="w-4 h-4 mt-0.5 text-blue-500 rounded">
@@ -613,13 +617,13 @@ Medicare Accredited
 <label for="location-contact-website">Leave this field empty</label>
 <input id="location-contact-website" type="text" name="website" tabindex="-1" autocomplete="off" data-testid="location-contact-honeypot-input">
 </div>
-<button type="submit" data-testid="location-contact-submit-button" class="w-full bg-blue-500 hover:bg-lime-600 text-white py-3 rounded-lg font-semibold">Submit</button>
+<button type="submit" data-testid="location-contact-submit-button" class="w-full bg-blue-500 hover:bg-[#004299] text-white py-3 rounded-lg font-semibold">Submit</button>
 </form>
 </div>
 </section>
 
 <!-- Footer -->
-<footer class="bg-navy-800 text-white py-12">
+<footer class="bg-[#0A1F44] text-white py-12">
 <div class="max-w-7xl mx-auto px-4">
 <div class="grid md:grid-cols-3 gap-8 mb-8">
 <div>
@@ -661,16 +665,16 @@ Medicare Accredited
 <div id="modal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
 <div class="modal-content">
 <div class="p-4 border-b flex justify-between items-center">
-<div><h2 class="text-lg font-bold text-navy-700">Check Eligibility</h2><p class="text-xs text-gray-500">60 seconds</p></div>
+<div><h2 class="text-lg font-bold text-[#0B2A5B]">Check Eligibility</h2><p class="text-xs text-gray-500">60 seconds</p></div>
 <button onclick="closeModal()" class="p-1.5 hover:bg-gray-100 rounded-lg"><svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
 </div>
 <div class="px-4 py-2 bg-blue-50">
 <div class="flex justify-between text-xs mb-1"><span id="stxt">Step 1 of 4</span><span id="ptxt" class="text-blue-600 font-medium">25%</span></div>
-<div class="w-full h-1.5 bg-lime-100 rounded-full"><div id="pbar" class="h-full bg-blue-500 rounded-full transition-all" style="width:25%"></div></div>
+<div class="w-full h-1.5 bg-[#E8F2FF] rounded-full"><div id="pbar" class="h-full bg-blue-500 rounded-full transition-all" style="width:25%"></div></div>
 </div>
 <form id="eform" class="p-4" data-testid="location-eligibility-form">
 <div class="step active" data-step="1">
-<h3 class="font-semibold text-navy-700 mb-4">What equipment do you need?</h3>
+<h3 class="font-semibold text-[#0B2A5B] mb-4">What equipment do you need?</h3>
 <div class="grid grid-cols-2 gap-3">
 <div class="opt" data-v="back" onclick="sel(this,'eq')"><span class="font-medium text-sm">Back Brace</span></div>
 <div class="opt" data-v="knee" onclick="sel(this,'eq')"><span class="font-medium text-sm">Knee Brace</span></div>
@@ -679,7 +683,7 @@ Medicare Accredited
 </div>
 </div>
 <div class="step" data-step="2">
-<h3 class="font-semibold text-navy-700 mb-4">Insurance type?</h3>
+<h3 class="font-semibold text-[#0B2A5B] mb-4">Insurance type?</h3>
 <div class="grid grid-cols-2 gap-3">
 <div class="opt" data-v="medicare" onclick="sel(this,'ins')"><span class="font-medium text-sm">Medicare</span></div>
 <div class="opt" data-v="medicaid" onclick="sel(this,'ins')"><span class="font-medium text-sm">Medicaid</span></div>
@@ -688,21 +692,21 @@ Medicare Accredited
 </div>
 </div>
 <div class="step" data-step="3">
-<h3 class="font-semibold text-navy-700 mb-4">Do you have a doctor?</h3>
+<h3 class="font-semibold text-[#0B2A5B] mb-4">Do you have a doctor?</h3>
 <div class="grid grid-cols-2 gap-3">
 <div class="opt" data-v="yes" onclick="sel(this,'doc')"><span class="font-medium text-sm">Yes</span></div>
 <div class="opt" data-v="no" onclick="sel(this,'doc')"><span class="font-medium text-sm">No</span></div>
 </div>
 </div>
 <div class="step" data-step="4">
-<h3 class="font-semibold text-navy-700 mb-4">Your Info</h3>
+<h3 class="font-semibold text-[#0B2A5B] mb-4">Your Info</h3>
 <div class="space-y-3">
 <div class="grid grid-cols-2 gap-3">
-<input type="text" name="fn" required placeholder="First Name" data-testid="location-eligibility-first-name-input" class="px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-lime-500">
-<input type="text" name="ln" required placeholder="Last Name" data-testid="location-eligibility-last-name-input" class="px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-lime-500">
+<input type="text" name="fn" required placeholder="First Name" data-testid="location-eligibility-first-name-input" class="px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#0055CC]">
+<input type="text" name="ln" required placeholder="Last Name" data-testid="location-eligibility-last-name-input" class="px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#0055CC]">
 </div>
-<input type="tel" name="ph" required placeholder="Phone" data-testid="location-eligibility-phone-input" class="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-lime-500">
-<input type="text" name="zip" required placeholder="ZIP Code" data-testid="location-eligibility-zip-input" class="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-lime-500">
+<input type="tel" name="ph" required placeholder="Phone" data-testid="location-eligibility-phone-input" class="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#0055CC]">
+<input type="text" name="zip" required placeholder="ZIP Code" data-testid="location-eligibility-zip-input" class="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#0055CC]">
 <label class="flex items-start gap-2"><input type="checkbox" name="ok" required data-testid="location-eligibility-consent-contact-checkbox" class="mt-0.5"><span class="text-xs text-gray-600">I consent to be contacted.</span></label>
 <label class="flex items-start gap-2"><input type="checkbox" name="tcpa" required data-testid="location-eligibility-consent-tcpa-checkbox" class="mt-0.5"><span class="text-xs text-gray-600">I consent to automated calls/texts under TCPA terms.</span></label>
 <div class="hidden" aria-hidden="true">
@@ -713,8 +717,8 @@ Medicare Accredited
 </div>
 <div class="step" data-step="5">
 <div class="text-center py-6">
-<div class="w-16 h-16 bg-lime-100 rounded-full flex items-center justify-center mx-auto mb-4"><svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div>
-<h3 class="text-xl font-bold text-navy-700 mb-2">Thank You!</h3>
+<div class="w-16 h-16 bg-[#E8F2FF] rounded-full flex items-center justify-center mx-auto mb-4"><svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div>
+<h3 class="text-xl font-bold text-[#0B2A5B] mb-2">Thank You!</h3>
 <p class="text-gray-600 text-sm mb-4">We'll contact you within 24 hours.</p>
 <button type="button" onclick="closeModal()" class="bg-blue-500 text-white px-6 py-2 rounded-lg font-semibold">Close</button>
 </div>
