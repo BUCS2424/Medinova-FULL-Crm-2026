@@ -437,9 +437,8 @@ body.mobile-drawer-open .mobile-drawer{{transform:translateX(0)}}
 <header class="bg-white border-b border-gray-100 py-4 sticky top-0 z-50">
 <div class="max-w-7xl mx-auto px-4 flex items-center justify-between">
 <a href="{SITE_DOMAIN}/" class="flex items-center gap-2" data-brand-logo-link data-default-href="{SITE_DOMAIN}/">
-<img data-brand-logo-image alt="MediNova Medical Supplies logo" class="h-[70px] max-w-[230px] object-contain hidden" />
-<span data-brand-logo-fallback class="text-2xl font-extrabold text-navy-700">DME</span>
-<span data-brand-logo-fallback class="text-2xl font-extrabold text-blue-500">PROS</span>
+<img data-brand-logo-image src="/images/medinova/logo.webp" alt="MediNova Medical Supplies logo" class="h-[60px] max-w-[200px] object-contain" onerror="this.style.display='none';document.querySelectorAll('[data-brand-logo-fallback]').forEach(n=>n.style.display='')" />
+<span data-brand-logo-fallback class="text-2xl font-extrabold text-navy-700" style="display:none">MediNova</span>
 </a>
 <nav class="hidden md:flex items-center gap-4 text-sm">
 {f'<span class="text-gray-500">{breadcrumb}<span class="text-navy-700 font-medium">{loc_name}</span></span>' if breadcrumb else ''}
@@ -453,9 +452,8 @@ body.mobile-drawer-open .mobile-drawer{{transform:translateX(0)}}
 <aside id="mobile-drawer" class="mobile-drawer md:hidden" aria-hidden="true" data-testid="location-mobile-drawer">
 <div class="flex items-start justify-between gap-4">
 <a href="{SITE_DOMAIN}/" class="flex items-center gap-2" data-brand-logo-link data-default-href="{SITE_DOMAIN}/" data-testid="location-mobile-menu-logo-link">
-<img data-brand-logo-image alt="MediNova Medical Supplies logo" class="h-[70px] max-w-[230px] object-contain hidden" data-testid="location-mobile-menu-logo-image" />
-<span data-brand-logo-fallback class="text-2xl font-extrabold text-navy-700">DME</span>
-<span data-brand-logo-fallback class="text-2xl font-extrabold text-blue-500">PROS</span>
+<img data-brand-logo-image src="/images/medinova/logo.webp" alt="MediNova Medical Supplies logo" class="h-[55px] max-w-[180px] object-contain" data-testid="location-mobile-menu-logo-image" onerror="this.style.display='none';document.querySelectorAll('[data-brand-logo-fallback]').forEach(n=>n.style.display='')" />
+<span data-brand-logo-fallback class="text-2xl font-extrabold text-navy-700" style="display:none">MediNova</span>
 </a>
 <button id="mobile-menu-close" type="button" class="p-2 rounded-xl text-navy-700 hover:bg-gray-100" aria-label="Close navigation menu" data-testid="location-mobile-menu-close-button"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
 </div>
@@ -628,8 +626,7 @@ Medicare Accredited
 <div class="grid md:grid-cols-3 gap-8 mb-8">
 <div>
 <div class="flex items-center gap-2 mb-4">
-<span class="text-xl font-extrabold">DME</span>
-<span class="text-xl font-extrabold text-blue-500">PROS</span>
+<img src="/images/medinova/logo.webp" alt="MediNova Medical Supplies" class="h-10 max-w-[160px] object-contain brightness-0 invert opacity-90" onerror="this.outerHTML='<span class=\'text-xl font-extrabold text-white\'>MediNova Medical Supplies</span>'" />
 </div>
 <p class="text-gray-400 text-sm">Medicare DME supplier serving {loc_name}.</p>
 </div>
