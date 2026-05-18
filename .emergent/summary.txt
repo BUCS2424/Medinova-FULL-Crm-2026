@@ -1,0 +1,164 @@
+<analysis>**original_problem_statement**: 
+The user requested to rebrand a CRM to MediNova Medical Supplies, fix routing, and integrate Availity/Waystar. *New Requirements:* Install a programmatic Location Generator V2 module from an uploaded ZIP into the Dev Settings, build a new 4-step standalone lead intake form at  (without replacing existing modals), fix a drag-and-drop bug on the Leads Kanban board, and create a production-ready  at the repository root.
+
+**User's preferred language**: English (INSTRUCT next agent to respond in English only)
+
+**what currently exists?** 
+A fully functional React/FastAPI/MongoDB application. The new Location Generator V2 is fully installed, integrated into the Dev Settings with a gold star, and tested. The standalone 4-step form exists at . The Kanban drag-and-drop functionality on the Leads page is fixed and working smoothly. A  and  were created at the root, but the Docker build is currently failing during the frontend yarn install v1.22.22
+[1/4] Resolving packages...
+[2/4] Fetching packages...
+[3/4] Linking dependencies...
+[4/4] Building fresh packages...
+success Saved lockfile.
+Done in 0.03s. stage due to a Node Out of Memory (OOM) error. 
+
+**Last working item**: 
+    - Last item agent was working: Fixing the  build process. The Node container is crashing with a  during yarn install v1.22.22
+[1/4] Resolving packages...
+success Already up-to-date.
+Done in 0.02s. (specifically at ). The agent added  and removed the requirement for , but it still failed for the user.
+    - Status: IN PROGRESS
+    - Agent Testing Done: N (Relying on user build logs from their VM/environment)
+    - Which testing method agent to use? manual testing by reviewing user's Docker build logs.
+    - User Testing Done: N
+
+**All Pending/In progress Issue list**: 
+  - Issue 1: Docker build failing due to Node OOM error (P0)
+     - Attempted fixes: Removed  (because  is not tracked in git). Added  to the Dockerfile. The build still crashes during yarn install v1.22.22
+[1/4] Resolving packages...
+success Already up-to-date.
+Done in 0.02s..
+     - Next debug checklist: 
+       1. Review .
+       2. Try increasing  further (e.g., 8192).
+       3. Consider adding yarn cache v1.22.22
+success Cleared cache.
+Done in 0.01s. before install, or using a  file to limit  (e.g., yarn install v1.22.22
+[1/4] Resolving packages...
+success Already up-to-date.
+Done in 0.02s.).
+       4. Alternatively, use  instead of yarn to see if npm handles the memory better.
+     - Why fix this issue and what will be achieved with the fix? The user cannot deploy the application until the Docker image builds successfully.
+     - Status: IN PROGRESS
+     - Is recurring issue? Y (OOM happened twice during the user's build attempts).
+     - Should Test frontend/backend/both after fix? NA (Provide the fix and await user build confirmation).
+     - Blocked on other issue: None.
+
+**In progress Task List**: 
+  None. The active blocker is Issue 1 (Docker build).
+
+**Upcoming and Future Tasks**
+    Upcoming Tasks:
+    - User acceptance check for print/fax lead workflow in real sales process (P0)
+    - Configure Telnyx fax API keys in new/prod to enable actual outgoing fax delivery (P0)
+    - User acceptance check for doctor tab workflow and NPI search import quality (P0)
+    
+    Future Tasks:
+    - Add more data sources to Stay Up To Date page (CMS Marketplace API for plan lookups) (P1)
+    - Migrate frontend from Create React App (/) to Vite to permanently resolve deprecation warnings and heavy build memory usage. *(Note: User explicitly agreed to defer this rebuild for now. Do not do this yet)* (P2)
+
+**Completed work in this session**
+- Extracted and fully integrated Location Generator V2 from ZIP into  and  (DONE).
+- Fixed   enum bug that broke the V2 loading (DONE).
+- Created  standalone 4-step React form matching user's uploaded images (DONE).
+- Fixed Leads Kanban drag-and-drop bug by adding  to  and fixing  collision detection logic (DONE).
+- Created base  and  (DONE).
+
+**Earlier issues found/mentioned but not fixed**
+- Deprecated packages inside the  dependency tree. The user asked why they were there; the agent explained it's due to CRA being outdated, but migrating to Vite is a large task. The user agreed to ignore the warnings and keep the stack as-is for now.
+
+**Known issue recurrence from previous fork**
+  - Issue recurrence in previous fork: None.
+  - Recurrence count: 0
+  - Status: NA
+
+**Code Architecture**
+
+
+**Key Technical Concepts**
+Frontend: React, Tailwind CSS, Shadcn UI,  (Kanban drag-and-drop).
+Backend: FastAPI, Motor (Async MongoDB).
+Build: Docker (multi-stage build), Kaniko (user's build environment).
+
+**key DB schema**
+  - : {type, name, slug_patterns, seo_rules...} (NEW)
+  - : {company_name, theme_mode...}
+
+**changes in tech stack**
+  - Added Docker containerization workflow.
+
+**All files of reference** 
+- : Currently failing build due to Node OOM.
+- : The new standalone 4-step intake form.
+- : Updated to fix Kanban  drag-and-drop.
+- : New backend routes for the Location V2 generator.
+
+**Areas that need refactoring**: 
+- : Heavily bloated due to . Needs Vite migration eventually, but **do not touch** unless explicitly instructed by the user.
+
+**key api endpoints**
+- ,  (V2 Generator)
+-  (Intake form submission)
+
+**Critical Info for New Agent** 
+1. **CRITICAL:** Do NOT modify existing modals on the landing/product pages to match the new 4-step form. The user got very angry about this. The new form must **only** live on the standalone  page.
+2. **Docker Build:**  is **untracked** in the git repo. Any yarn install v1.22.22
+[1/4] Resolving packages...
+success Already up-to-date.
+Done in 0.04s. command in the  must run without . 
+3. **Frontend Build Tooling:** The frontend uses  which is deprecated and causing memory bloat during yarn install v1.22.22
+[1/4] Resolving packages...
+success Already up-to-date.
+Done in 0.04s.. The user is aware and has opted to keep it as-is and migrate later. Focus ONLY on getting the Dockerfile to successfully compile the existing code.
+
+**documents and test reports created in this job** 
+  -  (V2 Generator tests)
+  -  (Form tests)
+  - 
+
+**Last 10 User Messages and any pending HUMAN messages** 
+1. : what template do you have for the location generator page and what url is it on so i can see it (COMPLETED - Explained V1 vs V2 generators)
+2. : can you create a dokerfile in the root please (COMPLETED)
+3. : it needs to live in the root for the vm to see it in the git fileso can we move it to /Dockerfile (COMPLETED - Explained  is the git root)
+4. : OK BUILD FAILED... lstat /repo/frontend/yarn.lock: no such file or directory (COMPLETED - Removed yarn.lock dependency in Dockerfile)
+5. : BUILD FAILED, LETS MAKE SURE ALL THESE DEPRICIATED THINGS ARE UPDATED... FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory (COMPLETED - Added NODE_OPTIONS to Dockerfile)
+6. : WHY WAS IT BUILT WITH THIS IF ITS OUTDATED OR DEPRICIATED? (COMPLETED - Explained CRA history vs Vite)
+7. : THIS IS A 10 YEAR PROJECT... WE WILL KEEP THIS AS IS FOR NOW AND I WILL HAVE TO REBUILD WITH ANOTHER AI (COMPLETED - Acknowledged)
+8. : LETS GET THE DOCKERFILE BUILT CORRECTLY CAUSE IT FAILED AGAIN (COMPLETED)
+9. : (Shared logs showing OOM happening again during ) (PENDING - Needs Dockerfile fix for memory/concurrency)
+
+**Project Health Check:**
+- Broken: Dockerfile (Frontend build OOM)
+- Mocked: None
+
+**3rd Party Integrations** 
+- Emergent LLM Key (AI features)
+- Telnyx (Voice/Fax)
+- Availity (Eligibility)
+- Waystar (Eligibility)
+
+**Testing status**
+  - Testing agent used after significant changes: YES
+  - Troubleshoot agent used after agent stuck in loop: NO
+  - Test files created: None
+  - Known regressions: None
+
+**Credentials to test flow:**
+Admin:  / 
+
+**What agent forgot to execute**
+The agent was in the middle of diagnosing the second Node OOM error in the Dockerfile and ran out of context before providing the final fix to the user.
+
+**Debugging checklist for current issue**
+    Issue: Node OOM during yarn install v1.22.22
+[1/4] Resolving packages...
+success Already up-to-date.
+Done in 0.02s. in Docker build
+
+    Files to check: 
+    - 
+  
+    Backend files to check: None
+    Database to check: None
+   
+    </analysis>
