@@ -13,11 +13,14 @@ FROM node:20-alpine AS frontend-builder
 WORKDIR /frontend
 
 # Increase Node heap to avoid OOM during yarn install + craco build on low-RAM hosts
-ENV NODE_OPTIONS=--max-old-space-size=4096
+ENV NODE_OPTIONS=--max-old-space-size=8192
 
 # Copy only package.json — yarn.lock is not tracked in git
 COPY frontend/package.json ./
-RUN yarn install --network-timeout 300000
+
+# Clear any stale cache, then install with limited network concurrency to prevent RAM spikes
+RUN yarn cache clean && \
+    yarn install --network-concurrency 1 --network-timeout 600000
 
 # Copy full source and build
 COPY frontend/ ./
