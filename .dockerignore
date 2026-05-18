@@ -1,0 +1,42 @@
+# Dependencies
+node_modules
+frontend/node_modules
+__pycache__
+**/__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Build artifacts (frontend build is handled inside Docker)
+frontend/build
+
+# Environment files — secrets must be injected at runtime, never baked in
+.env
+backend/.env
+frontend/.env
+**/.env.local
+**/.env.*.local
+
+# Dev/test artifacts
+.git
+.gitignore
+.emergent
+test_reports
+tests
+backend/tests
+*.test.js
+*.spec.js
+coverage
+
+# Logs & temp
+*.log
+*.tmp
+uploads/*
+!uploads/.gitkeep
+
+# Editor
+.vscode
+.idea
+*.swp
+*.swo
