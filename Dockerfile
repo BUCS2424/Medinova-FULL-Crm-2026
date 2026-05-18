@@ -19,8 +19,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Install Python dependencies (all packages have pre-built wheels — fast)
+# emergentintegrations is on a private index, so --extra-index-url is required
 COPY backend/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir \
+    --extra-index-url https://d33sy5i8bnduwe.cloudfront.net/simple/ \
+    -r requirements.txt
 
 # Copy backend source
 COPY backend/ ./backend/
