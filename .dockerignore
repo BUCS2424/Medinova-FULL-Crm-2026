@@ -8,8 +8,9 @@ __pycache__
 *.pyd
 .Python
 
-# Build artifacts (frontend build is handled inside Docker)
-frontend/build
+# Build artifacts — frontend/build IS committed to git and copied directly
+# (removing Node build stage entirely avoids 20+ min npm install + webpack timeout)
+# frontend/build
 
 # Environment files — secrets must be injected at runtime, never baked in
 .env

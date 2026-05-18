@@ -8,8 +8,8 @@
 # testing
 /coverage
 
-# production
-/build
+# production (build IS committed so Docker can COPY it without a Node build stage)
+# /build
 
 # misc
 .DS_Store

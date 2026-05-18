@@ -1,36 +1,16 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# MediNova Medical Supplies — Multi-stage Dockerfile
-# Builds React frontend, then packages everything into a single FastAPI image.
+# MediNova Medical Supplies — Dockerfile
 #
-# NOTES (learned from failed builds):
-#   - frontend/yarn.lock is NOT committed to git.
-#   - yarn v1 OOMs during [2/4] Fetching on constrained hosts (even with
-#     --network-concurrency 1) because it loads all package metadata into RAM.
-#   - Use npm install --legacy-peer-deps instead — much lower memory footprint.
+# STRATEGY: The React frontend is pre-built and committed to git as
+# frontend/build/. Docker just copies those static files — no Node.js stage,
+# no npm install, no webpack run. This eliminates the 20+ minute build that
+# was timing out on Hyperlift's Kaniko builder.
+#
+# TO UPDATE THE FRONTEND: run `npm run build` inside frontend/ locally (or let
+# Emergent build it), commit frontend/build/, then push and redeploy.
 # ─────────────────────────────────────────────────────────────────────────────
 
-# ── Stage 1: Build React frontend ─────────────────────────────────────────────
-FROM node:20-alpine AS frontend-builder
-
-WORKDIR /frontend
-
-# Increase Node heap to avoid OOM during craco build on low-RAM hosts
-ENV NODE_OPTIONS=--max-old-space-size=8192
-
-# Copy only package.json — yarn.lock is not tracked in git
-COPY frontend/package.json ./
-
-# Use npm instead of yarn — significantly lower memory footprint for large
-# react-scripts/craco dependency trees (yarn v1 holds all package metadata
-# in RAM simultaneously during [2/4] Fetching, causing OOM on constrained hosts)
-RUN npm install --legacy-peer-deps
-
-# Copy full source and build
-COPY frontend/ ./
-RUN npm run build
-
-# ── Stage 2: Python backend + static frontend ─────────────────────────────────
-FROM python:3.11-slim AS final
+FROM python:3.11-slim
 
 # System deps needed by Playwright Chromium + lxml
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -68,10 +48,10 @@ RUN playwright install chromium --with-deps || true
 # Copy backend source
 COPY backend/ ./backend/
 
-# Copy built React app
-COPY --from=frontend-builder /frontend/build ./frontend/build
+# Copy pre-built React app (committed to git — no Node build needed)
+COPY frontend/build ./frontend/build
 
-# ── Runtime config ─────────────────────────────────────────────────────────────
+# ── Runtime config ──────────────────────────────────────────────────────────
 WORKDIR /app/backend
 
 ENV PYTHONUNBUFFERED=1 \
