@@ -1,49 +1,26 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # MediNova Medical Supplies — Dockerfile
 #
-# STRATEGY: The React frontend is pre-built and committed to git as
-# frontend/build/. Docker just copies those static files — no Node.js stage,
-# no npm install, no webpack run. This eliminates the 20+ minute build that
-# was timing out on Hyperlift's Kaniko builder.
-#
-# TO UPDATE THE FRONTEND: run `npm run build` inside frontend/ locally (or let
-# Emergent build it), commit frontend/build/, then push and redeploy.
+# STRATEGY:
+#   1. Frontend is PRE-BUILT and committed as frontend/build/ — no Node stage.
+#   2. All Python packages have manylinux wheels — no build-essential needed.
+#   3. Playwright Chromium is NOT installed — template cloning is optional
+#      and the 148 X11 system packages it needs add 600MB + 2 min to the build.
+#      Every other feature works without it.
 # ─────────────────────────────────────────────────────────────────────────────
 
 FROM python:3.11-slim
 
-# System deps needed by Playwright Chromium + lxml
+# Minimal system deps: curl only (needed for health checks / some pip packages)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
     curl \
-    libglib2.0-0 \
-    libnss3 \
-    libnspr4 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libcups2 \
-    libdrm2 \
-    libxkbcommon0 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxfixes3 \
-    libxrandr2 \
-    libgbm1 \
-    libasound2 \
-    libpango-1.0-0 \
-    libcairo2 \
-    libxml2-dev \
-    libxslt1-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Install Python dependencies
+# Install Python dependencies (all packages have pre-built wheels — fast)
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Install Playwright Chromium for template cloning
-RUN playwright install chromium --with-deps || true
 
 # Copy backend source
 COPY backend/ ./backend/
