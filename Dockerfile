@@ -3,8 +3,10 @@
 # Builds React frontend, then packages everything into a single FastAPI image.
 #
 # NOTES (learned from failed builds):
-#   - frontend/yarn.lock is NOT committed to git — do NOT COPY it or use
-#     --frozen-lockfile. Use plain `yarn install` with a network timeout.
+#   - frontend/yarn.lock is NOT committed to git.
+#   - yarn v1 OOMs during [2/4] Fetching on constrained hosts (even with
+#     --network-concurrency 1) because it loads all package metadata into RAM.
+#   - Use npm install --legacy-peer-deps instead — much lower memory footprint.
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Stage 1: Build React frontend ─────────────────────────────────────────────
@@ -12,19 +14,20 @@ FROM node:20-alpine AS frontend-builder
 
 WORKDIR /frontend
 
-# Increase Node heap to avoid OOM during yarn install + craco build on low-RAM hosts
+# Increase Node heap to avoid OOM during craco build on low-RAM hosts
 ENV NODE_OPTIONS=--max-old-space-size=8192
 
 # Copy only package.json — yarn.lock is not tracked in git
 COPY frontend/package.json ./
 
-# Clear any stale cache, then install with limited network concurrency to prevent RAM spikes
-RUN yarn cache clean && \
-    yarn install --network-concurrency 1 --network-timeout 600000
+# Use npm instead of yarn — significantly lower memory footprint for large
+# react-scripts/craco dependency trees (yarn v1 holds all package metadata
+# in RAM simultaneously during [2/4] Fetching, causing OOM on constrained hosts)
+RUN npm install --legacy-peer-deps
 
 # Copy full source and build
 COPY frontend/ ./
-RUN yarn build
+RUN npm run build
 
 # ── Stage 2: Python backend + static frontend ─────────────────────────────────
 FROM python:3.11-slim AS final
