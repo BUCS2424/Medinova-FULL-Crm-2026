@@ -1,6 +1,10 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # MediNova Medical Supplies — Multi-stage Dockerfile
 # Builds React frontend, then packages everything into a single FastAPI image.
+#
+# NOTES (learned from failed builds):
+#   - frontend/yarn.lock is NOT committed to git — do NOT COPY it or use
+#     --frozen-lockfile. Use plain `yarn install` with a network timeout.
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Stage 1: Build React frontend ─────────────────────────────────────────────
@@ -8,18 +12,18 @@ FROM node:20-alpine AS frontend-builder
 
 WORKDIR /frontend
 
-# Install dependencies (yarn.lock for deterministic installs)
-COPY frontend/package.json frontend/yarn.lock ./
-RUN yarn install --frozen-lockfile
+# Copy only package.json — yarn.lock is not tracked in git
+COPY frontend/package.json ./
+RUN yarn install --network-timeout 300000
 
-# Copy source and build
+# Copy full source and build
 COPY frontend/ ./
 RUN yarn build
 
 # ── Stage 2: Python backend + static frontend ─────────────────────────────────
 FROM python:3.11-slim AS final
 
-# System deps needed by Playwright Chromium + lxml + Pillow
+# System deps needed by Playwright Chromium + lxml
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
@@ -55,21 +59,16 @@ RUN playwright install chromium --with-deps || true
 # Copy backend source
 COPY backend/ ./backend/
 
-# Copy built React app into backend's static directory so FastAPI can serve it
+# Copy built React app
 COPY --from=frontend-builder /frontend/build ./frontend/build
-
-# Copy location generator data files
-COPY backend/data/ ./backend/data/
 
 # ── Runtime config ─────────────────────────────────────────────────────────────
 WORKDIR /app/backend
 
-# All secrets/config come from environment variables at runtime — no .env baked in
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PORT=8001
 
 EXPOSE 8001
 
-# Serve with uvicorn (use --workers 2 for low-memory hosts; scale up via env)
 CMD ["sh", "-c", "uvicorn server:app --host 0.0.0.0 --port ${PORT} --workers ${UVICORN_WORKERS:-2}"]
