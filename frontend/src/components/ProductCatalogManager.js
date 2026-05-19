@@ -68,7 +68,7 @@ const PRODUCT_TEMPLATES = {
     { name: 'Heat/Cold Therapy', short_description: 'Therapeutic heating pads and cold packs', hcpcs: ['E0210', 'E0215'] },
     { name: 'Ultrasound Therapy Devices', short_description: 'Deep tissue therapeutic ultrasound', hcpcs: ['E0659'] },
   ],
-  'Mobility': [
+  'Mobility Equipment': [
     { name: 'Manual Wheelchairs', short_description: 'Standard and lightweight manual wheelchairs', hcpcs: ['K0001', 'K0002', 'K0003', 'K0004'] },
     { name: 'Power Wheelchairs', short_description: 'Electric-powered mobility chairs', hcpcs: ['K0813', 'K0814', 'K0815', 'K0816'] },
     { name: 'Walkers', short_description: 'Standard and wheeled walkers', hcpcs: ['E0130', 'E0135', 'E0141'] },
@@ -93,7 +93,7 @@ const PRODUCT_TEMPLATES = {
     { name: 'Cervical Collars', short_description: 'Neck support braces', hcpcs: ['L0120', 'L0172', 'L0174'] },
     { name: 'Hip Braces', short_description: 'Hip abduction and support orthoses', hcpcs: ['L1680', 'L1685', 'L1686'] },
   ],
-  'Respiratory / Oxygen': [
+  'Respiratory Equipment': [
     { name: 'Oxygen Concentrators', short_description: 'Home oxygen therapy equipment', hcpcs: ['E1390', 'E1391', 'E1392'] },
     { name: 'Portable Oxygen', short_description: 'Portable oxygen concentrators and tanks', hcpcs: ['E1390', 'K0738'] },
     { name: 'CPAP Machines', short_description: 'Continuous positive airway pressure for sleep apnea', hcpcs: ['E0601'] },
