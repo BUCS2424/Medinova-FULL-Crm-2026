@@ -17436,7 +17436,7 @@ try:
         require_super_dep=require_roles(UserRole.SUPER_ADMIN),
         get_user_dep=get_current_user,
     )
-    _public_router = _build_public_router(db)
+    _public_router = _build_public_router(db, dme_renderer=generate_location_page_on_demand)
     _seo_router = _build_seo_router(db)
 
     # Admin API

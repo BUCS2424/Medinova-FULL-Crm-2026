@@ -210,7 +210,7 @@ async def _resolve_xlinks(db, page: dict) -> dict:
     return out
 
 
-def build_public_router(db) -> APIRouter:
+def build_public_router(db, dme_renderer=None) -> APIRouter:
     router = APIRouter()
     _LOC = loc_prefix()
 
@@ -814,6 +814,27 @@ def build_public_router(db) -> APIRouter:
                         page_doc=doc,
                     )
                     return HTMLResponse(content=rendered, status_code=200)
+
+            # ── DME pages: use existing branded location template ──────────
+            gen_type_lower = ((gen or {}).get("type") or "").lower()
+            _DME_TRIGGERS = ("medical equipment", "durable medical", "dme")
+            is_dme = any(t in gen_type_lower for t in _DME_TRIGGERS) or \
+                     any(t in (page_product_slug or "").replace("-", " ") for t in _DME_TRIGGERS)
+            if is_dme and dme_renderer:
+                level = doc.get("level") or "city"
+                state_name = doc.get("state_name") or ""
+                city = doc.get("city") or ""
+                county = doc.get("county") or ""
+                if level == "state":
+                    loc_name = state_name
+                elif level == "county":
+                    loc_name = f"{county} County" if county else state_name
+                else:
+                    loc_name = city or state_name
+                state_slug = state_name.lower().replace(" ", "-")
+                html = await dme_renderer(loc_name, level, state_name, state_slug)
+                if html:
+                    return HTMLResponse(content=html, status_code=200)
 
             # Starter template fallback
             doc["_xlinks"] = await _resolve_xlinks(db, doc)

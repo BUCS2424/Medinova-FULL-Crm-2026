@@ -6,7 +6,7 @@
 **Project Name**: MediNova Medical Supplies CRM (rebranded from DME PROS)
 **Source**: https://github.com/BUCS2424/New-Core-Lead-vender-DME-r-us
 **Setup Date**: 2026-03-13
-**Last Updated**: 2026-05-16 (Location Generator V2 installed)
+**Last Updated**: 2026-05-19 (Location page product fix + product catalog seeding)
 
 ## Architecture
 - **Backend**: FastAPI (Python) on port 8001
@@ -39,7 +39,15 @@
   - All Waystar endpoints secured with `Depends(verify_token)` JWT auth (previously config/status/eligibility/claims/logs were open)
   - Log endpoint URL mismatch fixed (`/activity/logs` → `/logs`)
 
-- [x] **Location Generator V2 (2026-05-16)**:
+- [x] **Product Catalog + Location Pages Fix (2026-05-19)**:
+  - Seeded 21 Mobility Equipment + 24 Respiratory Equipment + 10 Orthopedic/Orthotics + 10 Emergency/Monitoring products (191 total)
+  - Added representative images to 4 main product categories
+  - Fixed `ProductCatalogManager.js` template keys to match DB category names
+  - Fixed P0 bug: coverage-area pages were rendering without product catalog
+  - Root cause: `public_location_detail` in `routes/public_pages.py` only fetched from `db.catalog_products` (empty), not `db.products`
+  - Fix: passed existing `generate_location_page_on_demand` function as `dme_renderer` param to `build_public_router` — zero code duplication, reuses existing working function
+
+
   - Full programmatic SEO engine installed from ZIP module
   - Creates pages for all 50 states × counties × cities (~33,000+ pages possible)
   - New menu item "Location Generator V2 ⭐" added to Dev Settings sidebar with gold star icon
