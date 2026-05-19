@@ -25,7 +25,7 @@ JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 24
 
 # Site URL for SEO
-SITE_URL = os.environ.get("SITE_URL", "https://mastechdme.com")
+SITE_URL = os.environ.get("SITE_URL", "https://medinovadme.com")
 
 # Create the main app
 app = FastAPI(title="DME CRM API", description="HIPAA-Compliant DME CRM System")
