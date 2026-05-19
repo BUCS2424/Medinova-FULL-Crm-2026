@@ -24,7 +24,8 @@ import {
 } from '../components/ui/table';
 import { Skeleton } from '../components/ui/skeleton';
 import { toast } from 'sonner';
-import { Plus, Building2, Edit, Trash2, Globe, Key, Tag, X, Wifi, WifiOff, Package, DollarSign, Truck, CheckCircle2, AlertCircle, Loader2, ShoppingCart, Eye } from 'lucide-react';
+import { Plus, Building2, Edit, Trash2, Globe, Key, Tag, X, Wifi, WifiOff, Package, DollarSign, Truck, CheckCircle2, AlertCircle, Loader2, ShoppingCart, Eye, Images } from 'lucide-react';
+import SupplierCatalogImages from '../components/SupplierCatalogImages';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -41,6 +42,7 @@ export default function SuppliersPage({ embedded = false }) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [catalogImagesSupplier, setCatalogImagesSupplier] = useState(null);
   const [tagInput, setTagInput] = useState('');
   const [testingConnection, setTestingConnection] = useState(null);
   const [checkingInventory, setCheckingInventory] = useState(null);
@@ -530,6 +532,16 @@ export default function SuppliersPage({ embedded = false }) {
                         >
                           <DollarSign className="w-4 h-4" />
                         </Button>
+                        {/* Catalog Images */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Catalog Images"
+                          onClick={() => setCatalogImagesSupplier(supplier)}
+                          data-testid={`catalog-images-${supplier.id}`}
+                        >
+                          <Images className="w-4 h-4 text-blue-500" />
+                        </Button>
                         {/* Edit */}
                         <Button
                           variant="ghost"
@@ -794,6 +806,13 @@ export default function SuppliersPage({ embedded = false }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Supplier Catalog Images */}
+      <SupplierCatalogImages
+        supplier={catalogImagesSupplier}
+        open={!!catalogImagesSupplier}
+        onClose={() => setCatalogImagesSupplier(null)}
+      />
     </div>
   );
 }

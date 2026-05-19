@@ -908,6 +908,7 @@ class OrderResponse(BaseModel):
 class SupplierBase(BaseModel):
     name: str
     api_endpoint_url: Optional[str] = None
+    website_url: Optional[str] = None
     contact_email: Optional[EmailStr] = None
     contact_phone: Optional[str] = None
     address: Optional[str] = None
@@ -920,13 +921,14 @@ class SupplierCreate(SupplierBase):
 class SupplierUpdate(BaseModel):
     name: Optional[str] = None
     api_endpoint_url: Optional[str] = None
+    website_url: Optional[str] = None
     api_key: Optional[str] = None
     contact_email: Optional[EmailStr] = None
     contact_phone: Optional[str] = None
     address: Optional[str] = None
     is_active: Optional[bool] = None
     product_tags: Optional[List[str]] = None
-    product_ids: Optional[List[str]] = None  # Links to product catalog items this supplier carries
+    product_ids: Optional[List[str]] = None
 
 class SupplierResponse(SupplierBase):
     model_config = ConfigDict(extra="ignore")
@@ -3869,6 +3871,107 @@ async def delete_supplier(supplier_id: str, current_user: dict = Depends(require
     await log_audit(current_user["id"], current_user["email"], "SUPPLIER_DELETED", "suppliers", supplier_id)
     
     return {"message": "Supplier deleted successfully"}
+
+
+# ==================== SUPPLIER CATALOG ASSETS ====================
+
+@api_router.get("/suppliers/{supplier_id}/assets")
+async def get_supplier_assets(supplier_id: str, current_user: dict = Depends(get_current_user)):
+    """Get all catalog image assets for a supplier"""
+    assets = await db.supplier_assets.find(
+        {"supplier_id": supplier_id}, {"_id": 0}
+    ).sort("entity_name", 1).to_list(1000)
+    return assets
+
+@api_router.post("/suppliers/{supplier_id}/assets/bulk")
+async def save_supplier_assets_bulk(
+    supplier_id: str,
+    payload: dict,
+    current_user: dict = Depends(require_roles(UserRole.ADMIN))
+):
+    """Bulk save supplier assets — replaces all assets for the supplier"""
+    supplier = await db.suppliers.find_one({"id": supplier_id}, {"_id": 0})
+    if not supplier:
+        raise HTTPException(status_code=404, detail="Supplier not found")
+    assets = payload.get("assets", [])
+    await db.supplier_assets.delete_many({"supplier_id": supplier_id})
+    if assets:
+        now = datetime.now(timezone.utc).isoformat()
+        for a in assets:
+            a["id"] = str(uuid.uuid4())
+            a["supplier_id"] = supplier_id
+            a["supplier_name"] = supplier.get("name", "")
+            a.setdefault("verified", True)
+            a["created_at"] = now
+        await db.supplier_assets.insert_many(assets)
+    return {"saved": len(assets)}
+
+@api_router.put("/suppliers/{supplier_id}/assets/{asset_id}")
+async def update_supplier_asset(
+    supplier_id: str,
+    asset_id: str,
+    payload: dict,
+    current_user: dict = Depends(require_roles(UserRole.ADMIN))
+):
+    """Update a single supplier asset (e.g. update image_url)"""
+    allowed = {"image_url", "alt_text", "source_url", "verified"}
+    update = {k: v for k, v in payload.items() if k in allowed}
+    if not update:
+        raise HTTPException(status_code=400, detail="No valid fields to update")
+    await db.supplier_assets.update_one(
+        {"id": asset_id, "supplier_id": supplier_id},
+        {"$set": update}
+    )
+    return {"updated": True}
+
+@api_router.post("/suppliers/{supplier_id}/apply")
+async def apply_supplier_catalog(
+    supplier_id: str,
+    current_user: dict = Depends(require_roles(UserRole.ADMIN))
+):
+    """Apply a supplier's catalog images to the active product/category records"""
+    supplier = await db.suppliers.find_one({"id": supplier_id}, {"_id": 0})
+    if not supplier:
+        raise HTTPException(status_code=404, detail="Supplier not found")
+    assets = await db.supplier_assets.find(
+        {"supplier_id": supplier_id, "image_url": {"$nin": [None, ""]}},
+        {"_id": 0}
+    ).to_list(1000)
+    cats_updated = 0
+    prods_updated = 0
+    for asset in assets:
+        url = asset.get("image_url", "")
+        name = asset.get("entity_name", "")
+        entity_id = asset.get("entity_id")
+        atype = asset.get("asset_type", "category")
+        meta = {"image_url": url, "image_source": "supplier", "image_supplier_id": supplier_id}
+        if atype == "category":
+            q = {"id": entity_id} if entity_id else {"name": name}
+            r = await db.product_categories.update_many(q, {"$set": meta})
+            cats_updated += r.modified_count
+        else:
+            q = {"id": entity_id} if entity_id else {"name": name}
+            r = await db.products.update_many(q, {"$set": meta})
+            prods_updated += r.modified_count
+    await log_audit(current_user["id"], current_user["email"], "SUPPLIER_CATALOG_APPLIED",
+                    "supplier_assets", supplier_id,
+                    details={"categories": cats_updated, "products": prods_updated})
+    return {"success": True, "categories_updated": cats_updated, "products_updated": prods_updated,
+            "supplier_name": supplier.get("name")}
+
+@api_router.get("/suppliers/{supplier_id}/assets/status")
+async def get_supplier_assets_status(supplier_id: str, current_user: dict = Depends(get_current_user)):
+    """Get coverage status: how many categories/products have images from this supplier"""
+    assets = await db.supplier_assets.find(
+        {"supplier_id": supplier_id, "image_url": {"$nin": [None, ""]}},
+        {"_id": 0, "asset_type": 1}
+    ).to_list(1000)
+    cats = sum(1 for a in assets if a.get("asset_type") == "category")
+    prods = sum(1 for a in assets if a.get("asset_type") == "product")
+    total_cats = await db.product_categories.count_documents({"enabled": True})
+    total_prods = await db.products.count_documents({"enabled": True})
+    return {"category_assets": cats, "product_assets": prods,
+            "total_categories": total_cats, "total_products": total_prods}
 
 
 # ==================== SUPPLIER API INTEGRATION ====================
