@@ -479,6 +479,13 @@ def build_router(db, require_perm_dep, require_super_dep, get_user_dep) -> APIRo
         )
         return {"deleted": result.deleted_count, "state_code": code}
 
+    @router.delete("/page-generators/{gen_id}/pages/all", dependencies=[perm_dep])
+    async def delete_all_pages_for_generator(gen_id: str):
+        """Delete ALL generated pages for a generator without deleting the generator itself."""
+        await _load_generator(gen_id)
+        result = await db[coll("generated_pages")].delete_many({"generator_id": gen_id})
+        return {"deleted": result.deleted_count, "generator_id": gen_id}
+
     # ---- Slug preview ----
 
     @router.post("/page-generators/{gen_id}/preview-slugs", dependencies=[perm_dep])

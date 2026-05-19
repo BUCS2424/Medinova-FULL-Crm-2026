@@ -1,7 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ExternalLink, Search, Globe, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+    AlertDialog, AlertDialogAction, AlertDialogCancel,
+    AlertDialogContent, AlertDialogDescription,
+    AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { ExternalLink, Search, Globe, ChevronLeft, ChevronRight, Trash2, Loader2 } from "lucide-react";
 import { api, formatApiError } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -14,6 +19,8 @@ export default function PagesTab({ generator }) {
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(0);
     const [level, setLevel] = useState("all");
+    const [deleteAllOpen, setDeleteAllOpen] = useState(false);
+    const [deletingAll, setDeletingAll] = useState(false);
     const genId = generator?.id;
 
     const load = useCallback(async () => {
@@ -36,6 +43,22 @@ export default function PagesTab({ generator }) {
     useEffect(() => { load(); }, [load]);
 
     const handleSearch = (e) => { e.preventDefault(); setPage(0); load(); };
+
+    const handleDeleteAll = async () => {
+        setDeletingAll(true);
+        try {
+            const { data } = await api.delete(`/page-generators/${genId}/pages/all`);
+            toast.success(`Deleted ${data?.deleted ?? 0} pages. Generator config preserved.`);
+            setPages([]);
+            setTotal(0);
+            setDeleteAllOpen(false);
+        } catch (err) {
+            toast.error(formatApiError(err.response?.data?.detail) || err.message);
+        } finally {
+            setDeletingAll(false);
+        }
+    };
+
     const totalPages = Math.ceil(total / PAGE_SIZE);
     const publicPrefix = generator?.public_prefix || "coverage-areas";
 
@@ -76,7 +99,20 @@ export default function PagesTab({ generator }) {
                 </div>
             </div>
 
-            <p className="text-xs text-host-foreground/50">{total.toLocaleString()} pages total</p>
+            <div className="flex items-center justify-between">
+                <p className="text-xs text-host-foreground/50">{total.toLocaleString()} pages total</p>
+                {total > 0 && (
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-400 hover:text-red-300 hover:bg-red-950/40 h-7 text-xs"
+                        onClick={() => setDeleteAllOpen(true)}
+                        data-testid="delete-all-pages-btn"
+                    >
+                        <Trash2 className="h-3.5 w-3.5 mr-1.5" /> Delete All {total.toLocaleString()} Pages
+                    </Button>
+                )}
+            </div>
 
             {loading ? (
                 <p className="text-sm text-host-foreground/50 py-8 text-center">Loading…</p>
@@ -131,6 +167,35 @@ export default function PagesTab({ generator }) {
                     </Button>
                 </div>
             )}
+
+            <AlertDialog open={deleteAllOpen} onOpenChange={(o) => !deletingAll && setDeleteAllOpen(o)}>
+                <AlertDialogContent className="bg-host-background border-host-secondary text-host-foreground" data-testid="delete-all-pages-dialog">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-host-foreground">
+                            Delete all {total.toLocaleString()} pages?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-host-foreground/60">
+                            This permanently removes every generated page for <strong>{generator?.name}</strong>. The generator configuration and settings are kept intact — you can regenerate pages for any states at any time.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel
+                            className="bg-host-secondary border-host-foreground/20 text-host-foreground hover:bg-host-foreground/10"
+                            disabled={deletingAll}
+                        >
+                            Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDeleteAll}
+                            disabled={deletingAll}
+                            className="bg-red-700 text-white hover:bg-red-600"
+                            data-testid="delete-all-pages-confirm"
+                        >
+                            {deletingAll ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Deleting…</> : "Yes, delete all pages"}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }
