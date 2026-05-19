@@ -9,7 +9,7 @@ import sys
 from datetime import datetime
 
 # Public endpoint from frontend/.env
-API_URL = "https://supplies-platform.preview.emergentagent.com"
+API_URL = "https://coverage-catalog-v2.preview.emergentagent.com"
 
 # Test credentials from /app/memory/test_credentials.md
 TEST_EMAIL = "mel@a2gdesigns.com"
