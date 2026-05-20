@@ -33,6 +33,8 @@ export default function VideoRoomPage() {
   const [videoOn, setVideoOn] = useState(true);
   const [audioOn, setAudioOn] = useState(true);
   const [screenSharing, setScreenSharing] = useState(false);
+  // media state: 'pending' | 'ok' | 'audio_only' | 'denied' | 'not_found' | 'unavailable'
+  const [mediaState, setMediaState] = useState('pending');
   const [showDiagnose, setShowDiagnose] = useState(false);
   const [symptoms, setSymptoms] = useState('');
   const [diagnosis, setDiagnosis] = useState('');
@@ -55,16 +57,36 @@ export default function VideoRoomPage() {
     return () => cleanup();
   }, [meetingId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Start camera preview once in lobby
+  // Start camera preview once in lobby — track media state for UI feedback
   useEffect(() => {
     if (!loading && meeting && meeting.status !== 'ended' && !connected) {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setMediaState('unavailable');
+        return;
+      }
       navigator.mediaDevices
         .getUserMedia({ audio: true, video: true })
         .then((stream) => {
           localStreamRef.current = stream;
           if (localVideoRef.current) localVideoRef.current.srcObject = stream;
+          setMediaState('ok');
         })
-        .catch(() => {});
+        .catch((err) => {
+          if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+            setMediaState('denied');
+          } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+            // Try audio-only fallback
+            navigator.mediaDevices
+              .getUserMedia({ audio: true, video: false })
+              .then((stream) => {
+                localStreamRef.current = stream;
+                setMediaState('audio_only');
+              })
+              .catch(() => setMediaState('not_found'));
+          } else {
+            setMediaState('not_found');
+          }
+        });
     }
   }, [loading, meeting, connected]);
 
@@ -173,12 +195,47 @@ export default function VideoRoomPage() {
   );
 
   const handleJoin = async () => {
+    // Hard stop if mediaDevices API not available
+    if (!navigator.mediaDevices?.getUserMedia) {
+      toast.error('Your browser does not support camera/mic access. Use Chrome, Firefox, or Safari over HTTPS.');
+      return;
+    }
+
     setJoining(true);
     try {
-      // Reuse preview stream or request new
+      // Reuse existing stream if still alive
       let stream = localStreamRef.current;
-      if (!stream || stream.getTracks().every((t) => t.readyState === 'ended')) {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+      const streamDead = !stream || stream.getTracks().every((t) => t.readyState === 'ended');
+
+      if (streamDead) {
+        try {
+          // Prefer full AV
+          stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+          setMediaState('ok');
+        } catch (mediaErr) {
+          if (mediaErr.name === 'NotAllowedError' || mediaErr.name === 'PermissionDeniedError') {
+            toast.error('Camera/microphone permission was denied. Click the camera icon in your browser address bar and allow access, then try again.');
+            setMediaState('denied');
+            setJoining(false);
+            return;
+          }
+          // NotFoundError / NotReadableError → try audio-only
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+            setMediaState('audio_only');
+            toast.info('No camera found — joining with microphone only.');
+          } catch (audioErr) {
+            if (audioErr.name === 'NotAllowedError' || audioErr.name === 'PermissionDeniedError') {
+              toast.error('Microphone permission denied. Allow access in your browser and try again.');
+              setMediaState('denied');
+            } else {
+              toast.error('No camera or microphone found. Check your device settings.');
+              setMediaState('not_found');
+            }
+            setJoining(false);
+            return;
+          }
+        }
         localStreamRef.current = stream;
         if (localVideoRef.current) localVideoRef.current.srcObject = stream;
       }
@@ -207,7 +264,7 @@ export default function VideoRoomPage() {
       };
 
       ws.onerror = () => {
-        toast.error('Signaling connection error');
+        toast.error('Could not connect to the signaling server. Check your network and try again.');
         setJoining(false);
       };
 
@@ -215,11 +272,8 @@ export default function VideoRoomPage() {
         setConnected(false);
       };
     } catch (error) {
-      toast.error(
-        error.name === 'NotAllowedError'
-          ? 'Camera/microphone permission denied'
-          : 'Failed to join meeting'
-      );
+      console.error('[VideoRoom] handleJoin error:', error);
+      toast.error(`Join failed: ${error.message || error.name || 'Unknown error'}`);
       setJoining(false);
     }
   };
@@ -373,7 +427,7 @@ export default function VideoRoomPage() {
 
           {/* Camera preview */}
           <div
-            className="relative rounded-xl overflow-hidden mb-6 aspect-video"
+            className="relative rounded-xl overflow-hidden mb-4 aspect-video"
             style={{ background: '#0a2240' }}
           >
             <video
@@ -383,13 +437,44 @@ export default function VideoRoomPage() {
               playsInline
               className="w-full h-full object-cover"
             />
+
+            {/* Media state overlays */}
+            {mediaState === 'pending' && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+                <p className="text-slate-400 text-xs">Requesting camera access…</p>
+              </div>
+            )}
+            {mediaState === 'audio_only' && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                <Mic className="w-8 h-8 text-yellow-400" />
+                <p className="text-yellow-300 text-xs font-medium">Audio only — no camera found</p>
+              </div>
+            )}
+            {(mediaState === 'denied' || mediaState === 'not_found' || mediaState === 'unavailable') && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-4">
+                <VideoOff className="w-8 h-8 text-red-400" />
+                <p className="text-red-300 text-xs font-medium text-center">
+                  {mediaState === 'denied' && 'Camera permission blocked — click the camera icon in your browser address bar to allow it'}
+                  {mediaState === 'not_found' && 'No camera/mic found — check that your device is connected'}
+                  {mediaState === 'unavailable' && 'WebRTC not supported — use Chrome, Firefox, or Safari'}
+                </p>
+              </div>
+            )}
+
             <div className="absolute bottom-3 left-3">
-              <Badge variant="secondary" className="text-xs">Preview</Badge>
+              <Badge
+                variant="secondary"
+                className="text-xs"
+                style={mediaState === 'ok' ? {} : mediaState === 'audio_only' ? { background: '#7c5f00', color: '#fde68a' } : { background: '#7f1d1d', color: '#fca5a5' }}
+              >
+                {mediaState === 'ok' ? 'Preview' : mediaState === 'audio_only' ? 'Audio only' : mediaState === 'pending' ? 'Requesting…' : 'No device'}
+              </Badge>
             </div>
           </div>
 
           {/* Media toggles */}
-          <div className="flex gap-3 justify-center mb-6">
+          <div className="flex gap-3 justify-center mb-5">
             <Button
               variant={audioOn ? 'secondary' : 'destructive'}
               size="icon"
@@ -408,19 +493,47 @@ export default function VideoRoomPage() {
             >
               {videoOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
             </Button>
+            {/* Re-request permission button when blocked */}
+            {(mediaState === 'denied' || mediaState === 'not_found') && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => {
+                  setMediaState('pending');
+                  navigator.mediaDevices
+                    .getUserMedia({ audio: true, video: true })
+                    .then((stream) => {
+                      localStreamRef.current = stream;
+                      if (localVideoRef.current) localVideoRef.current.srcObject = stream;
+                      setMediaState('ok');
+                    })
+                    .catch(() => setMediaState('denied'));
+                }}
+                className="rounded-full w-12 h-12 border-yellow-400 text-yellow-400"
+                title="Retry camera access"
+              >
+                <Loader2 className="w-5 h-5" />
+              </Button>
+            )}
           </div>
 
           <Button
             onClick={handleJoin}
-            disabled={joining}
+            disabled={joining || mediaState === 'unavailable'}
             className="w-full py-6 text-lg font-semibold mb-3"
-            style={{ background: 'linear-gradient(135deg, #0055CC, #00A3E0)' }}
+            style={{
+              background: mediaState === 'unavailable'
+                ? '#334155'
+                : 'linear-gradient(135deg, #0055CC, #00A3E0)'
+            }}
             data-testid="join-meeting-btn"
           >
             {joining ? (
-              <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Connecting...
-              </>
+              <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Connecting...</>
+            ) : mediaState === 'unavailable' ? (
+              'Browser Not Supported'
+            ) : mediaState === 'audio_only' ? (
+              'Join Meeting (Audio Only)'
             ) : (
               'Join Meeting'
             )}
