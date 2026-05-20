@@ -12,11 +12,21 @@ import {
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 const getWsUrl = () => API_URL.replace(/^https/, 'wss').replace(/^http(?!s)/, 'ws');
 
+// ICE config: Google STUN + free public TURN relay for cross-network support
 const ICE_SERVERS = {
   iceServers: [
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
-    { urls: 'stun:stun2.l.google.com:19302' },
+    // Free public TURN relay — replace with dedicated TURN for production
+    {
+      urls: [
+        'turn:openrelay.metered.ca:80',
+        'turn:openrelay.metered.ca:443',
+        'turns:openrelay.metered.ca:443',
+      ],
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
+    },
   ],
 };
 
@@ -46,6 +56,10 @@ export default function VideoRoomPage() {
   const remoteVideoRef = useRef(null);
   const localStreamRef = useRef(null);
   const pendingCandidates = useRef([]);
+  // Store incoming remote stream here — independent of DOM rendering
+  const remoteStreamRef = useRef(null);
+  // WebSocket keepalive interval
+  const pingIntervalRef = useRef(null);
 
   const getHeaders = () => {
     const token = localStorage.getItem('dme_token');
@@ -56,6 +70,13 @@ export default function VideoRoomPage() {
     fetchMeeting();
     return () => cleanup();
   }, [meetingId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Wire remote stream to <video> element once hasRemote triggers the element into the DOM
+  useEffect(() => {
+    if (hasRemote && remoteVideoRef.current && remoteStreamRef.current) {
+      remoteVideoRef.current.srcObject = remoteStreamRef.current;
+    }
+  }, [hasRemote]);
 
   // Start camera preview once in lobby — track media state for UI feedback
   useEffect(() => {
@@ -104,9 +125,11 @@ export default function VideoRoomPage() {
   };
 
   const cleanup = () => {
+    if (pingIntervalRef.current) { clearInterval(pingIntervalRef.current); pingIntervalRef.current = null; }
     if (wsRef.current) { try { wsRef.current.close(); } catch (e) {} wsRef.current = null; }
     if (pcRef.current) { try { pcRef.current.close(); } catch (e) {} pcRef.current = null; }
     localStreamRef.current?.getTracks().forEach((t) => t.stop());
+    remoteStreamRef.current = null;
   };
 
   const createPeerConnection = useCallback(() => {
@@ -121,8 +144,11 @@ export default function VideoRoomPage() {
     };
 
     pc.ontrack = (event) => {
-      if (remoteVideoRef.current && event.streams[0]) {
-        remoteVideoRef.current.srcObject = event.streams[0];
+      if (event.streams[0]) {
+        // Save to ref FIRST — remoteVideoRef.current may be null here
+        // because the <video> element only renders after hasRemote becomes true.
+        // The useEffect below attaches the stream once the element exists.
+        remoteStreamRef.current = event.streams[0];
         setHasRemote(true);
       }
     };
@@ -254,6 +280,12 @@ export default function VideoRoomPage() {
         setConnected(true);
         setJoining(false);
         toast.success(`Joined as ${role === 'host' ? 'Provider' : 'Patient'}`);
+        // Send keepalive pings every 10 seconds to prevent proxy idle-timeout
+        pingIntervalRef.current = setInterval(() => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'ping' }));
+          }
+        }, 10000);
       };
 
       ws.onmessage = async (event) => {
@@ -269,6 +301,7 @@ export default function VideoRoomPage() {
       };
 
       ws.onclose = () => {
+        if (pingIntervalRef.current) { clearInterval(pingIntervalRef.current); pingIntervalRef.current = null; }
         setConnected(false);
       };
     } catch (error) {
