@@ -12,22 +12,26 @@ import {
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 const getWsUrl = () => API_URL.replace(/^https/, 'wss').replace(/^http(?!s)/, 'ws');
 
-// ICE config: Google STUN + free public TURN relay for cross-network support
+// ICE config: multiple STUN servers + free public TURN relay for cross-network support
 const ICE_SERVERS = {
   iceServers: [
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'stun:stun2.l.google.com:19302' },
+    { urls: 'stun:stun3.l.google.com:19302' },
     // Free public TURN relay — replace with dedicated TURN for production
     {
       urls: [
         'turn:openrelay.metered.ca:80',
         'turn:openrelay.metered.ca:443',
+        'turn:openrelay.metered.ca:443?transport=tcp',
         'turns:openrelay.metered.ca:443',
       ],
       username: 'openrelayproject',
       credential: 'openrelayproject',
     },
   ],
+  iceCandidatePoolSize: 10,
 };
 
 export default function VideoRoomPage() {
@@ -62,6 +66,7 @@ export default function VideoRoomPage() {
   const remoteStreamRef = useRef(null);
   // WebSocket keepalive interval
   const pingIntervalRef = useRef(null);
+  const iceRestartTimerRef = useRef(null);
 
   const getHeaders = () => {
     const token = localStorage.getItem('dme_token');
@@ -128,6 +133,7 @@ export default function VideoRoomPage() {
 
   const cleanup = () => {
     if (pingIntervalRef.current) { clearInterval(pingIntervalRef.current); pingIntervalRef.current = null; }
+    if (iceRestartTimerRef.current) { clearTimeout(iceRestartTimerRef.current); iceRestartTimerRef.current = null; }
     if (wsRef.current) { try { wsRef.current.close(); } catch (e) {} wsRef.current = null; }
     if (pcRef.current) { try { pcRef.current.close(); } catch (e) {} pcRef.current = null; }
     localStreamRef.current?.getTracks().forEach((t) => t.stop());
@@ -156,14 +162,84 @@ export default function VideoRoomPage() {
     };
 
     pc.onconnectionstatechange = () => {
-      if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+      if (pc.connectionState === 'connected') {
+        setIceStatus('stable');
+      } else if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
         setHasRemote(false);
         if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
       }
     };
 
+    // ── ICE restart: recover from disconnection/failure ───────────────────────
+    pc.oniceconnectionstatechange = () => {
+      const state = pc.iceConnectionState;
+      console.log('[WebRTC] ICE state →', state);
+
+      if (state === 'connected' || state === 'completed') {
+        if (iceRestartTimerRef.current) { clearTimeout(iceRestartTimerRef.current); iceRestartTimerRef.current = null; }
+        setIceStatus('stable');
+        return;
+      }
+
+      if (state === 'disconnected') {
+        setIceStatus('reconnecting');
+        // Wait 4s to allow transient network blip to self-recover before forcing restart
+        if (iceRestartTimerRef.current) clearTimeout(iceRestartTimerRef.current);
+        iceRestartTimerRef.current = setTimeout(async () => {
+          // Only act if this PC is still the active one and WS is alive
+          if (pcRef.current !== pc) return;
+          if (pc.iceConnectionState !== 'disconnected' && pc.iceConnectionState !== 'failed') return;
+          if (role === 'host' && wsRef.current?.readyState === WebSocket.OPEN) {
+            try {
+              const offer = await pc.createOffer({ iceRestart: true });
+              await pc.setLocalDescription(offer);
+              wsRef.current.send(JSON.stringify({ type: 'offer', sdp: pc.localDescription }));
+              console.log('[WebRTC] ICE restart offer sent');
+            } catch (e) {
+              console.error('[WebRTC] ICE restart error:', e);
+            }
+          }
+        }, 4000);
+        return;
+      }
+
+      if (state === 'failed') {
+        setIceStatus('failed');
+        if (iceRestartTimerRef.current) { clearTimeout(iceRestartTimerRef.current); iceRestartTimerRef.current = null; }
+        if (role === 'host' && wsRef.current?.readyState === WebSocket.OPEN) {
+          pc.createOffer({ iceRestart: true })
+            .then((offer) => pc.setLocalDescription(offer))
+            .then(() => {
+              if (wsRef.current?.readyState === WebSocket.OPEN) {
+                wsRef.current.send(JSON.stringify({ type: 'offer', sdp: pc.localDescription }));
+                console.log('[WebRTC] ICE restart offer sent (failed state)');
+              }
+            })
+            .catch((e) => console.error('[WebRTC] ICE restart (failed):', e));
+        }
+      }
+    };
+
+    // ── Renegotiation: safety net for browser-triggered SDP changes ───────────
+    // replaceTrack() normally doesn't need this, but some browsers fire it anyway.
+    pc.onnegotiationneeded = async () => {
+      // Only host creates offers; patient always answers
+      if (role !== 'host') return;
+      // Guard against firing during initial track setup (WS not yet open)
+      if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
+      if (pc.signalingState !== 'stable') return;
+      try {
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        wsRef.current.send(JSON.stringify({ type: 'offer', sdp: pc.localDescription }));
+        console.log('[WebRTC] onnegotiationneeded offer sent');
+      } catch (e) {
+        console.error('[WebRTC] negotiationneeded offer error:', e);
+      }
+    };
+
     return pc;
-  }, []);
+  }, [role]);
 
   const handleSignalingMessage = useCallback(
     async (msg) => {
@@ -329,42 +405,61 @@ export default function VideoRoomPage() {
 
   const toggleScreenShare = async () => {
     if (screenSharing) {
+      // Stop sharing: replace screen track back with camera track (if available)
       const videoTrack = localStreamRef.current?.getVideoTracks()[0];
-      if (videoTrack && pcRef.current) {
+      if (pcRef.current) {
         const sender = pcRef.current.getSenders().find((s) => s.track?.kind === 'video');
-        if (sender) await sender.replaceTrack(videoTrack).catch(() => {});
+        if (sender) {
+          if (videoTrack) {
+            await sender.replaceTrack(videoTrack).catch(() => {});
+          } else {
+            // No camera track to fall back to — remove the sender
+            pcRef.current.removeTrack(sender);
+          }
+        }
       }
       if (localVideoRef.current) localVideoRef.current.srcObject = localStreamRef.current;
       setScreenSharing(false);
       return;
     }
     try {
-      const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
       const screenTrack = screenStream.getVideoTracks()[0];
 
       if (pcRef.current) {
-        const sender = pcRef.current.getSenders().find((s) => s.track?.kind === 'video');
-        if (sender) await sender.replaceTrack(screenTrack).catch(() => {});
+        const videoSender = pcRef.current.getSenders().find((s) => s.track?.kind === 'video');
+        if (videoSender) {
+          // Replace existing video track with screen track (no renegotiation needed)
+          await videoSender.replaceTrack(screenTrack).catch(() => {});
+        } else {
+          // No video sender yet (audio-only join) — add as new track
+          // Note: addTrack fires onnegotiationneeded, which will create a new offer
+          const screenOnlyStream = new MediaStream([screenTrack]);
+          pcRef.current.addTrack(screenTrack, screenOnlyStream);
+        }
       }
-      if (localVideoRef.current)
+
+      // Update local preview to show screen
+      if (localVideoRef.current) {
         localVideoRef.current.srcObject = new MediaStream([
           screenTrack,
-          ...( localStreamRef.current?.getAudioTracks() || []),
+          ...(localStreamRef.current?.getAudioTracks() || []),
         ]);
-
+      }
       setScreenSharing(true);
 
+      // When user stops sharing from the browser's native control
       screenTrack.onended = () => {
         setScreenSharing(false);
         const vt = localStreamRef.current?.getVideoTracks()[0];
-        if (vt && pcRef.current) {
-          const s = pcRef.current.getSenders().find((x) => x.track?.kind === 'video');
-          if (s) s.replaceTrack(vt);
+        if (pcRef.current) {
+          const sender = pcRef.current.getSenders().find((s) => s.track?.kind === 'video');
+          if (sender && vt) sender.replaceTrack(vt).catch(() => {});
         }
         if (localVideoRef.current) localVideoRef.current.srcObject = localStreamRef.current;
       };
     } catch (e) {
-      if (e.name !== 'NotAllowedError') toast.error('Screen share failed');
+      if (e.name !== 'NotAllowedError') toast.error('Screen share failed: ' + (e.message || e.name));
     }
   };
 
@@ -609,6 +704,18 @@ export default function VideoRoomPage() {
           <Badge className="text-xs" style={{ background: '#1a3a5c', color: '#7eb8e8' }}>
             {role === 'host' ? 'Provider' : 'Patient'}
           </Badge>
+          {iceStatus === 'reconnecting' && (
+            <Badge className="gap-1.5 text-xs animate-pulse" style={{ background: '#7c4d00', color: '#fbbf24' }}>
+              <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
+              Reconnecting...
+            </Badge>
+          )}
+          {iceStatus === 'failed' && (
+            <Badge className="gap-1.5 text-xs" style={{ background: '#7f1d1d', color: '#fca5a5' }}>
+              <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
+              Connection lost
+            </Badge>
+          )}
           <span className="text-slate-500 text-xs">
             {hasRemote ? '2 participants' : 'Waiting for other party...'}
           </span>
@@ -635,6 +742,13 @@ export default function VideoRoomPage() {
                   playsInline
                   className="w-full h-full object-cover"
                 />
+                {iceStatus === 'reconnecting' && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2"
+                    style={{ background: 'rgba(0,0,0,0.6)' }}>
+                    <Loader2 className="w-8 h-8 animate-spin text-yellow-400" />
+                    <p className="text-yellow-300 text-sm font-medium">Reconnecting...</p>
+                  </div>
+                )}
                 <div className="absolute bottom-3 left-3">
                   <Badge variant="secondary" className="text-xs">
                     {role === 'host' ? 'Patient' : 'Provider'}

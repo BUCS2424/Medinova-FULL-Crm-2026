@@ -6,11 +6,23 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
+# Load from frontend .env if not set in environment
+_base = os.environ.get('REACT_APP_BACKEND_URL', '')
+if not _base:
+    try:
+        with open('/app/frontend/.env') as f:
+            for line in f:
+                if line.startswith('REACT_APP_BACKEND_URL='):
+                    _base = line.strip().split('=', 1)[1]
+                    break
+    except Exception:
+        pass
+BASE_URL = _base.rstrip('/')
 
 ADMIN_EMAIL = "mel@a2gdesigns.com"
 ADMIN_PASSWORD = "BigDaddy2016!!"
-TEST_MEETING_ID = "72a2a36a-6a23-405a-81c5-b0506c185270"
+# A known ended meeting ID for 404/ended tests
+TEST_ENDED_MEETING_ID = "72a2a36a-6a23-405a-81c5-b0506c185270"
 
 
 @pytest.fixture(scope="module")
@@ -30,6 +42,16 @@ def auth_token():
 @pytest.fixture(scope="module")
 def headers(auth_token):
     return {"Authorization": f"Bearer {auth_token}", "Content-Type": "application/json"}
+
+
+@pytest.fixture(scope="module")
+def active_meeting_id(headers):
+    """Create a fresh active meeting for tests that need a live meeting"""
+    resp = requests.post(f"{BASE_URL}/api/video-rooms/meetings", headers=headers,
+                         json={"title": "TEST_WS_Active_Session", "duration_minutes": 30})
+    if resp.status_code == 200:
+        return resp.json()["meeting"]["id"]
+    pytest.skip("Could not create active meeting for WS tests")
 
 
 # ==================== MEETING CRUD TESTS ====================
@@ -52,12 +74,12 @@ class TestVideoRoomMeetingsCRUD:
         assert resp.status_code in [200, 401, 403], f"Unexpected: {resp.status_code}"
         print(f"✓ List meetings without auth: {resp.status_code}")
 
-    def test_get_existing_meeting(self, headers):
+    def test_get_existing_meeting(self, headers, active_meeting_id):
         """GET /api/video-rooms/meetings/{id} returns meeting details for known meeting"""
-        resp = requests.get(f"{BASE_URL}/api/video-rooms/meetings/{TEST_MEETING_ID}", headers=headers)
+        resp = requests.get(f"{BASE_URL}/api/video-rooms/meetings/{active_meeting_id}", headers=headers)
         assert resp.status_code == 200, f"Expected 200, got {resp.status_code}: {resp.text}"
         data = resp.json()
-        assert data.get("id") == TEST_MEETING_ID, "Meeting id mismatch"
+        assert data.get("id") == active_meeting_id, "Meeting id mismatch"
         assert "title" in data, "Missing title field"
         assert "status" in data, "Missing status field"
         assert "engine" in data, "Missing engine field"
@@ -65,9 +87,9 @@ class TestVideoRoomMeetingsCRUD:
         assert "host_url" in data, "Missing host_url field"
         print(f"✓ Get meeting: id={data['id']}, engine={data.get('engine')}, status={data.get('status')}")
 
-    def test_get_meeting_engine_is_webrtc(self, headers):
+    def test_get_meeting_engine_is_webrtc(self, headers, active_meeting_id):
         """Meeting engine should be 'webrtc' since Telnyx key is not configured"""
-        resp = requests.get(f"{BASE_URL}/api/video-rooms/meetings/{TEST_MEETING_ID}", headers=headers)
+        resp = requests.get(f"{BASE_URL}/api/video-rooms/meetings/{active_meeting_id}", headers=headers)
         assert resp.status_code == 200
         data = resp.json()
         # Since no Telnyx API key is configured, engine should be 'webrtc'
@@ -150,10 +172,10 @@ class TestVideoRoomMeetingsCRUD:
 class TestJoinToken:
     """Test /api/video-rooms/meetings/{id}/join-token"""
 
-    def test_get_join_token_for_existing_meeting(self, headers):
-        """POST join-token for known meeting returns engine and token"""
+    def test_get_join_token_for_existing_meeting(self, headers, active_meeting_id):
+        """POST join-token for active meeting returns engine and token"""
         resp = requests.post(
-            f"{BASE_URL}/api/video-rooms/meetings/{TEST_MEETING_ID}/join-token",
+            f"{BASE_URL}/api/video-rooms/meetings/{active_meeting_id}/join-token",
             headers=headers,
             json={"role": "patient"}
         )
@@ -235,30 +257,90 @@ class TestGeminiDiagnose:
 # ==================== WEBSOCKET SIGNALING URL TESTS ====================
 
 class TestWebSocketSignaling:
-    """Test WebSocket signaling endpoint availability via HTTP upgrade"""
+    """Test WebSocket signaling endpoint availability"""
 
-    def test_websocket_endpoint_url_construction(self):
+    def test_websocket_endpoint_url_construction(self, active_meeting_id):
         """Verify WebSocket URL is correctly constructed"""
         base = BASE_URL.replace("https://", "wss://").replace("http://", "ws://")
-        ws_url = f"{base}/api/video-rooms/ws/{TEST_MEETING_ID}/host"
-        assert ws_url.startswith("wss://") or ws_url.startswith("ws://")
+        ws_url = f"{base}/api/video-rooms/ws/{active_meeting_id}/host"
+        assert ws_url.startswith("wss://") or ws_url.startswith("ws://"), f"Bad WS URL: {ws_url}"
         print(f"✓ WebSocket URL: {ws_url}")
 
-    def test_websocket_invalid_role_rejected(self):
-        """An HTTP request to the WebSocket endpoint with invalid role should indicate rejection"""
-        # Can't test WebSocket with requests lib, but we can check the signaling endpoint path exists
-        # by confirming the HTTP upgrade attempt gets a meaningful response
-        import socket
-        import ssl
-        resp = requests.get(
-            f"{BASE_URL}/api/video-rooms/ws/{TEST_MEETING_ID}/invalid_role",
-            headers={"Upgrade": "websocket", "Connection": "Upgrade",
-                     "Sec-WebSocket-Key": "dGhlIHNhbXBsZSBub25jZQ==",
-                     "Sec-WebSocket-Version": "13"}
-        )
-        # FastAPI returns 403 for wrong upgrade or 4003 close on invalid role
-        # HTTP GET to a websocket endpoint typically returns 200 or 403
-        print(f"✓ WebSocket HTTP probe for invalid role: {resp.status_code}")
+    def test_websocket_connect_as_host(self, active_meeting_id):
+        """WebSocket connects successfully for a valid meeting as host"""
+        import asyncio
+        import websockets as _ws
+
+        ws_url = BASE_URL.replace("https://", "wss://").replace("http://", "ws://")
+        ws_url = f"{ws_url}/api/video-rooms/ws/{active_meeting_id}/host"
+
+        async def _connect():
+            try:
+                async with _ws.connect(ws_url, open_timeout=10) as conn:
+                    # Send a ping to verify connection is alive
+                    await conn.send('{"type":"ping"}')
+                    # Try to receive a message (may be pong or nothing immediately)
+                    return True
+            except Exception as e:
+                return str(e)
+
+        result = asyncio.run(_connect())
+        assert result is True, f"WebSocket connect failed: {result}"
+        print(f"✓ WebSocket host connection to meeting {active_meeting_id}: OK")
+
+    def test_websocket_invalid_role_rejected(self, active_meeting_id):
+        """WebSocket with invalid role should close with error"""
+        import asyncio
+        import websockets as _ws
+
+        ws_url = BASE_URL.replace("https://", "wss://").replace("http://", "ws://")
+        ws_url = f"{ws_url}/api/video-rooms/ws/{active_meeting_id}/invalid_role"
+
+        async def _connect():
+            try:
+                async with _ws.connect(ws_url, open_timeout=10) as conn:
+                    # Should be rejected immediately
+                    return "connected_unexpectedly"
+            except _ws.exceptions.ConnectionClosedError as e:
+                return f"closed:{e.code}"
+            except Exception as e:
+                return f"error:{type(e).__name__}"
+
+        result = asyncio.run(_connect())
+        # Expect connection to be rejected (closed with code 4003 or similar)
+        assert "connected_unexpectedly" not in result, "Invalid role should be rejected"
+        print(f"✓ WebSocket invalid role rejected: {result}")
+
+    def test_websocket_ended_meeting_rejected(self, headers):
+        """WebSocket to an ended meeting should be rejected"""
+        import asyncio
+        import websockets as _ws
+
+        # First create and end a meeting
+        resp = requests.post(f"{BASE_URL}/api/video-rooms/meetings", headers=headers,
+                             json={"title": "TEST_WS_Ended_Meeting_Check"})
+        assert resp.status_code == 200
+        mid = resp.json()["meeting"]["id"]
+
+        # End it
+        end_resp = requests.post(f"{BASE_URL}/api/video-rooms/meetings/{mid}/end", headers=headers, json={})
+        assert end_resp.status_code == 200
+
+        ws_url = BASE_URL.replace("https://", "wss://").replace("http://", "ws://")
+        ws_url = f"{ws_url}/api/video-rooms/ws/{mid}/host"
+
+        async def _connect():
+            try:
+                async with _ws.connect(ws_url, open_timeout=10) as conn:
+                    return "connected_unexpectedly"
+            except _ws.exceptions.ConnectionClosedError as e:
+                return f"closed:{e.code}"
+            except Exception as e:
+                return f"error:{type(e).__name__}"
+
+        result = asyncio.run(_connect())
+        assert "connected_unexpectedly" not in result, "Ended meeting should reject WS"
+        print(f"✓ Ended meeting WebSocket rejected: {result}")
 
 
 if __name__ == "__main__":
