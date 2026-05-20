@@ -1,14 +1,15 @@
 """
-Telnyx Video Rooms API routes.
-Handles room creation, token generation, participant management, and meeting scheduling.
+Video Rooms — native WebRTC signaling (no Telnyx required).
+Falls back to Telnyx if an API key is configured.
 """
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime, timezone
 import httpx
 import uuid
 import logging
+import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +17,10 @@ video_rooms_router = APIRouter(prefix="/video-rooms", tags=["video-rooms"])
 
 _db = None
 _get_current_user = None
+
+# ── In-memory signaling rooms ─────────────────────────────────────────────────
+# { meeting_id: { "host": WebSocket | None, "patient": WebSocket | None } }
+_signal_rooms: dict = {}
 
 def set_database(db):
     global _db
@@ -27,20 +32,19 @@ def set_auth(get_current_user_fn):
 
 
 async def _get_telnyx_api_key():
-    """Get Telnyx API key from voice config, fax config, or site settings"""
-    for collection_type in ["telnyx_config", "fax_config"]:
-        config = await _db.system_settings.find_one({"type": collection_type}, {"_id": 0})
-        if config and config.get("api_key"):
-            return config["api_key"]
-    config = await _db.site_settings.find_one({"type": "telnyx_config"}, {"_id": 0})
-    if config and config.get("api_key"):
-        return config["api_key"]
+    for ctype in ["telnyx_config", "fax_config"]:
+        cfg = await _db.system_settings.find_one({"type": ctype}, {"_id": 0})
+        if cfg and cfg.get("api_key"):
+            return cfg["api_key"]
+    cfg = await _db.site_settings.find_one({"type": "telnyx_config"}, {"_id": 0})
+    if cfg and cfg.get("api_key"):
+        return cfg["api_key"]
     return None
 
 
 class CreateMeetingRequest(BaseModel):
     title: str
-    scheduled_at: Optional[str] = None  # ISO datetime, None = instant
+    scheduled_at: Optional[str] = None
     duration_minutes: int = 30
     participant_emails: List[str] = []
     participant_phones: List[str] = []
@@ -54,39 +58,30 @@ class CreateMeetingRequest(BaseModel):
 
 @video_rooms_router.post("/meetings")
 async def create_meeting(data: CreateMeetingRequest):
-    """Create a video meeting — creates Telnyx room and stores meeting record"""
+    """Create a video meeting — uses native WebRTC signaling by default.
+    Falls back to Telnyx room if API key is configured."""
     api_key = await _get_telnyx_api_key()
-    if not api_key:
-        raise HTTPException(status_code=400, detail="Telnyx API key not configured. Set it in Voice or Fax settings.")
-
-    # Create Telnyx room
-    try:
-        async with httpx.AsyncClient(timeout=15.0) as client:
-            response = await client.post(
-                "https://api.telnyx.com/v2/rooms",
-                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-                json={
-                    "unique_name": f"meeting-{uuid.uuid4().hex[:8]}",
-                    "max_participants": 10,
-                    "enable_recording": True
-                }
-            )
-            if response.status_code not in [200, 201]:
-                raise HTTPException(status_code=502, detail=f"Failed to create Telnyx room: {response.text}")
-            room_data = response.json().get("data", {})
-            telnyx_room_id = room_data.get("id")
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Telnyx room creation error: {e}")
-        raise HTTPException(status_code=502, detail=str(e))
-
     meeting_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
+    telnyx_room_id = None
+
+    if api_key:
+        try:
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                resp = await client.post(
+                    "https://api.telnyx.com/v2/rooms",
+                    headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                    json={"unique_name": f"meeting-{uuid.uuid4().hex[:8]}", "max_participants": 10}
+                )
+                if resp.status_code in [200, 201]:
+                    telnyx_room_id = resp.json().get("data", {}).get("id")
+        except Exception as e:
+            logger.warning(f"Telnyx room creation failed, using native WebRTC: {e}")
 
     meeting = {
         "id": meeting_id,
         "telnyx_room_id": telnyx_room_id,
+        "engine": "telnyx" if telnyx_room_id else "webrtc",
         "title": data.title,
         "status": "scheduled" if data.scheduled_at else "active",
         "scheduled_at": data.scheduled_at or now,
@@ -98,22 +93,19 @@ async def create_meeting(data: CreateMeetingRequest):
         "lead_id": data.lead_id,
         "doctor_id": data.doctor_id,
         "join_url": f"/video-room/{meeting_id}",
+        "host_url": f"/video-room/{meeting_id}?role=host",
         "created_at": now,
         "ended_at": None,
     }
 
     await _db.video_meetings.insert_one(meeting)
-
-    # Send invitations
     invites_sent = await _send_invitations(meeting, api_key)
-
     meeting.pop("_id", None)
     return {"meeting": meeting, "invites_sent": invites_sent}
 
 
 @video_rooms_router.get("/meetings")
 async def list_meetings(status: Optional[str] = None, limit: int = 50):
-    """List video meetings"""
     query = {}
     if status:
         query["status"] = status
@@ -125,7 +117,6 @@ async def list_meetings(status: Optional[str] = None, limit: int = 50):
 
 @video_rooms_router.get("/meetings/{meeting_id}")
 async def get_meeting(meeting_id: str):
-    """Get a specific meeting"""
     meeting = await _db.video_meetings.find_one({"id": meeting_id}, {"_id": 0})
     if not meeting:
         raise HTTPException(status_code=404, detail="Meeting not found")
@@ -134,7 +125,6 @@ async def get_meeting(meeting_id: str):
 
 @video_rooms_router.post("/meetings/{meeting_id}/end")
 async def end_meeting(meeting_id: str):
-    """End an active meeting"""
     meeting = await _db.video_meetings.find_one({"id": meeting_id}, {"_id": 0})
     if not meeting:
         raise HTTPException(status_code=404, detail="Meeting not found")
@@ -150,6 +140,9 @@ async def end_meeting(meeting_id: str):
         except Exception as e:
             logger.warning(f"Failed to delete Telnyx room: {e}")
 
+    # Clean up signaling room
+    _signal_rooms.pop(meeting_id, None)
+
     await _db.video_meetings.update_one(
         {"id": meeting_id},
         {"$set": {"status": "ended", "ended_at": datetime.now(timezone.utc).isoformat()}}
@@ -157,56 +150,123 @@ async def end_meeting(meeting_id: str):
     return {"message": "Meeting ended"}
 
 
-# ==================== JOIN TOKEN ====================
+# ==================== JOIN TOKEN (native WebRTC) ====================
 
 @video_rooms_router.post("/meetings/{meeting_id}/join-token")
 async def get_join_token(meeting_id: str, data: dict = {}):
-    """Generate a client token to join the video room"""
+    """For Telnyx meetings: returns Telnyx token.
+    For native WebRTC meetings: returns meeting_id as the signaling room key."""
     meeting = await _db.video_meetings.find_one({"id": meeting_id}, {"_id": 0})
     if not meeting:
         raise HTTPException(status_code=404, detail="Meeting not found")
     if meeting.get("status") == "ended":
         raise HTTPException(status_code=400, detail="Meeting has ended")
 
+    # Native WebRTC — no token needed, just confirm meeting is valid
+    if meeting.get("engine") != "telnyx" or not meeting.get("telnyx_room_id"):
+        return {"engine": "webrtc", "room_id": meeting_id, "token": meeting_id, "meeting": meeting}
+
+    # Telnyx path (backward compat)
     api_key = await _get_telnyx_api_key()
     if not api_key:
-        raise HTTPException(status_code=400, detail="Telnyx API key not configured")
-
-    telnyx_room_id = meeting.get("telnyx_room_id")
-    if not telnyx_room_id:
-        raise HTTPException(status_code=400, detail="No Telnyx room associated")
+        return {"engine": "webrtc", "room_id": meeting_id, "token": meeting_id, "meeting": meeting}
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
-            response = await client.post(
-                f"https://api.telnyx.com/v2/rooms/{telnyx_room_id}/actions/generate_join_client_token",
+            resp = await client.post(
+                f"https://api.telnyx.com/v2/rooms/{meeting['telnyx_room_id']}/actions/generate_join_client_token",
                 headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
                 json={"token_ttl_secs": 3600, "refresh_token_ttl_secs": 86400}
             )
-            if response.status_code == 200:
-                token_data = response.json().get("data", {})
-                return {
-                    "token": token_data.get("token"),
-                    "refresh_token": token_data.get("refresh_token"),
-                    "room_id": telnyx_room_id,
-                    "meeting": meeting
-                }
-            else:
-                raise HTTPException(status_code=502, detail=f"Failed to get join token: {response.text}")
-    except HTTPException:
-        raise
+            if resp.status_code == 200:
+                td = resp.json().get("data", {})
+                return {"engine": "telnyx", "token": td.get("token"), "room_id": meeting["telnyx_room_id"], "meeting": meeting}
     except Exception as e:
-        logger.error(f"Join token error: {e}")
-        raise HTTPException(status_code=502, detail=str(e))
+        logger.warning(f"Telnyx token failed, falling back to native WebRTC: {e}")
+
+    return {"engine": "webrtc", "room_id": meeting_id, "token": meeting_id, "meeting": meeting}
+
+
+# ==================== NATIVE WebRTC SIGNALING (WebSocket) ====================
+
+@video_rooms_router.websocket("/ws/{meeting_id}/{role}")
+async def webrtc_signaling(websocket: WebSocket, meeting_id: str, role: str):
+    """
+    Pure WebRTC signaling relay.
+    role: 'host' (provider watches) or 'patient' (broadcasts camera).
+    Just relays JSON messages between the two peers — no media passes through.
+    """
+    if role not in ("host", "patient"):
+        await websocket.close(code=4003, reason="Invalid role")
+        return
+
+    meeting = await _db.video_meetings.find_one({"id": meeting_id}, {"_id": 0})
+    if not meeting:
+        await websocket.close(code=4004, reason="Meeting not found")
+        return
+    if meeting.get("status") == "ended":
+        await websocket.close(code=4001, reason="Meeting ended")
+        return
+
+    await websocket.accept()
+
+    if meeting_id not in _signal_rooms:
+        _signal_rooms[meeting_id] = {"host": None, "patient": None}
+
+    _signal_rooms[meeting_id][role] = websocket
+    other_role = "patient" if role == "host" else "host"
+
+    # Notify the other peer that this peer connected
+    other_ws = _signal_rooms[meeting_id].get(other_role)
+    if other_ws:
+        try:
+            await other_ws.send_json({"type": "peer_joined", "role": role})
+        except Exception:
+            pass
+
+    logger.info(f"[signaling] {role} connected to room {meeting_id}")
+
+    try:
+        while True:
+            try:
+                msg = await asyncio.wait_for(websocket.receive_json(), timeout=120)
+            except asyncio.TimeoutError:
+                # Send ping to keep connection alive
+                try:
+                    await websocket.send_json({"type": "ping"})
+                except Exception:
+                    break
+                continue
+
+            other_ws = _signal_rooms[meeting_id].get(other_role)
+            if other_ws and msg.get("type") != "ping":
+                try:
+                    await other_ws.send_json(msg)
+                except Exception:
+                    _signal_rooms[meeting_id][other_role] = None
+
+    except WebSocketDisconnect:
+        logger.info(f"[signaling] {role} disconnected from room {meeting_id}")
+    except Exception as e:
+        logger.warning(f"[signaling] error in room {meeting_id}: {e}")
+    finally:
+        if _signal_rooms.get(meeting_id, {}).get(role) is websocket:
+            _signal_rooms[meeting_id][role] = None
+
+        other_ws = _signal_rooms.get(meeting_id, {}).get(other_role)
+        if other_ws:
+            try:
+                await other_ws.send_json({"type": "peer_left", "role": role})
+            except Exception:
+                pass
 
 
 # ==================== SEND INVITATIONS ====================
 
 async def _send_invitations(meeting: dict, api_key: str) -> dict:
-    """Send meeting invitations via SMS and email"""
     sent = {"sms": 0, "email": 0}
     site_settings = await _db.site_settings.find_one({"type": "site"}, {"_id": 0})
-    domain = site_settings.get("site_domain", "https://mastechdme.com") if site_settings else "https://mastechdme.com"
+    domain = site_settings.get("site_domain", "https://medinovadme.com") if site_settings else "https://medinovadme.com"
     join_url = f"{domain}/video-room/{meeting['id']}"
 
     scheduled = meeting.get("scheduled_at", "")
@@ -217,7 +277,7 @@ async def _send_invitations(meeting: dict, api_key: str) -> dict:
         time_str = scheduled
 
     message = (
-        f"You're invited to a video meeting: {meeting['title']}\n"
+        f"You're invited to a telehealth video consultation: {meeting['title']}\n"
         f"When: {time_str}\n"
         f"Duration: {meeting['duration_minutes']} minutes\n"
         f"Join here: {join_url}\n"
@@ -225,13 +285,12 @@ async def _send_invitations(meeting: dict, api_key: str) -> dict:
     if meeting.get("notes"):
         message += f"Notes: {meeting['notes']}\n"
 
-    # Send SMS invitations
     sms_config = await _db.system_settings.find_one({"type": "sms_config"}, {"_id": 0})
     from_number = None
     if sms_config and sms_config.get("enabled") and sms_config.get("phone_number"):
         from_number = sms_config["phone_number"]
 
-    if from_number:
+    if api_key and from_number:
         for phone in meeting.get("participant_phones", []):
             if not phone:
                 continue
@@ -244,9 +303,8 @@ async def _send_invitations(meeting: dict, api_key: str) -> dict:
                     )
                     sent["sms"] += 1
             except Exception as e:
-                logger.warning(f"Failed to send SMS invite to {phone}: {e}")
+                logger.warning(f"SMS invite failed: {e}")
 
-    # Send email invitations (store in communications for now)
     for email in meeting.get("participant_emails", []):
         if not email:
             continue
@@ -255,7 +313,7 @@ async def _send_invitations(meeting: dict, api_key: str) -> dict:
             "type": "email",
             "direction": "outbound",
             "to": email,
-            "subject": f"Video Meeting Invitation: {meeting['title']}",
+            "subject": f"Telehealth Appointment: {meeting['title']}",
             "body": message,
             "meeting_id": meeting["id"],
             "status": "queued",
