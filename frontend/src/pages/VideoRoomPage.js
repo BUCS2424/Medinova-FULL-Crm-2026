@@ -40,6 +40,8 @@ export default function VideoRoomPage() {
   const [joining, setJoining] = useState(false);
   const [connected, setConnected] = useState(false);
   const [hasRemote, setHasRemote] = useState(false);
+  // 'stable' | 'reconnecting' | 'failed'
+  const [iceStatus, setIceStatus] = useState('stable');
   const [videoOn, setVideoOn] = useState(true);
   const [audioOn, setAudioOn] = useState(true);
   const [screenSharing, setScreenSharing] = useState(false);

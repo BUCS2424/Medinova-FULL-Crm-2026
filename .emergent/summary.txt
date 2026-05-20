@@ -1,39 +1,38 @@
 <analysis>**original_problem_statement**: 
-The user initially requested to fix a bug where generated location pages were rendering without the product catalog. The scope subsequently expanded to include: adding a Delete All feature for generated pages, fixing category icon styling to eliminate gray fallbacks, scraping product catalog images from 12 DME fulfillment suppliers (e.g., Apria, Preferred Medical, Paradigm) into a new  DB, adding Mastectomy and Compression categories, and finally, completely replacing the paid Telnyx Video API with a free, native browser WebRTC telehealth module that uses Gemini 1.5 for clinical diagnostic assistance.
+The user originally requested to fix a bug with generated location pages rendering without product catalogs. Scope expanded to include adding a Delete All feature for generated pages, fixing category icon styling, scraping product catalog images from 12 DME fulfillment suppliers into a new  DB, adding Mastectomy and Compression categories, and completely replacing the paid Telnyx Video API with a free, native browser WebRTC telehealth module that uses Gemini 1.5 for clinical diagnostic assistance. 
 
 PRODUCT REQUIREMENTS:
-- Location pages must strictly render DME products using correct icons mapped to the database.
+- Location pages must render DME products using correct mapped icons.
 - Admin must be able to bulk-delete generated pages.
-- Supplier catalog images must be scraped and stored so the user can easily Apply to Catalog.
-- The Video Room must run on native WebRTC (RTCPeerConnection/MediaDevices API) using a local loopback engine without third-party media servers, integrated with a secure  route for real-time symptom analysis.
+- Supplier catalog images scraped and stored.
+- Video Room must run on native WebRTC (RTCPeerConnection/MediaDevices API) without third-party media servers, integrated with a secure  route for real-time symptom analysis.
+- Dev Settings feature toggles must correctly gate navigation items (e.g., Telehealth, Analytics, etc.).
+- Telehealth meetings must be strictly access-controlled (creatable only by admin, super_admin, sales_rep, sales_manager, doctor).
 
 **User's preferred language**: English (INSTRUCT next agent to respond in the user's preferred language only)
 
 **what currently exists?** 
-A React/FastAPI/MongoDB app with Location Generator V2 fully functional (products and colored icons now render perfectly). The system features an automated Web Scraper for DME Suppliers that stores external image URLs in a  collection (12 suppliers integrated). The DB contains 20 total product categories and 225 total products (including newly added Mastectomy and Compression). The Telnyx Video Room implementation has just been overwritten with Native WebRTC + FastAPI WebSockets, but it is currently untested.
+A React/FastAPI/MongoDB app with Location Generator V2 fully functional. Supplier web scraper operational for 12 DME suppliers. Dev Settings feature toggles are now completely wired to the UI sidebar (Analytics, Telehealth, Campaigns, Leads, Orders, etc.). The native WebRTC Telehealth module is built with FastAPI WebSockets for signaling and has role-based access. Gemini 1.5 diagnostic assist is wired up. However, the WebRTC implementation currently struggles with cross-network connection stability and screen sharing renegotiation.
 
 **Last working item**: 
-    - Last item agent was working: Replacing Telnyx Video Rooms with a native browser WebRTC telehealth module and FastAPI WebSocket signaling relay. The agent just executed a search_replace on  and  but got cut off before verifying the WebSocket connections, camera/mic permissions, or Gemini API integration.
+    - Last item agent was working: Fixing WebRTC connection stability (ICE connection dropping after 1-2 minutes) and enabling Screen Share track renegotiation in . Agent was just implementing ICE restart logic and SDP renegotiation for  but got cut off.
     - Status: IN PROGRESS
     - Agent Testing Done: N
-    - Which testing method agent to use? Both (Backend WebSocket verification via logs/curl, Frontend manual testing for camera/mic stream, or testing_agent_v4_fork for full flow).
+    - Which testing method agent to use? Both (Backend Python script to mock WS + Frontend manual testing/screenshot tool, followed by  when complete).
     - User Testing Done: N
 
 **All Pending/In progress Issue list**: 
-  - Issue 1: 🔴 Verify and test the new Native WebRTC Telehealth Module (P0)
-     - Attempted fixes: Agent replaced Telnyx-dependent code with pure WebRTC and WebSocket logic in  and .
-     - Next debug checklist: 
-       1. Check  to ensure  WebSocket endpoints are properly mounted and allowed.
-       2. Check  to ensure  triggers correctly and WebSockets connect.
-       3. Verify the Gemini 1.5 integration () is successfully connected and receiving symptoms.
-     - Why fix this issue and what will be achieved with the fix? Completes the user's explicit request to remove paid API dependencies for video and utilize free native browser loopback connections.
+  - Issue 1: 🔴 WebRTC connection drops after 1-2 mins and Screen Share fails to connect (P0)
+     - Attempted fixes: Agent fixed React ref deadlocks, added 10s WebSocket keepalive pings, and added free TURN servers (). Agent just started rewriting connection management for ICE restarts and Screen Share track replacements.
+     - Next debug checklist: Check . Implement proper  handling to trigger ICE restarts when disconnected. Ensure that Screen Share () correctly triggers a new SDP Offer/Answer negotiation so the remote peer can decode the new video track.
+     - Why fix this issue and what will be achieved with the fix? Stabilizes the core 2-way telehealth experience and fulfills the user's requirement to allow presenters to share their screen.
      - Status: IN PROGRESS
-     - Is recurring issue? N
+     - Is recurring issue? Y
      - Should Test frontend/backend/both after fix? Both
      - Blocked on other issue: None
 
 **In progress Task List**: 
-  None beyond the active WebRTC implementation.
+  None
 
 **Upcoming and Future Tasks**
     Upcoming Tasks:
@@ -45,97 +44,99 @@ A React/FastAPI/MongoDB app with Location Generator V2 fully functional (product
     - 🔵 Add more data sources to Stay Up To Date page (CMS Marketplace API for plan lookups) (P2)
 
 **Completed work in this session**
-- Fixed P0 bug: Location pages not rendering products (DONE).
-- Added Delete All Pages endpoint and UI button in  (DONE).
-- Fixed UI bug: Category icons rendering gray by aligning  keys with actual DB names (DONE).
-- Created Supplier Catalog Images system (Scraped Apria, Byram, DDP, etc., created  DB, added  UI) (DONE).
-- Added Preferred Medical and Paradigm DME to suppliers and  (DONE).
-- Created Mastectomy Supplies and Compression Therapy categories, seeded products, added prosthetics to Mastectomy. Total 225 products across 20 categories (DONE).
+- Built  route and integrated Gemini 1.5 Clinical Diagnostics in Telehealth room (DONE)
+- Wired Dev Settings feature flags (, , , , , , ) to Layout.js navigation (DONE)
+- Created  and restricted Telehealth room creation to provider roles (DONE)
+- Implemented Python automated tests for WebSocket signaling and resolved host-patient join race conditions (DONE)
+- Added detailed media device error handling and camera permission fallbacks to VideoRoomPage (DONE)
+- Fixed React ref deadlocks and Kubernetes 30s WS idle timeouts via keepalive pings in VideoRoomPage (DONE)
 
 **Earlier issues found/mentioned but not fixed**
-None.
+None. 
 
 **Known issue recurrence from previous fork**
-  - Issue recurrence in previous fork: None
-  - Recurrence count: 0
-  - Status: NA
+  - Issue recurrence in previous fork: Native WebRTC connection stability
+  - Recurrence count: 1
+  - Status: IN PROGRESS
 
 **Code Architecture**
-cat_display
+
 
 **Key Technical Concepts**
-React, FastAPI, MongoDB, WebSockets (for WebRTC signaling), Native WebRTC (RTCPeerConnection / MediaDevices), Beautiful Soup (Web Scraping). 
+React, FastAPI, MongoDB, Native WebRTC (RTCPeerConnection, MediaDevices, SDP Negotiation, STUN/TURN), WebSockets (Keepalive Pings), Feature Flagging, Role-Based Access Control (RBAC).
 
 **key DB schema**
   - : 
   - : 
 
 **changes in tech stack**
-  - Telnyx Video API is completely **removed** and replaced with native WebRTC + FastAPI WebSockets.
+  - Telnyx completely removed for Video. Native WebRTC + usage: websockets [--version | <uri>] python library is now the standard.
 
 **All files of reference** 
--  (Currently being rewritten for WebRTC)
--  (Currently being rewritten for WebSocket signaling)
--  (Created this session)
--  (Added Bulk Delete UI)
--  (Updated to fix catalog rendering)
--  (Updated  keys)
+-  (Currently being rewritten for ICE restarts & screen share)
+-  (Created this session for managing meetings)
+-  (WebSocket relay and meeting creation logic)
+-  (Gemini API logic)
+-  (Feature flag routing)
+-  (Feature flag state)
+-  (RBAC setup)
 
 **Areas that need refactoring**: 
--  and  need immediate validation post-rewrite.
+-  is growing extremely large (>850 lines). Consider splitting WebRTC logic into a custom hook (e.g., ) once stability issues are resolved.
 
 **key api endpoints**
--  (Expected new WebSocket route)
+- 
+- 
 - 
 - 
 
 **Critical Info for New Agent** 
-1. **PREVIEW vs PRODUCTION**: The user heavily tests on their LIVE production deployment (). The production database is entirely separate from the preview database. Code changes only happen in PREVIEW. If user reports an issue, clarify if it's on live or preview.
-2. **Native WebRTC:** The user strictly wants the new telehealth module to use *native browser WebRTC (local loopback)* and *no paid video APIs*. It needs to integrate the Emergent LLM key via  for clinical assistance based on symptoms.
-3. **Telnyx Usage:** Telnyx is still utilized for SMS/Fax routing, but MUST NOT be utilized for Video Rooms anymore.
+- **WebRTC Testing:** The preview environment *does not* have a physical camera/microphone. It will inherently fall back to No device found or an empty stream during automated tests. When writing WebRTC logic, be sure you do not block the join flow purely because no camera is found.
+- **WebSocket Timeout:** The Kubernetes ingress proxy strictly terminates WebSocket connections that are idle for ~30 seconds. A 10-second  keepalive is required and currently implemented; ensure you do not accidentally remove it during refactoring.
+- **Role Restrictions:** Only , , , , and  roles can create or view telehealth meetings. Patients can only join via direct meeting links without logging in.
 
 **documents and test reports created in this job** 
--  (Updated to reflect location page fixes)
+- 
+- 
+- 
 
 **Last 10 User Messages and any pending HUMAN messages** 
-1. : lets scan each dme fullfillment companies websites... (COMPLETED)
-2. : Answered questions about permissions and flow (COMPLETED)
-3. : DID YOU WIRE UP THEIR APIS BEING READY TO SET ON THE FEATURES SWITCHES..." (COMPLETED)
-4. `User`: "SORRY THESE GO UNDER SUPPLIER S IN THE ADMIN MENU" (COMPLETED)
-5. `User`: "Lets add another category for MASTECHEMY... PROSTECTICS, & COMPRESSION" (COMPLETED)
-6. `User`: "there should also be products under Mastectomy for Prosthetics" (COMPLETED)
-7. `User`: "can we build a web rtc without the telenxy pay api? like a 1 way telehealth... The telehealth video module is built directly on the browsers native WebRTC API... (IN PROGRESS - Agent initiated code rewrite but hasn't tested it).
+1. : we need to be sure all features are hooked up to the toggle buttons... (COMPLETED)
+2. : ok, how and who can start a telehealth meeting? lets allow any admin, doctor or sales person... (COMPLETED)
+3. : Test live 2-way call: Open /video-meetings - Meeting... (COMPLETED)
+4. : Uploaded image showing Failed to join meeting error. (COMPLETED)
+5. : Uploaded image showing both parties stuck on waiting for party to join and 30s disconnects. (COMPLETED)
+6. : joins for about 1 or 2 min and stops, lets try to make this more stable, and cant get the screen share to connect (IN PROGRESS)
 
 **Project Health Check:**
-- Broken: Video Room is currently in an unverified state mid-rewrite.
-- Mocked: WebRTC will use local loopback to simulate a connection without a remote media server.
+- Broken: Native WebRTC Screen sharing and connections dropping after 1-2 minutes.
+- Mocked: WebRTC utilizes public STUN/TURN servers () for relay testing.
 
 **3rd Party Integrations** 
-- Emergent LLM Key (Utilized for Gemini diagnostics in WebRTC module)
+- Emergent LLM Key (Gemini diagnostics route)
 - Telnyx (Voice/SMS/Fax only)
-- Availity 
-- Waystar 
+- Availity
+- Waystar
 
 **Testing status**
-  - Testing agent used after significant changes: NO
+  - Testing agent used after significant changes: YES
   - Troubleshoot agent used after agent stuck in loop: NO
-  - Test files created: None
-  - Known regressions: Telnyx video removed, WebRTC untested.
+  - Test files created: , 
+  - Known regressions: WebRTC drops connections and screen share is failing.
 
 **Credentials to test flow:**
 Admin:  / 
 
 **What agent forgot to execute**
-The agent overwrote  and  to establish Native WebRTC, but the job ended before the agent could verify the WebSocket connections, confirm camera/mic permissions UI, or ensure the Gemini API integration was fully wired up.
+The agent properly diagnosed the WebRTC ICE drop and screen sharing renegotiation failures, but the job concluded mid-edit while actively replacing the  connection logic.
 
 **Debugging checklist for current issue**
-    Issue: Complete and verify the Native WebRTC Telehealth Module implementation.
+    Issue: WebRTC connection drops after 1-2 mins and Screen Share fails to connect.
     
     Frontend files to check: 
-    -  (Ensure WebSocket initializes properly and  successfully grabs the video stream).
+    -  
+      - Line ~140+: Check the  event listener. Implement ICE restart functionality when  becomes  or .
+      - Check  function. When  is called with the display media track, WebRTC requires an SDP renegotiation () so the remote peer gets the new track information.
   
     Backend files to check: 
-    -  (Check WebSocket connection logic).
-    -  (Ensure the WebSocket route is properly mounted alongside REST routes).
-    
-    </analysis>
+    -  (Ensure relay continues to pass SDP offers/answers and ICE candidates without dropping during renegotiation).</analysis>
