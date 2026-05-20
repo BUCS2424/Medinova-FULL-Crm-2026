@@ -58,7 +58,8 @@ import {
   BarChart3,
   Megaphone,
   Key,
-  CalendarCheck
+  CalendarCheck,
+  BookOpen
 } from 'lucide-react';
 import axios from 'axios';
 import SlideOutDialer from './SlideOutDialer';
@@ -528,6 +529,37 @@ export const Layout = ({ children }) => {
               </div>
             )}
             
+            {/* Knowledge Base — visible to all staff */}
+            <div className={`mb-3 ${isCollapsed ? 'px-2' : ''}`}>
+              {isCollapsed ? (
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <NavLink
+                      to="/knowledge-base"
+                      className={({ isActive }) =>
+                        `w-full flex justify-center p-2 rounded-lg transition-colors hover:bg-accent ${isActive ? 'bg-accent text-foreground' : ''}`
+                      }
+                      data-testid="kb-nav-icon"
+                    >
+                      <BookOpen className="w-5 h-5" />
+                    </NavLink>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Knowledge Base</TooltipContent>
+                </Tooltip>
+              ) : (
+                <NavLink
+                  to="/knowledge-base"
+                  className={({ isActive }) =>
+                    `w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-sm font-medium hover:bg-accent ${isActive ? 'bg-accent text-foreground' : 'text-foreground'}`
+                  }
+                  data-testid="kb-nav-link"
+                >
+                  <BookOpen className="w-5 h-5" />
+                  <span>Knowledge Base</span>
+                </NavLink>
+              )}
+            </div>
+
             {/* Live Chat Window Button - visible to admin, sales_manager, super_admin, store_owner */}
             {(user?.role === 'admin' || user?.role === 'sales_manager' || user?.role === 'super_admin' || user?.role === 'store_owner') && (
               <div className={`mb-3 ${isCollapsed ? 'px-2' : ''}`}>

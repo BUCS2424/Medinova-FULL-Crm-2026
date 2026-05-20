@@ -52,6 +52,7 @@ import VideoMeetingsPage from "./pages/VideoMeetingsPage";
 import CampaignPage from "./pages/CampaignPage";
 import MedicareResourcesPage from "./pages/MedicareResourcesPage";
 import StayUpToDatePage from "./pages/StayUpToDatePage";
+import KnowledgeBasePage from "./pages/KnowledgeBasePage";
 import CoverageAreaPage from "./pages/CoverageAreaPage";
 import DevPageGenerator from "./pages/DevPageGenerator";
 import PageGeneratorEditor from "./pages/PageGeneratorEditor";
@@ -410,6 +411,15 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <StayUpToDatePage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/knowledge-base"
+        element={
+          <ProtectedRoute>
+            <KnowledgeBasePage />
           </ProtectedRoute>
         }
       />
