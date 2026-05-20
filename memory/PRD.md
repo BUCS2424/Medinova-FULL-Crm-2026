@@ -259,6 +259,17 @@
 - availity_integration, waystar_integration, officeally_integration
 - video_conferencing, marketing_campaigns, lead_intake_hub
 
+- [x] **CMS Compliance News Panel (2026-05-20)**:
+  - New `/api/cms-news/feed` backend endpoint — fetches live CMS regulatory updates via Federal Register API (general CMS + DMEPOS-specific), 1-hour cache
+  - Auto-tags articles: DMEPOS, Prior Auth, Payment, Compliance, Home Health, Medicaid, Hospice
+  - 77+ live articles pulled at launch (Final Rules, Proposed Rules, Notices)
+  - Right-side slide-out panel on Stay Up To Date page — 340px wide, sticky, independent scroll
+  - Dark gradient header with search input + type filter pills (All / Notice / Final Rule / Proposed Rule)
+  - Article count + last-refreshed timestamp + manual refresh button
+  - Panel toggle (open/close) via "CMS News" button in page header; defaults to open
+  - Article modal on click: type badge, doc #, title, Published/Effective dates, tags, full summary text, "Read Full Article" external link, PDF download button
+  - Footer link to Federal Register CMS page
+
 ## Prioritized Backlog
 - P0: User acceptance check of new landing page visual design (2026-05-16 overhaul)
 - P1: Wire Availity & Waystar live API sync (schemas exist, APIs currently mocked)

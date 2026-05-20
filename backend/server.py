@@ -17270,6 +17270,111 @@ async def get_cms_dataset_stats(
 
 
 # ========================================
+# CMS COMPLIANCE NEWS FEED
+# ========================================
+_cms_news_cache: dict = {"data": None, "ts": 0.0}
+_CMS_NEWS_CACHE_TTL = 3600  # 1 hour
+
+
+def _auto_tag(title: str, abstract: str) -> list:
+    text = (title + " " + (abstract or "")).lower()
+    tags = []
+    if "dmepos" in text or "durable medical equipment" in text or "prosthetics" in text:
+        tags.append("DMEPOS")
+    if "prior authorization" in text or "prior auth" in text:
+        tags.append("Prior Auth")
+    if "payment" in text or "reimbursement" in text or "fee schedule" in text:
+        tags.append("Payment")
+    if "home health" in text:
+        tags.append("Home Health")
+    if "compliance" in text or "fraud" in text or "overpayment" in text:
+        tags.append("Compliance")
+    if "hospice" in text:
+        tags.append("Hospice")
+    if "medicaid" in text and "medicare" not in text:
+        tags.append("Medicaid")
+    return list(dict.fromkeys(tags))[:3]
+
+
+@api_router.get("/cms-news/feed")
+async def get_cms_news_feed(refresh: bool = False, current_user: dict = Depends(get_current_user)):
+    """Latest CMS regulatory and compliance updates via Federal Register API."""
+    now = datetime.now(timezone.utc).timestamp()
+    if not refresh and _cms_news_cache["data"] and (now - _cms_news_cache["ts"]) < _CMS_NEWS_CACHE_TTL:
+        return _cms_news_cache["data"]
+
+    items = []
+    seen_ids: set = set()
+
+    async def _fetch_fr(extra_params: dict) -> list:
+        base_params = {
+            "conditions[agencies][]": "centers-for-medicare-medicaid-services",
+            "per_page": "40",
+            "order": "newest",
+        }
+        base_params.update(extra_params)
+        try:
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                r = await client.get(
+                    "https://www.federalregister.gov/api/v1/documents.json",
+                    params=base_params,
+                )
+                if r.status_code == 200:
+                    return r.json().get("results", [])
+        except Exception as e:
+            logging.warning(f"Federal Register API error: {e}")
+        return []
+
+    def _map_doc(doc: dict, forced_tags: list = None) -> dict | None:
+        doc_id = doc.get("document_number", "")
+        if not doc_id or doc_id in seen_ids:
+            return None
+        seen_ids.add(doc_id)
+        title = doc.get("title", "")
+        abstract = doc.get("abstract", "")
+        tags = forced_tags[:] if forced_tags else []
+        tags += _auto_tag(title, abstract)
+        tags = list(dict.fromkeys(tags))[:3]
+        return {
+            "id": doc_id,
+            "title": title,
+            "abstract": abstract,
+            "type": doc.get("type", "Document"),
+            "published_at": doc.get("publication_date"),
+            "effective_on": doc.get("effective_on"),
+            "url": doc.get("html_url"),
+            "pdf_url": doc.get("pdf_url"),
+            "source": "Federal Register",
+            "tags": tags,
+        }
+
+    # Sequential fetch: general CMS docs + DMEPOS-specific
+    general_docs = await _fetch_fr({})
+    dmepos_docs = await _fetch_fr({"conditions[term]": "DMEPOS durable medical equipment Medicare"})
+
+    for doc in general_docs:
+        item = _map_doc(doc)
+        if item:
+            items.append(item)
+    for doc in dmepos_docs:
+        item = _map_doc(doc, ["DMEPOS"])
+        if item:
+            items.append(item)
+
+    items.sort(key=lambda x: x.get("published_at") or "", reverse=True)
+    items = items[:80]
+
+    result = {
+        "items": items,
+        "total": len(items),
+        "last_updated": datetime.now(timezone.utc).isoformat(),
+    }
+    _cms_news_cache["data"] = result
+    _cms_news_cache["ts"] = now
+    return result
+
+
+# ========================================
 # STATIC PAGE SERVING ROUTES
 # ========================================
 
