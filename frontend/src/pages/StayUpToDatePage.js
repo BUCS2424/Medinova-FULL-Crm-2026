@@ -320,8 +320,14 @@ function CmsNewsPanel({ onArticleClick }) {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [tagFilter, setTagFilter] = useState('');
-  const [sortMode, setSortMode] = useState('priority'); // 'priority' | 'newest'
+  const [sortMode, setSortMode] = useState('priority');
   const [refreshing, setRefreshing] = useState(false);
+  // Deep search state
+  const [deepQuery, setDeepQuery] = useState('');
+  const [deepResults, setDeepResults] = useState(null);
+  const [deepLoading, setDeepLoading] = useState(false);
+  const [deepError, setDeepError] = useState('');
+  const searchInputRef = useRef(null);
 
   const fetchNews = useCallback(async (force = false) => {
     force ? setRefreshing(true) : setLoading(true);
@@ -343,10 +349,37 @@ function CmsNewsPanel({ onArticleClick }) {
 
   useEffect(() => { fetchNews(); }, [fetchNews]);
 
-  // All unique tags from the feed for quick-filter chips
-  const allTags = [...new Set(items.flatMap(i => i.tags || []))].sort();
+  const runDeepSearch = useCallback(async (q) => {
+    const trimmed = (q || '').trim();
+    if (!trimmed || trimmed.length < 2) return;
+    setDeepLoading(true);
+    setDeepError('');
+    setDeepResults(null);
+    try {
+      const token = localStorage.getItem('dme_token');
+      const res = await axios.get(`${API_URL}/api/cms-news/search`, {
+        params: { q: trimmed },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setDeepResults(res.data);
+      setDeepQuery(trimmed);
+    } catch (e) {
+      setDeepError(e?.response?.data?.detail || 'Search failed. Try again.');
+    } finally {
+      setDeepLoading(false);
+    }
+  }, []);
 
-  const filtered = items.filter(item => {
+  const clearDeepSearch = () => {
+    setDeepResults(null);
+    setDeepQuery('');
+    setDeepError('');
+    setSearch('');
+    searchInputRef.current?.focus();
+  };
+
+  // Local filter (applied only when NOT in deep search mode)
+  const localFiltered = items.filter(item => {
     const matchType = typeFilter === 'all' || (item.type || '').toLowerCase() === typeFilter;
     const matchTag = !tagFilter || (item.tags || []).includes(tagFilter);
     const matchSearch = !search ||
@@ -356,8 +389,7 @@ function CmsNewsPanel({ onArticleClick }) {
     return matchType && matchTag && matchSearch;
   });
 
-  // Apply sort
-  const sorted = [...filtered].sort((a, b) => {
+  const localSorted = [...localFiltered].sort((a, b) => {
     if (sortMode === 'priority') {
       const pd = (b.priority || 0) - (a.priority || 0);
       if (pd !== 0) return pd;
@@ -365,9 +397,11 @@ function CmsNewsPanel({ onArticleClick }) {
     return (b.published_at || '') > (a.published_at || '') ? 1 : -1;
   });
 
-  const docTypes = [...new Set(items.map(i => (i.type || '').toLowerCase()).filter(Boolean))];
+  const allTags = [...new Set(items.flatMap(i => i.tags || []))].sort();
   const newCount = items.filter(i => i.is_new).length;
   const ruleCount = items.filter(i => (i.type || '').toLowerCase() === 'rule').length;
+  const isDeepMode = deepResults !== null || deepLoading;
+  const displayItems = isDeepMode ? (deepResults?.items || []) : localSorted;
 
   return (
     <div className="flex flex-col h-full" data-testid="cms-news-panel">
@@ -387,110 +421,122 @@ function CmsNewsPanel({ onArticleClick }) {
             </div>
           </div>
           <div className="flex items-center gap-1">
-            {newCount > 0 && (
+            {newCount > 0 && !isDeepMode && (
               <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500 text-white">
                 {newCount} NEW
               </span>
             )}
-            <button
-              onClick={() => fetchNews(true)}
-              disabled={refreshing}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
-              title="Refresh feed"
-              data-testid="news-panel-refresh"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-            </button>
+            {!isDeepMode && (
+              <button
+                onClick={() => fetchNews(true)}
+                disabled={refreshing}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+                title="Refresh feed"
+                data-testid="news-panel-refresh"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Stats row */}
-        <div className="flex items-center gap-3 mb-2">
-          <span className="text-[10px] text-slate-400">
-            <span className="text-red-400 font-semibold">{ruleCount} Final Rules</span>
-            {' · '}
-            <span className="text-amber-400">{items.filter(i => (i.type||'').toLowerCase()==='proposed rule').length} Proposed</span>
-            {' · '}
-            <span className="text-blue-400">{items.filter(i => (i.type||'').toLowerCase()==='notice').length} Notices</span>
-          </span>
-        </div>
+        {/* Stats row — only in feed mode */}
+        {!isDeepMode && (
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-[10px] text-slate-400">
+              <span className="text-red-400 font-semibold">{ruleCount} Final Rules</span>
+              {' · '}
+              <span className="text-amber-400">{items.filter(i => (i.type||'').toLowerCase()==='proposed rule').length} Proposed</span>
+              {' · '}
+              <span className="text-blue-400">{items.filter(i => (i.type||'').toLowerCase()==='notice').length} Notices</span>
+            </span>
+          </div>
+        )}
 
-        {/* Search */}
+        {/* Search input */}
         <div className="relative mb-2">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-500" />
           <input
+            ref={searchInputRef}
             type="text"
-            placeholder="Search rules, topics, tags..."
+            placeholder={isDeepMode ? `Searched: "${deepQuery}"` : 'Search or press Enter for deep search...'}
             value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-full pl-7 pr-3 py-1.5 rounded-lg text-xs bg-white/10 text-white placeholder-slate-500 border border-white/10 focus:outline-none focus:border-blue-400 transition-colors"
+            onChange={e => {
+              setSearch(e.target.value);
+              // Clear deep results when user starts typing a new query
+              if (deepResults) { setDeepResults(null); setDeepQuery(''); }
+            }}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && search.trim().length >= 2) {
+                runDeepSearch(search.trim());
+              }
+              if (e.key === 'Escape') clearDeepSearch();
+            }}
+            className="w-full pl-7 pr-16 py-1.5 rounded-lg text-xs bg-white/10 text-white placeholder-slate-500 border border-white/10 focus:outline-none focus:border-blue-400 transition-colors"
             data-testid="news-search"
           />
-        </div>
-
-        {/* Sort toggle */}
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex gap-1">
-            <button
-              onClick={() => setSortMode('priority')}
-              className={`px-2 py-0.5 rounded-full text-[10px] font-medium transition-colors ${sortMode === 'priority' ? 'bg-blue-500 text-white' : 'bg-white/10 text-slate-400 hover:bg-white/20'}`}
-              data-testid="sort-priority"
-            >
-              Priority
-            </button>
-            <button
-              onClick={() => setSortMode('newest')}
-              className={`px-2 py-0.5 rounded-full text-[10px] font-medium transition-colors ${sortMode === 'newest' ? 'bg-blue-500 text-white' : 'bg-white/10 text-slate-400 hover:bg-white/20'}`}
-              data-testid="sort-newest"
-            >
-              Newest
-            </button>
-          </div>
-          {tagFilter && (
-            <button onClick={() => setTagFilter('')} className="text-[10px] text-slate-400 hover:text-white flex items-center gap-0.5">
-              <X className="w-2.5 h-2.5" /> Clear tag
-            </button>
-          )}
-        </div>
-
-        {/* Type filter pills */}
-        <div className="flex gap-1 flex-wrap">
+          {/* Deep search trigger button */}
           <button
-            onClick={() => setTypeFilter('all')}
-            className={`px-2 py-0.5 rounded-full text-[10px] font-medium transition-colors ${typeFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-white/10 text-slate-400 hover:bg-white/20'}`}
+            onClick={() => search.trim().length >= 2 ? runDeepSearch(search.trim()) : null}
+            disabled={deepLoading || search.trim().length < 2}
+            className="absolute right-1 top-1/2 -translate-y-1/2 px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white transition-colors"
+            data-testid="deep-search-btn"
+            title="Search Federal Register (Enter)"
           >
-            All
+            {deepLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Go'}
           </button>
-          {docTypes.map(t => {
-            const m = docTypeMeta(t);
-            return (
-              <button
-                key={t}
-                onClick={() => setTypeFilter(typeFilter === t ? 'all' : t)}
-                className={`px-2 py-0.5 rounded-full text-[10px] font-medium transition-colors ${typeFilter === t ? 'bg-blue-500 text-white' : 'bg-white/10 text-slate-400 hover:bg-white/20'}`}
-              >
-                {m.label}
-              </button>
-            );
-          })}
         </div>
+
+        {/* Sort + filters row — only in feed mode */}
+        {!isDeepMode && (
+          <>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex gap-1">
+                <button onClick={() => setSortMode('priority')}
+                  className={`px-2 py-0.5 rounded-full text-[10px] font-medium transition-colors ${sortMode === 'priority' ? 'bg-blue-500 text-white' : 'bg-white/10 text-slate-400 hover:bg-white/20'}`}
+                  data-testid="sort-priority">Priority</button>
+                <button onClick={() => setSortMode('newest')}
+                  className={`px-2 py-0.5 rounded-full text-[10px] font-medium transition-colors ${sortMode === 'newest' ? 'bg-blue-500 text-white' : 'bg-white/10 text-slate-400 hover:bg-white/20'}`}
+                  data-testid="sort-newest">Newest</button>
+              </div>
+              {tagFilter && (
+                <button onClick={() => setTagFilter('')} className="text-[10px] text-slate-400 hover:text-white flex items-center gap-0.5">
+                  <X className="w-2.5 h-2.5" /> Clear tag
+                </button>
+              )}
+            </div>
+            <div className="flex gap-1 flex-wrap">
+              <button onClick={() => setTypeFilter('all')}
+                className={`px-2 py-0.5 rounded-full text-[10px] font-medium transition-colors ${typeFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-white/10 text-slate-400 hover:bg-white/20'}`}>
+                All
+              </button>
+              {[...new Set(items.map(i => (i.type||'').toLowerCase()).filter(Boolean))].map(t => {
+                const m = docTypeMeta(t);
+                return (
+                  <button key={t} onClick={() => setTypeFilter(typeFilter === t ? 'all' : t)}
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-medium transition-colors ${typeFilter === t ? 'bg-blue-500 text-white' : 'bg-white/10 text-slate-400 hover:bg-white/20'}`}>
+                    {m.label}
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
 
-      {/* Tag quick-filter chips (DME-specific tags) */}
-      {allTags.length > 0 && !loading && (
+      {/* Tag quick-filters — feed mode only */}
+      {!isDeepMode && allTags.length > 0 && !loading && (
         <div className="shrink-0 px-3 py-2 bg-slate-50 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 overflow-x-auto">
-          <div className="flex gap-1.5 flex-nowrap min-w-0">
+          <div className="flex gap-1.5 flex-nowrap">
             {allTags.map(tag => (
-              <button
-                key={tag}
+              <button key={tag}
                 onClick={() => setTagFilter(tagFilter === tag ? '' : tag)}
                 className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-medium border transition-colors whitespace-nowrap ${
                   tagFilter === tag
                     ? 'bg-blue-600 border-blue-600 text-white'
                     : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-blue-400 hover:text-blue-600'
                 }`}
-                data-testid={`tag-filter-${tag.replace(/\//g, '-').replace(/\s/g, '-').toLowerCase()}`}
-              >
+                data-testid={`tag-filter-${tag.replace(/\//g,'-').replace(/\s/g,'-').toLowerCase()}`}>
                 {tag}
               </button>
             ))}
@@ -498,21 +544,50 @@ function CmsNewsPanel({ onArticleClick }) {
         </div>
       )}
 
-      {/* Article count + last updated */}
+      {/* Deep search banner */}
+      {isDeepMode && !deepLoading && (
+        <div className="shrink-0 px-3 py-2 flex items-center justify-between border-b border-blue-100 dark:border-blue-900"
+          style={{ background: 'linear-gradient(90deg, #eff6ff, #dbeafe)' }}>
+          <div className="flex items-center gap-1.5 min-w-0">
+            <Search className="w-3 h-3 text-blue-600 shrink-0" />
+            <span className="text-[11px] font-semibold text-blue-800 truncate">
+              Live results for: <span className="font-bold">"{deepQuery}"</span>
+            </span>
+          </div>
+          <button
+            onClick={clearDeepSearch}
+            className="shrink-0 ml-2 flex items-center gap-1 text-[10px] text-blue-600 hover:text-blue-800 font-medium"
+            data-testid="clear-deep-search"
+          >
+            <X className="w-3 h-3" /> Back to feed
+          </button>
+        </div>
+      )}
+
+      {/* Count bar */}
       <div className="shrink-0 px-3 py-1.5 flex items-center justify-between bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
-        <span className="text-[10px] text-slate-500">
-          {loading ? 'Loading...' : `${sorted.length} of ${items.length} updates`}
-        </span>
-        {lastUpdated && (
+        {deepLoading ? (
+          <span className="text-[10px] text-blue-500 flex items-center gap-1.5">
+            <Loader2 className="w-3 h-3 animate-spin" />
+            Searching Federal Register for "{search}"...
+          </span>
+        ) : (
+          <span className="text-[10px] text-slate-500">
+            {isDeepMode
+              ? `${displayItems.length} live results`
+              : `${displayItems.length} of ${items.length} updates`}
+          </span>
+        )}
+        {!isDeepMode && lastUpdated && (
           <span className="text-[10px] text-slate-400">
             {new Date(lastUpdated).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
           </span>
         )}
       </div>
 
-      {/* Scrollable list */}
+      {/* List */}
       <div className="flex-1 overflow-y-auto bg-white dark:bg-slate-900">
-        {loading ? (
+        {(loading && !isDeepMode) ? (
           <div className="p-3 space-y-3">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="space-y-1.5">
@@ -522,22 +597,39 @@ function CmsNewsPanel({ onArticleClick }) {
               </div>
             ))}
           </div>
-        ) : sorted.length === 0 ? (
+        ) : deepLoading ? (
+          <div className="flex flex-col items-center justify-center py-16 gap-3">
+            <Loader2 className="w-7 h-7 animate-spin text-blue-500" />
+            <p className="text-sm text-slate-500 text-center px-4">
+              Searching Federal Register for<br />
+              <span className="font-semibold text-blue-600">"{search}"</span>
+            </p>
+          </div>
+        ) : deepError ? (
+          <div className="text-center py-12 px-4">
+            <AlertCircle className="w-8 h-8 mx-auto mb-2 text-red-400" />
+            <p className="text-sm text-red-500 mb-3">{deepError}</p>
+            <button onClick={clearDeepSearch} className="text-xs text-blue-500 hover:underline">Back to feed</button>
+          </div>
+        ) : displayItems.length === 0 ? (
           <div className="text-center py-12 px-4">
             <Search className="w-8 h-8 mx-auto mb-2 text-slate-300" />
-            <p className="text-sm text-slate-500">No matching updates</p>
-            {(search || typeFilter !== 'all' || tagFilter) && (
-              <button
-                onClick={() => { setSearch(''); setTypeFilter('all'); setTagFilter(''); }}
-                className="mt-2 text-xs text-blue-500 hover:underline"
-              >
-                Clear filters
-              </button>
+            <p className="text-sm text-slate-500 mb-1">
+              {isDeepMode ? `No CMS results found for "${deepQuery}"` : 'No matching updates'}
+            </p>
+            {isDeepMode && (
+              <p className="text-xs text-slate-400 mb-3">Try different keywords or a broader term</p>
             )}
+            <button
+              onClick={isDeepMode ? clearDeepSearch : () => { setSearch(''); setTypeFilter('all'); setTagFilter(''); }}
+              className="text-xs text-blue-500 hover:underline"
+            >
+              {isDeepMode ? 'Back to feed' : 'Clear filters'}
+            </button>
           </div>
         ) : (
           <div>
-            {sorted.map(item => (
+            {displayItems.map(item => (
               <NewsItem key={item.id} item={item} onClick={onArticleClick} />
             ))}
           </div>

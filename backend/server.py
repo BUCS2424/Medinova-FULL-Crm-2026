@@ -17448,9 +17448,60 @@ async def get_cms_news_feed(refresh: bool = False, current_user: dict = Depends(
     return result
 
 
-# ========================================
-# STATIC PAGE SERVING ROUTES
-# ========================================
+@api_router.get("/cms-news/search")
+async def search_cms_news(q: str, current_user: dict = Depends(get_current_user)):
+    """Live keyword search against Federal Register for CMS documents."""
+    q = (q or "").strip()
+    if len(q) < 2:
+        raise HTTPException(status_code=400, detail="Query must be at least 2 characters")
+    try:
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            r = await client.get(
+                "https://www.federalregister.gov/api/v1/documents.json",
+                params={
+                    "conditions[agencies][]": "centers-for-medicare-medicaid-services",
+                    "conditions[term]": q,
+                    "per_page": "40",
+                    "order": "newest",
+                },
+            )
+            if r.status_code != 200:
+                raise HTTPException(status_code=503, detail="Federal Register unavailable")
+            docs = r.json().get("results", [])
+            items = []
+            from datetime import date as _date
+            for doc in docs:
+                title = doc.get("title", "") or ""
+                abstract = doc.get("abstract", "") or ""
+                pub_date = doc.get("publication_date", "")
+                is_new = False
+                try:
+                    is_new = (_date.today() - _date.fromisoformat(pub_date)).days <= 14
+                except Exception:
+                    pass
+                items.append({
+                    "id": doc.get("document_number", ""),
+                    "title": title,
+                    "abstract": abstract,
+                    "type": doc.get("type", "Document"),
+                    "published_at": pub_date,
+                    "effective_on": doc.get("effective_on"),
+                    "url": doc.get("html_url"),
+                    "pdf_url": doc.get("pdf_url"),
+                    "source": "Federal Register",
+                    "tags": _auto_tag(title, abstract),
+                    "is_new": is_new,
+                    "priority": _DOC_PRIORITY.get((doc.get("type") or "").lower(), 0),
+                })
+            # Sort: Final Rules first, then newest
+            items.sort(key=lambda x: x.get("published_at") or "", reverse=True)
+            items.sort(key=lambda x: x.get("priority") or 0, reverse=True)
+            return {"items": items, "total": len(items), "query": q}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.warning(f"CMS news search error: {e}")
+        raise HTTPException(status_code=503, detail="Search unavailable")
 
 # Serve sitemap.xml at root level (where Google expects it)
 @app.get("/sitemap.xml", include_in_schema=False)
