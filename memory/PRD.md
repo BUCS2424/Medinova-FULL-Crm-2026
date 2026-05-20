@@ -44,8 +44,19 @@
   - Added representative images to 4 main product categories
   - Fixed `ProductCatalogManager.js` template keys to match DB category names
   - Fixed P0 bug: coverage-area pages were rendering without product catalog
-  - Root cause: `public_location_detail` in `routes/public_pages.py` only fetched from `db.catalog_products` (empty), not `db.products`
-  - Fix: passed existing `generate_location_page_on_demand` function as `dme_renderer` param to `build_public_router` — zero code duplication, reuses existing working function
+
+- [x] **Supplier Catalog Images + DME Categories (2026-05-19)**:
+  - Scraped 12 DME suppliers into `supplier_assets` DB, created SupplierCatalogImages.js UI
+  - Added "Delete All Pages" bulk-delete in PagesTab.jsx
+  - Added Mastectomy Supplies + Compression Therapy categories (20 total categories, 225 products)
+
+- [x] **Native WebRTC Telehealth Module (2026-05-20)**:
+  - Removed Telnyx Video API — replaced with native `RTCPeerConnection` + FastAPI WebSocket signaling
+  - 2-way video call, screen share, role-based URLs (?role=host / ?role=patient)
+  - Camera/mic preview lobby, waiting indicator, in-meeting controls
+  - `POST /api/gemini/diagnose` (gemini-2.5-flash) for AI clinical assistance
+  - AI panel: toggle button, symptom input → Assessment + DME recommendations + ICD-10 codes
+  - 100% backend tests (18/18), 95% frontend verified
 
 
   - Full programmatic SEO engine installed from ZIP module

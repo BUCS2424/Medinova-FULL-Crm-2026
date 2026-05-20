@@ -285,6 +285,12 @@ export default function VideoRoomPage() {
     window.history.back();
   };
 
+  const formatDiagnosis = (text) =>
+    text
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
+      .trim();
+
   const handleDiagnose = async () => {
     if (!symptoms.trim()) return;
     setDiagnosing(true);
@@ -294,7 +300,7 @@ export default function VideoRoomPage() {
         { symptoms: symptoms.trim() },
         { headers: getHeaders() }
       );
-      setDiagnosis(res.data.diagnosis);
+      setDiagnosis(formatDiagnosis(res.data.diagnosis));
     } catch {
       toast.error('AI service unavailable');
     } finally {
