@@ -664,6 +664,8 @@ export default function VideoRoomPage() {
               'Browser Not Supported'
             ) : mediaState === 'audio_only' ? (
               'Join Meeting (Audio Only)'
+            ) : mediaState === 'not_found' ? (
+              'Join Meeting (No Camera/Mic)'
             ) : (
               'Join Meeting'
             )}

@@ -69,6 +69,16 @@
   - AI panel: toggle button, symptom input → Assessment + DME recommendations + ICD-10 codes
   - 100% backend tests (18/18), 95% frontend verified
 
+- [x] **WebRTC Stability Fix (2026-05-20)**:
+  - Added `pc.oniceconnectionstatechange` handler: `disconnected` waits 4s then sends ICE restart offer; `failed` immediately sends ICE restart offer (host-only to avoid SDP glare)
+  - Added `pc.onnegotiationneeded` safety net: fires only when WS is open + signalingState=stable
+  - Improved screen share: handles audio-only joins via `addTrack` when no video sender exists
+  - Reconnecting UI: amber pulsing badge + video overlay (`iceStatus='reconnecting'`); red badge (`iceStatus='failed'`)
+  - Expanded ICE config: 4 Google STUN servers + 4 TURN relay URLs + `iceCandidatePoolSize=10`
+  - Fixed WS backend: `accept()` before `close()` → proper WS close codes (4001/4003/4004)
+  - Join button label fix: `not_found` → "Join Meeting (No Camera/Mic)"
+  - 20/20 backend tests passed, all ICE handlers confirmed via code review
+
 
   - Full programmatic SEO engine installed from ZIP module
   - Creates pages for all 50 states × counties × cities (~33,000+ pages possible)
@@ -255,9 +265,12 @@
 - P1: Configure Telnyx API keys for fax/voice functionality
 - P1: Add EMERGENT_LLM_KEY to backend .env for AI features
 - P1: Add server-side rate limiting specific to /api/public/leads spam bursts
+- P1: User acceptance check for print/fax lead workflow in real sales process
+- P1: User acceptance check for doctor tab workflow and NPI search import quality
 - P2: Refactor server.py (17k+ lines) into modular route files
+- P2: Refactor VideoRoomPage.js (~960 lines) into useWebRTC custom hook
 - P2: PDF export option alongside browser print for leads
-- P2: Add more data sources to Stay Up To Date page
+- P2: Add more data sources to Stay Up To Date page (CMS Marketplace API)
 
 ## Login Credentials
 - **Email**: mel@a2gdesigns.com

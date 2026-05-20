@@ -234,6 +234,8 @@ async def webrtc_signaling(websocket: WebSocket, meeting_id: str, role: str):
     role: 'host' (provider watches) or 'patient' (broadcasts camera).
     Just relays JSON messages between the two peers — no media passes through.
     """
+    await websocket.accept()
+
     if role not in ("host", "patient"):
         await websocket.close(code=4003, reason="Invalid role")
         return
@@ -245,8 +247,6 @@ async def webrtc_signaling(websocket: WebSocket, meeting_id: str, role: str):
     if meeting.get("status") == "ended":
         await websocket.close(code=4001, reason="Meeting ended")
         return
-
-    await websocket.accept()
 
     if meeting_id not in _signal_rooms:
         _signal_rooms[meeting_id] = {"host": None, "patient": None}
