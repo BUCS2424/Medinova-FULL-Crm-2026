@@ -1,34 +1,49 @@
-import { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { toast } from 'sonner';
 import axios from 'axios';
 import {
-  Video, VideoOff, Mic, MicOff, Monitor, PhoneOff,
-  Users, MessageSquare, Loader2, Copy, Send
+  Video, VideoOff, Mic, MicOff, Monitor, MonitorOff,
+  PhoneOff, Loader2, Copy, Brain, Send, X
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
+const getWsUrl = () => API_URL.replace(/^https/, 'wss').replace(/^http(?!s)/, 'ws');
+
+const ICE_SERVERS = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'stun:stun2.l.google.com:19302' },
+  ],
+};
 
 export default function VideoRoomPage() {
   const { meetingId } = useParams();
+  const [searchParams] = useSearchParams();
+  const role = searchParams.get('role') || 'patient';
+
   const [meeting, setMeeting] = useState(null);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
   const [connected, setConnected] = useState(false);
+  const [hasRemote, setHasRemote] = useState(false);
   const [videoOn, setVideoOn] = useState(true);
   const [audioOn, setAudioOn] = useState(true);
   const [screenSharing, setScreenSharing] = useState(false);
-  const [participants, setParticipants] = useState([]);
-  const [chatMessages, setChatMessages] = useState([]);
-  const [chatInput, setChatInput] = useState('');
-  const [showChat, setShowChat] = useState(false);
+  const [showDiagnose, setShowDiagnose] = useState(false);
+  const [symptoms, setSymptoms] = useState('');
+  const [diagnosis, setDiagnosis] = useState('');
+  const [diagnosing, setDiagnosing] = useState(false);
 
-  const roomRef = useRef(null);
+  const wsRef = useRef(null);
+  const pcRef = useRef(null);
   const localVideoRef = useRef(null);
+  const remoteVideoRef = useRef(null);
   const localStreamRef = useRef(null);
-  const remoteVideosRef = useRef({});
+  const pendingCandidates = useRef([]);
 
   const getHeaders = () => {
     const token = localStorage.getItem('dme_token');
@@ -37,14 +52,29 @@ export default function VideoRoomPage() {
 
   useEffect(() => {
     fetchMeeting();
-    return () => { cleanup(); };
-  }, [meetingId]);
+    return () => cleanup();
+  }, [meetingId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Start camera preview once in lobby
+  useEffect(() => {
+    if (!loading && meeting && meeting.status !== 'ended' && !connected) {
+      navigator.mediaDevices
+        .getUserMedia({ audio: true, video: true })
+        .then((stream) => {
+          localStreamRef.current = stream;
+          if (localVideoRef.current) localVideoRef.current.srcObject = stream;
+        })
+        .catch(() => {});
+    }
+  }, [loading, meeting, connected]);
 
   const fetchMeeting = async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/video-rooms/meetings/${meetingId}`, { headers: getHeaders() });
+      const res = await axios.get(`${API_URL}/api/video-rooms/meetings/${meetingId}`, {
+        headers: getHeaders(),
+      });
       setMeeting(res.data);
-    } catch (error) {
+    } catch {
       toast.error('Meeting not found');
     } finally {
       setLoading(false);
@@ -52,137 +82,235 @@ export default function VideoRoomPage() {
   };
 
   const cleanup = () => {
-    if (localStreamRef.current) {
-      localStreamRef.current.getTracks().forEach(t => t.stop());
-    }
-    if (roomRef.current) {
-      try { roomRef.current.disconnect(); } catch (e) {}
-    }
+    if (wsRef.current) { try { wsRef.current.close(); } catch (e) {} wsRef.current = null; }
+    if (pcRef.current) { try { pcRef.current.close(); } catch (e) {} pcRef.current = null; }
+    localStreamRef.current?.getTracks().forEach((t) => t.stop());
   };
+
+  const createPeerConnection = useCallback(() => {
+    const pc = new RTCPeerConnection(ICE_SERVERS);
+
+    pc.onicecandidate = (event) => {
+      if (event.candidate && wsRef.current?.readyState === WebSocket.OPEN) {
+        wsRef.current.send(
+          JSON.stringify({ type: 'ice-candidate', candidate: event.candidate })
+        );
+      }
+    };
+
+    pc.ontrack = (event) => {
+      if (remoteVideoRef.current && event.streams[0]) {
+        remoteVideoRef.current.srcObject = event.streams[0];
+        setHasRemote(true);
+      }
+    };
+
+    pc.onconnectionstatechange = () => {
+      if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+        setHasRemote(false);
+        if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
+      }
+    };
+
+    return pc;
+  }, []);
+
+  const handleSignalingMessage = useCallback(
+    async (msg) => {
+      const pc = pcRef.current;
+      if (!pc) return;
+
+      if (msg.type === 'peer_joined') {
+        // Host initiates the offer when the patient joins
+        if (role === 'host') {
+          try {
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+            wsRef.current?.send(
+              JSON.stringify({ type: 'offer', sdp: pc.localDescription })
+            );
+          } catch (e) {
+            console.error('Offer creation error:', e);
+          }
+        }
+      } else if (msg.type === 'offer') {
+        try {
+          await pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+          for (const c of pendingCandidates.current) {
+            await pc.addIceCandidate(new RTCIceCandidate(c)).catch(() => {});
+          }
+          pendingCandidates.current = [];
+          const answer = await pc.createAnswer();
+          await pc.setLocalDescription(answer);
+          wsRef.current?.send(
+            JSON.stringify({ type: 'answer', sdp: pc.localDescription })
+          );
+        } catch (e) {
+          console.error('Answer creation error:', e);
+        }
+      } else if (msg.type === 'answer') {
+        try {
+          await pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+          for (const c of pendingCandidates.current) {
+            await pc.addIceCandidate(new RTCIceCandidate(c)).catch(() => {});
+          }
+          pendingCandidates.current = [];
+        } catch (e) {
+          console.error('Set remote description error:', e);
+        }
+      } else if (msg.type === 'ice-candidate') {
+        if (pc.remoteDescription) {
+          await pc.addIceCandidate(new RTCIceCandidate(msg.candidate)).catch(() => {});
+        } else {
+          pendingCandidates.current.push(msg.candidate);
+        }
+      } else if (msg.type === 'peer_left') {
+        setHasRemote(false);
+        if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
+      }
+    },
+    [role]
+  );
 
   const handleJoin = async () => {
     setJoining(true);
     try {
-      // Get join token
-      const tokenRes = await axios.post(
-        `${API_URL}/api/video-rooms/meetings/${meetingId}/join-token`, {},
-        { headers: getHeaders() }
-      );
-
-      const { token, room_id } = tokenRes.data;
-
-      // Get local media
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-      localStreamRef.current = stream;
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = stream;
+      // Reuse preview stream or request new
+      let stream = localStreamRef.current;
+      if (!stream || stream.getTracks().every((t) => t.readyState === 'ended')) {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+        localStreamRef.current = stream;
+        if (localVideoRef.current) localVideoRef.current.srcObject = stream;
       }
 
-      // Connect via Telnyx Video SDK
-      const { Room } = await import('@telnyx/video');
-      const room = new Room(room_id, { clientToken: token });
+      // Create RTCPeerConnection and add tracks
+      const pc = createPeerConnection();
+      stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+      pcRef.current = pc;
 
-      room.on('connected', () => {
+      // Connect WebSocket signaling
+      const wsUrl = `${getWsUrl()}/api/video-rooms/ws/${meetingId}/${role}`;
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
         setConnected(true);
-        toast.success('Connected to meeting');
-      });
+        setJoining(false);
+        toast.success(`Joined as ${role === 'host' ? 'Provider' : 'Patient'}`);
+      };
 
-      room.on('participant_joined', (participant) => {
-        setParticipants(prev => [...prev, participant]);
-      });
+      ws.onmessage = async (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.type !== 'ping') await handleSignalingMessage(msg);
+        } catch (e) {}
+      };
 
-      room.on('participant_left', (participant) => {
-        setParticipants(prev => prev.filter(p => p.id !== participant.id));
-        if (remoteVideosRef.current[participant.id]) {
-          delete remoteVideosRef.current[participant.id];
-        }
-      });
+      ws.onerror = () => {
+        toast.error('Signaling connection error');
+        setJoining(false);
+      };
 
-      room.on('stream_published', (participant, stream) => {
-        const videoEl = document.getElementById(`remote-video-${participant.id}`);
-        if (videoEl) {
-          videoEl.srcObject = stream;
-        }
-      });
-
-      room.on('disconnected', () => {
+      ws.onclose = () => {
         setConnected(false);
-        toast.info('Disconnected from meeting');
-      });
-
-      await room.connect();
-      roomRef.current = room;
-
-      // Publish local stream
-      const audioTrack = stream.getAudioTracks()[0];
-      const videoTrack = stream.getVideoTracks()[0];
-      if (audioTrack || videoTrack) {
-        await room.addStream('self', {
-          audio: audioTrack || undefined,
-          video: videoTrack || undefined
-        });
-      }
-
+      };
     } catch (error) {
-      console.error('Join error:', error);
-      toast.error(error.response?.data?.detail || 'Failed to join meeting');
-    } finally {
+      toast.error(
+        error.name === 'NotAllowedError'
+          ? 'Camera/microphone permission denied'
+          : 'Failed to join meeting'
+      );
       setJoining(false);
     }
   };
 
   const toggleVideo = () => {
-    if (localStreamRef.current) {
-      localStreamRef.current.getVideoTracks().forEach(t => { t.enabled = !t.enabled; });
-      setVideoOn(prev => !prev);
-    }
+    localStreamRef.current?.getVideoTracks().forEach((t) => {
+      t.enabled = !t.enabled;
+    });
+    setVideoOn((prev) => !prev);
   };
 
   const toggleAudio = () => {
-    if (localStreamRef.current) {
-      localStreamRef.current.getAudioTracks().forEach(t => { t.enabled = !t.enabled; });
-      setAudioOn(prev => !prev);
-    }
+    localStreamRef.current?.getAudioTracks().forEach((t) => {
+      t.enabled = !t.enabled;
+    });
+    setAudioOn((prev) => !prev);
   };
 
   const toggleScreenShare = async () => {
     if (screenSharing) {
-      cleanup();
+      const videoTrack = localStreamRef.current?.getVideoTracks()[0];
+      if (videoTrack && pcRef.current) {
+        const sender = pcRef.current.getSenders().find((s) => s.track?.kind === 'video');
+        if (sender) await sender.replaceTrack(videoTrack).catch(() => {});
+      }
+      if (localVideoRef.current) localVideoRef.current.srcObject = localStreamRef.current;
       setScreenSharing(false);
       return;
     }
     try {
-      const screen = await navigator.mediaDevices.getDisplayMedia({ video: true });
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = screen;
+      const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      const screenTrack = screenStream.getVideoTracks()[0];
+
+      if (pcRef.current) {
+        const sender = pcRef.current.getSenders().find((s) => s.track?.kind === 'video');
+        if (sender) await sender.replaceTrack(screenTrack).catch(() => {});
       }
+      if (localVideoRef.current)
+        localVideoRef.current.srcObject = new MediaStream([
+          screenTrack,
+          ...( localStreamRef.current?.getAudioTracks() || []),
+        ]);
+
       setScreenSharing(true);
-      screen.getVideoTracks()[0].onended = () => {
-        if (localStreamRef.current && localVideoRef.current) {
-          localVideoRef.current.srcObject = localStreamRef.current;
-        }
+
+      screenTrack.onended = () => {
         setScreenSharing(false);
+        const vt = localStreamRef.current?.getVideoTracks()[0];
+        if (vt && pcRef.current) {
+          const s = pcRef.current.getSenders().find((x) => x.track?.kind === 'video');
+          if (s) s.replaceTrack(vt);
+        }
+        if (localVideoRef.current) localVideoRef.current.srcObject = localStreamRef.current;
       };
     } catch (e) {
-      toast.error('Screen share cancelled');
+      if (e.name !== 'NotAllowedError') toast.error('Screen share failed');
     }
   };
 
   const handleLeave = () => {
     cleanup();
     setConnected(false);
-    window.close();
+    window.history.back();
+  };
+
+  const handleDiagnose = async () => {
+    if (!symptoms.trim()) return;
+    setDiagnosing(true);
+    try {
+      const res = await axios.post(
+        `${API_URL}/api/gemini/diagnose`,
+        { symptoms: symptoms.trim() },
+        { headers: getHeaders() }
+      );
+      setDiagnosis(res.data.diagnosis);
+    } catch {
+      toast.error('AI service unavailable');
+    } finally {
+      setDiagnosing(false);
+    }
   };
 
   const copyJoinLink = () => {
-    const link = `${window.location.origin}/video-room/${meetingId}`;
-    navigator.clipboard.writeText(link);
+    navigator.clipboard.writeText(`${window.location.origin}/video-room/${meetingId}`);
     toast.success('Join link copied!');
   };
 
+  // ── Loading ─────────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-navy-900">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0B1B33' }}>
         <Loader2 className="w-8 h-8 animate-spin text-white" />
       </div>
     );
@@ -190,8 +318,8 @@ export default function VideoRoomPage() {
 
   if (!meeting) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-navy-900 text-white">
-        <div className="text-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0B1B33' }}>
+        <div className="text-center text-white">
           <h1 className="text-2xl font-bold mb-2">Meeting Not Found</h1>
           <p className="text-slate-400">This meeting may have ended or the link is invalid.</p>
         </div>
@@ -201,8 +329,8 @@ export default function VideoRoomPage() {
 
   if (meeting.status === 'ended') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-navy-900 text-white">
-        <div className="text-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0B1B33' }}>
+        <div className="text-center text-white">
           <h1 className="text-2xl font-bold mb-2">Meeting Ended</h1>
           <p className="text-slate-400">This meeting has concluded.</p>
         </div>
@@ -210,42 +338,93 @@ export default function VideoRoomPage() {
     );
   }
 
-  // Pre-join lobby
+  // ── Pre-join lobby ──────────────────────────────────────────────────────────
   if (!connected) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-navy-900 to-navy-800">
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: 'linear-gradient(135deg, #0B1B33 0%, #0a2240 100%)' }}
+      >
         <div className="max-w-md w-full p-8 text-center text-white" data-testid="video-lobby">
-          <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <div
+            className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6"
+            style={{ background: 'linear-gradient(135deg, #0055CC, #00A3E0)' }}
+          >
             <Video className="w-8 h-8" />
           </div>
-          <h1 className="text-2xl font-bold mb-2">{meeting.title}</h1>
-          <p className="text-slate-400 mb-1">
+          <h1 className="text-2xl font-bold mb-1">{meeting.title}</h1>
+          <p className="text-slate-400 text-sm mb-1">
             {new Date(meeting.scheduled_at).toLocaleString()}
           </p>
-          <p className="text-slate-500 text-sm mb-8">{meeting.duration_minutes} minutes</p>
+          <div className="flex justify-center mb-6">
+            <Badge
+              className="text-xs px-3 py-1"
+              style={{ background: role === 'host' ? '#0055CC' : '#1a3a5c', color: '#fff' }}
+            >
+              Joining as {role === 'host' ? 'Provider (Host)' : 'Patient'}
+            </Badge>
+          </div>
 
-          {/* Preview */}
-          <div className="relative bg-navy-800 rounded-xl overflow-hidden mb-6 aspect-video">
-            <video ref={localVideoRef} autoPlay muted playsInline className="w-full h-full object-cover" />
+          {/* Camera preview */}
+          <div
+            className="relative rounded-xl overflow-hidden mb-6 aspect-video"
+            style={{ background: '#0a2240' }}
+          >
+            <video
+              ref={localVideoRef}
+              autoPlay
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            />
             <div className="absolute bottom-3 left-3">
-              <Badge variant="secondary" className="text-xs">You</Badge>
+              <Badge variant="secondary" className="text-xs">Preview</Badge>
             </div>
           </div>
 
+          {/* Media toggles */}
           <div className="flex gap-3 justify-center mb-6">
-            <Button variant={audioOn ? 'secondary' : 'destructive'} size="icon" onClick={toggleAudio} className="rounded-full w-12 h-12">
+            <Button
+              variant={audioOn ? 'secondary' : 'destructive'}
+              size="icon"
+              onClick={toggleAudio}
+              className="rounded-full w-12 h-12"
+              data-testid="lobby-toggle-audio"
+            >
               {audioOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
             </Button>
-            <Button variant={videoOn ? 'secondary' : 'destructive'} size="icon" onClick={toggleVideo} className="rounded-full w-12 h-12">
+            <Button
+              variant={videoOn ? 'secondary' : 'destructive'}
+              size="icon"
+              onClick={toggleVideo}
+              className="rounded-full w-12 h-12"
+              data-testid="lobby-toggle-video"
+            >
               {videoOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
             </Button>
           </div>
 
-          <Button onClick={handleJoin} disabled={joining} className="w-full bg-blue-600 hover:bg-blue-700 py-6 text-lg" data-testid="join-meeting-btn">
-            {joining ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Joining...</> : 'Join Meeting'}
+          <Button
+            onClick={handleJoin}
+            disabled={joining}
+            className="w-full py-6 text-lg font-semibold mb-3"
+            style={{ background: 'linear-gradient(135deg, #0055CC, #00A3E0)' }}
+            data-testid="join-meeting-btn"
+          >
+            {joining ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Connecting...
+              </>
+            ) : (
+              'Join Meeting'
+            )}
           </Button>
 
-          <Button variant="ghost" onClick={copyJoinLink} className="w-full mt-3 text-slate-400 hover:text-white">
+          <Button
+            variant="ghost"
+            onClick={copyJoinLink}
+            className="w-full text-slate-400 hover:text-white"
+          >
             <Copy className="w-4 h-4 mr-2" /> Copy Join Link
           </Button>
         </div>
@@ -253,96 +432,259 @@ export default function VideoRoomPage() {
     );
   }
 
-  // In-meeting view
+  // ── In-meeting view ─────────────────────────────────────────────────────────
   return (
-    <div className="h-screen flex flex-col bg-navy-900" data-testid="video-room-active">
+    <div
+      className="h-screen flex flex-col"
+      style={{ background: '#0B1B33' }}
+      data-testid="video-room-active"
+    >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2 bg-navy-800 border-b border-slate-700">
+      <div
+        className="flex items-center justify-between px-4 py-2.5 border-b shrink-0"
+        style={{ background: '#0a1f3d', borderColor: '#1e3a5f' }}
+      >
         <div className="flex items-center gap-3">
-          <Badge className="bg-red-600 text-white gap-1"><div className="w-2 h-2 rounded-full bg-white animate-pulse" /> Live</Badge>
-          <span className="text-white font-medium text-sm">{meeting.title}</span>
+          <Badge className="gap-1.5 text-white text-xs" style={{ background: '#c0392b' }}>
+            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+            Live
+          </Badge>
+          <span className="text-white font-medium text-sm truncate max-w-48">{meeting.title}</span>
         </div>
-        <div className="flex items-center gap-2 text-slate-400 text-sm">
-          <Users className="w-4 h-4" />
-          <span>{participants.length + 1}</span>
+        <div className="flex items-center gap-3">
+          <Badge className="text-xs" style={{ background: '#1a3a5c', color: '#7eb8e8' }}>
+            {role === 'host' ? 'Provider' : 'Patient'}
+          </Badge>
+          <span className="text-slate-500 text-xs">
+            {hasRemote ? '2 participants' : 'Waiting for other party...'}
+          </span>
         </div>
       </div>
 
-      {/* Video Grid */}
-      <div className="flex-1 p-4 grid gap-4" style={{
-        gridTemplateColumns: participants.length === 0 ? '1fr' : participants.length <= 1 ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(300px, 1fr))'
-      }}>
-        {/* Local video */}
-        <div className="relative bg-navy-800 rounded-xl overflow-hidden">
-          <video ref={localVideoRef} autoPlay muted playsInline className="w-full h-full object-cover" />
-          <div className="absolute bottom-3 left-3">
-            <Badge variant="secondary" className="text-xs">You {screenSharing ? '(Screen)' : ''}</Badge>
-          </div>
-        </div>
+      {/* Main content */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Video area */}
+        <div className="flex-1 p-3">
+          <div
+            className={`h-full grid gap-3 ${hasRemote ? 'grid-cols-2' : 'grid-cols-1'}`}
+          >
+            {/* Remote video */}
+            {hasRemote && (
+              <div
+                className="relative rounded-xl overflow-hidden"
+                style={{ background: '#0a2240' }}
+                data-testid="remote-video-container"
+              >
+                <video
+                  ref={remoteVideoRef}
+                  autoPlay
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-3 left-3">
+                  <Badge variant="secondary" className="text-xs">
+                    {role === 'host' ? 'Patient' : 'Provider'}
+                  </Badge>
+                </div>
+              </div>
+            )}
 
-        {/* Remote participants */}
-        {participants.map(p => (
-          <div key={p.id} className="relative bg-navy-800 rounded-xl overflow-hidden">
-            <video id={`remote-video-${p.id}`} autoPlay playsInline className="w-full h-full object-cover" />
-            <div className="absolute bottom-3 left-3">
-              <Badge variant="secondary" className="text-xs">{p.context?.name || 'Participant'}</Badge>
+            {/* Local video */}
+            <div
+              className="relative rounded-xl overflow-hidden"
+              style={{ background: '#0a2240' }}
+              data-testid="local-video-container"
+            >
+              <video
+                ref={localVideoRef}
+                autoPlay
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+              />
+              {!videoOn && (
+                <div
+                  className="absolute inset-0 flex items-center justify-center"
+                  style={{ background: '#0a2240' }}
+                >
+                  <VideoOff className="w-10 h-10 text-slate-600" />
+                </div>
+              )}
+              <div className="absolute bottom-3 left-3 flex gap-2">
+                <Badge variant="secondary" className="text-xs">
+                  You {screenSharing ? '(Screen)' : ''}
+                </Badge>
+                {!audioOn && (
+                  <Badge variant="destructive" className="text-xs">
+                    Muted
+                  </Badge>
+                )}
+              </div>
+
+              {/* Waiting indicator */}
+              {!hasRemote && (
+                <div className="absolute bottom-12 left-0 right-0 flex justify-center pointer-events-none">
+                  <div
+                    className="px-4 py-2.5 rounded-lg text-center"
+                    style={{ background: 'rgba(10,31,61,0.85)' }}
+                  >
+                    <div className="flex items-center gap-2 justify-center">
+                      <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
+                      <span className="text-slate-300 text-sm">
+                        Waiting for other party to join...
+                      </span>
+                    </div>
+                    <p className="text-slate-500 text-xs mt-1">
+                      Share the join link to invite them
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        ))}
+        </div>
+
+        {/* AI Diagnose Panel */}
+        {showDiagnose && (
+          <div
+            className="w-80 flex flex-col border-l shrink-0"
+            style={{ background: '#0a1f3d', borderColor: '#1e3a5f' }}
+            data-testid="diagnose-panel"
+          >
+            <div
+              className="flex items-center justify-between px-3 py-2.5 border-b shrink-0"
+              style={{ borderColor: '#1e3a5f' }}
+            >
+              <div className="flex items-center gap-2">
+                <Brain className="w-4 h-4 text-blue-400" />
+                <span className="text-white font-medium text-sm">AI Clinical Assistant</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 hover:bg-slate-700"
+                onClick={() => setShowDiagnose(false)}
+              >
+                <X className="w-4 h-4 text-slate-400" />
+              </Button>
+            </div>
+
+            {/* Results */}
+            <div className="flex-1 overflow-y-auto p-3">
+              {diagnosis && (
+                <div
+                  className="text-xs text-slate-300 whitespace-pre-wrap leading-relaxed p-3 rounded-lg"
+                  style={{ background: '#0B1B33' }}
+                  data-testid="diagnosis-result"
+                >
+                  {diagnosis}
+                </div>
+              )}
+              {!diagnosis && !diagnosing && (
+                <p className="text-slate-500 text-xs text-center mt-8 px-2 leading-relaxed">
+                  Enter patient symptoms below to get AI clinical suggestions, DME
+                  recommendations, and ICD-10 codes.
+                </p>
+              )}
+              {diagnosing && (
+                <div className="flex items-center justify-center gap-2 mt-8">
+                  <Loader2 className="w-5 h-5 animate-spin text-blue-400" />
+                  <span className="text-slate-400 text-sm">Analyzing...</span>
+                </div>
+              )}
+            </div>
+
+            {/* Input */}
+            <div className="p-3 border-t shrink-0" style={{ borderColor: '#1e3a5f' }}>
+              <textarea
+                value={symptoms}
+                onChange={(e) => setSymptoms(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && e.ctrlKey) handleDiagnose();
+                }}
+                placeholder="Describe patient symptoms... (Ctrl+Enter to submit)"
+                rows={3}
+                className="w-full rounded-lg px-3 py-2 text-sm resize-none outline-none text-white placeholder-slate-600"
+                style={{ background: '#0B1B33', border: '1px solid #1e3a5f' }}
+                data-testid="symptoms-input"
+              />
+              <Button
+                onClick={handleDiagnose}
+                disabled={!symptoms.trim() || diagnosing}
+                className="w-full mt-2 text-sm font-medium"
+                style={{ background: 'linear-gradient(135deg, #0055CC, #00A3E0)' }}
+                data-testid="diagnose-submit-btn"
+              >
+                {diagnosing ? (
+                  <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> Analyzing...</>
+                ) : (
+                  <><Send className="w-3.5 h-3.5 mr-1.5" /> Analyze Symptoms</>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Chat Sidebar */}
-      {showChat && (
-        <div className="absolute right-0 top-12 bottom-16 w-80 bg-navy-800 border-l border-slate-700 flex flex-col">
-          <div className="p-3 border-b border-slate-700 font-medium text-white text-sm">Chat</div>
-          <div className="flex-1 overflow-y-auto p-3 space-y-2">
-            {chatMessages.map((msg, i) => (
-              <div key={i} className="text-sm">
-                <span className="font-medium text-blue-400">{msg.from}: </span>
-                <span className="text-slate-300">{msg.text}</span>
-              </div>
-            ))}
-          </div>
-          <div className="p-3 border-t border-slate-700 flex gap-2">
-            <input
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && chatInput.trim()) {
-                  setChatMessages(prev => [...prev, { from: 'You', text: chatInput }]);
-                  setChatInput('');
-                }
-              }}
-              placeholder="Type a message..."
-              className="flex-1 bg-slate-700 text-white rounded px-3 py-2 text-sm outline-none"
-            />
-            <Button size="icon" variant="ghost" onClick={() => {
-              if (chatInput.trim()) {
-                setChatMessages(prev => [...prev, { from: 'You', text: chatInput }]);
-                setChatInput('');
-              }
-            }}>
-              <Send className="w-4 h-4 text-white" />
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Controls */}
-      <div className="flex items-center justify-center gap-3 py-4 bg-navy-800 border-t border-slate-700">
-        <Button variant={audioOn ? 'secondary' : 'destructive'} size="icon" onClick={toggleAudio} className="rounded-full w-12 h-12" data-testid="toggle-audio">
+      {/* Controls bar */}
+      <div
+        className="flex items-center justify-center gap-3 py-3 border-t shrink-0"
+        style={{ background: '#0a1f3d', borderColor: '#1e3a5f' }}
+      >
+        <Button
+          variant={audioOn ? 'secondary' : 'destructive'}
+          size="icon"
+          onClick={toggleAudio}
+          className="rounded-full w-12 h-12"
+          data-testid="toggle-audio"
+          title={audioOn ? 'Mute microphone' : 'Unmute microphone'}
+        >
           {audioOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
         </Button>
-        <Button variant={videoOn ? 'secondary' : 'destructive'} size="icon" onClick={toggleVideo} className="rounded-full w-12 h-12" data-testid="toggle-video">
+
+        <Button
+          variant={videoOn ? 'secondary' : 'destructive'}
+          size="icon"
+          onClick={toggleVideo}
+          className="rounded-full w-12 h-12"
+          data-testid="toggle-video"
+          title={videoOn ? 'Stop video' : 'Start video'}
+        >
           {videoOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
         </Button>
-        <Button variant={screenSharing ? 'default' : 'secondary'} size="icon" onClick={toggleScreenShare} className="rounded-full w-12 h-12" data-testid="toggle-screen">
-          <Monitor className="w-5 h-5" />
+
+        <Button
+          variant="secondary"
+          size="icon"
+          onClick={toggleScreenShare}
+          className="rounded-full w-12 h-12"
+          data-testid="toggle-screen"
+          title={screenSharing ? 'Stop screen share' : 'Share screen'}
+          style={screenSharing ? { background: '#0055CC', color: '#fff' } : {}}
+        >
+          {screenSharing ? <MonitorOff className="w-5 h-5" /> : <Monitor className="w-5 h-5" />}
         </Button>
-        <Button variant={showChat ? 'default' : 'secondary'} size="icon" onClick={() => setShowChat(!showChat)} className="rounded-full w-12 h-12">
-          <MessageSquare className="w-5 h-5" />
+
+        <Button
+          variant="secondary"
+          size="icon"
+          onClick={() => setShowDiagnose((v) => !v)}
+          className="rounded-full w-12 h-12"
+          data-testid="toggle-diagnose"
+          title="AI Clinical Assistant"
+          style={showDiagnose ? { background: '#0055CC', color: '#fff' } : {}}
+        >
+          <Brain className="w-5 h-5" />
         </Button>
-        <Button variant="destructive" size="icon" onClick={handleLeave} className="rounded-full w-14 h-14 ml-4" data-testid="leave-meeting">
+
+        <Button
+          variant="destructive"
+          size="icon"
+          onClick={handleLeave}
+          className="rounded-full w-14 h-14 ml-4"
+          data-testid="leave-meeting"
+          style={{ background: '#c0392b' }}
+        >
           <PhoneOff className="w-6 h-6" />
         </Button>
       </div>

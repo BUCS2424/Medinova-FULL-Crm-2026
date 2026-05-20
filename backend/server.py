@@ -17500,6 +17500,16 @@ except ImportError as e:
 except Exception as e:
     logger.error(f"Error loading Video Rooms routes: {e}")
 
+# Import and include Gemini routes
+try:
+    from routes.gemini_routes import gemini_router
+    api_router.include_router(gemini_router)
+    logger.info("Gemini routes loaded successfully")
+except ImportError as e:
+    logger.warning(f"Gemini routes not loaded: {e}")
+except Exception as e:
+    logger.error(f"Error loading Gemini routes: {e}")
+
 # Import and include Campaign routes
 try:
     from routes.campaign_routes import campaign_router, set_database as set_campaign_db
