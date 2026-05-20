@@ -118,6 +118,26 @@ class SupplierAPIClient:
                 "order_status": "/orders/{order_id}",
                 "pricing": "/products/pricing"
             }
+        },
+        "Preferred Medical": {
+            "base_url": "https://api.preferredmedical.com/v1",
+            "auth_type": "api_key",
+            "endpoints": {
+                "inventory": "/catalog/availability",
+                "order_submit": "/orders/submit",
+                "order_status": "/orders/{order_id}/status",
+                "pricing": "/catalog/{sku}/pricing"
+            }
+        },
+        "Paradigm DME": {
+            "base_url": "https://carelink.paradigmcorp.com/api/v1",
+            "auth_type": "bearer",
+            "endpoints": {
+                "inventory": "/dme/inventory",
+                "order_submit": "/dme/orders",
+                "order_status": "/dme/orders/{order_id}",
+                "pricing": "/dme/pricing/{sku}"
+            }
         }
     }
     
