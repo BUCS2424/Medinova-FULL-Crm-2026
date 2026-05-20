@@ -261,6 +261,13 @@ async def webrtc_signaling(websocket: WebSocket, meeting_id: str, role: str):
             await other_ws.send_json({"type": "peer_joined", "role": role})
         except Exception:
             pass
+        # Also tell the newly-connected peer that the other is ALREADY present.
+        # This covers the case where patient joins before host:
+        # host connects later → host receives peer_joined(patient) → host creates offer.
+        try:
+            await websocket.send_json({"type": "peer_joined", "role": other_role})
+        except Exception:
+            pass
 
     logger.info(f"[signaling] {role} connected to room {meeting_id}")
 
