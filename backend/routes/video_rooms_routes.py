@@ -2,7 +2,7 @@
 Video Rooms — native WebRTC signaling (no Telnyx required).
 Falls back to Telnyx if an API key is configured.
 """
-from fastapi import APIRouter, HTTPException, Depends, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, HTTPException, Depends, WebSocket, WebSocketDisconnect, Request
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime, timezone
@@ -56,10 +56,45 @@ class CreateMeetingRequest(BaseModel):
 
 # ==================== MEETINGS (CRUD) ====================
 
+PROVIDER_ROLES = {"super_admin", "admin", "sales_rep", "sales_manager", "doctor"}
+
+
+def _optional_current_user():
+    """Returns a dependency that tries to authenticate but doesn't hard-fail."""
+    async def _dep(request: None = None):
+        return None
+    return _dep
+
+
 @video_rooms_router.post("/meetings")
-async def create_meeting(data: CreateMeetingRequest):
-    """Create a video meeting — uses native WebRTC signaling by default.
-    Falls back to Telnyx room if API key is configured."""
+async def create_meeting(data: CreateMeetingRequest, request: Request):
+    """Create a video meeting — provider auth via Authorization header.
+    Allowed roles: super_admin, admin, sales_rep, sales_manager, doctor.
+    Uses native WebRTC signaling by default; falls back to Telnyx if API key configured."""
+    # Authenticate the requesting user (required for providers)
+    created_by_id = None
+    created_by_name = None
+    created_by_role = None
+    if _get_current_user:
+        try:
+            token = request.headers.get("authorization", "").replace("Bearer ", "")
+            if token:
+                user = await _get_current_user(token)
+                if user:
+                    role = user.get("role", "")
+                    if role not in PROVIDER_ROLES:
+                        raise HTTPException(
+                            status_code=403,
+                            detail=f"Only providers can create meetings (role: {role})"
+                        )
+                    created_by_id = user.get("id")
+                    created_by_name = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
+                    created_by_role = role
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.warning(f"Auth check failed for meeting creation: {e}")
+
     api_key = await _get_telnyx_api_key()
     meeting_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
@@ -96,6 +131,9 @@ async def create_meeting(data: CreateMeetingRequest):
         "host_url": f"/video-room/{meeting_id}?role=host",
         "created_at": now,
         "ended_at": None,
+        "created_by_id": created_by_id,
+        "created_by_name": created_by_name,
+        "created_by_role": created_by_role,
     }
 
     await _db.video_meetings.insert_one(meeting)

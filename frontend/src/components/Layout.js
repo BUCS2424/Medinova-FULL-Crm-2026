@@ -373,8 +373,14 @@ export const Layout = ({ children }) => {
               {doctorsDirectoryEnabled && (
                 <NavItem item={doctorsNavItem} />
               )}
-              {/* Telehealth / Video Conferencing - visible when feature is enabled */}
+              {/* Telehealth / Video Conferencing - visible to provider roles when feature is enabled */}
               {videoConferencingEnabled && (
+                user?.role === 'super_admin' ||
+                user?.role === 'admin' ||
+                user?.role === 'sales_rep' ||
+                user?.role === 'sales_manager' ||
+                user?.role === 'doctor'
+              ) && (
                 <NavItem item={videoMeetingsNavItem} />
               )}
               {/* Analytics - visible when feature is enabled (admin only) */}

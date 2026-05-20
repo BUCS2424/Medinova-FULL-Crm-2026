@@ -50,7 +50,12 @@
   - Added "Delete All Pages" bulk-delete in PagesTab.jsx
   - Added Mastectomy Supplies + Compression Therapy categories (20 total categories, 225 products)
 
-- [x] **Feature Flag Sidebar Wiring (2026-05-20)**:
+- [x] **Telehealth Access Control & UX (2026-05-20)**:
+  - Telehealth nav item gated to provider roles only: `super_admin`, `admin`, `sales_rep`, `sales_manager`, `doctor`
+  - Patients access via shareable `/video-room/{id}` link — no login required
+  - `created_by_name` + `created_by_role` stored on meetings (via new `verify_token_raw` helper)
+  - VideoMeetingsPage enhanced: 3-step "How Telehealth Works" guide, inline patient link display, SMS invite button, creator attribution per meeting
+  - `video_conferencing` feature enabled in DB by default
   - Previously unwired flags now gated in Layout.js: `analytics_dashboard` → Analytics nav, `video_conferencing` → Telehealth nav, `marketing_campaigns` → Campaigns nav, `lead_intake_hub` → Lead Intake nav
   - `officeally_integration` added to Insurance Verify nav condition (alongside availity + waystar)
   - Created `VideoMeetingsPage.js` at `/video-meetings`: lists meetings, create/end controls, copy patient/host join links

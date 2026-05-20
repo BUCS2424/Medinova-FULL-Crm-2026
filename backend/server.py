@@ -1155,6 +1155,22 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
+
+async def verify_token_raw(token: str) -> dict | None:
+    """Decode a raw JWT string and return the user dict (no HTTPAuthorizationCredentials needed).
+    Returns None if the token is invalid — callers handle authorization themselves."""
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user_id = payload.get("sub")
+        if not user_id:
+            return None
+        user = await db.users.find_one({"id": user_id})
+        if not user:
+            return None
+        return {k: v for k, v in user.items() if k != "_id"}
+    except Exception:
+        return None
+
 def require_roles(*roles: UserRole):
     async def role_checker(current_user: dict = Depends(get_current_user)):
         user_role = current_user.get("role")
@@ -17492,7 +17508,7 @@ except Exception as e:
 try:
     from routes.video_rooms_routes import video_rooms_router, set_database as set_video_rooms_db, set_auth as set_video_rooms_auth
     set_video_rooms_db(db)
-    set_video_rooms_auth(get_current_user)
+    set_video_rooms_auth(verify_token_raw)
     api_router.include_router(video_rooms_router)
     logger.info("Video Rooms routes loaded successfully")
 except ImportError as e:
