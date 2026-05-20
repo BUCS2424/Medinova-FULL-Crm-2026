@@ -289,7 +289,7 @@ const FEATURE_DEFINITIONS = [
   {
     id: 'video_conferencing',
     name: 'Video Conferencing',
-    description: 'Telnyx-powered video meetings for patient consultations, doctor calls, and team meetings with screen sharing and chat',
+    description: 'Native WebRTC video meetings for patient telehealth consultations with screen sharing and AI clinical assistant',
     category: 'communication',
     icon: PhoneCall,
     defaultEnabled: false,

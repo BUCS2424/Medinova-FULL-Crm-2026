@@ -48,6 +48,7 @@ import LegalDocumentPage from "./pages/LegalDocumentPage";
 import DialerWindowPage from "./pages/DialerWindowPage";
 import ConsentAuditPage from "./pages/ConsentAuditPage";
 import VideoRoomPage from "./pages/VideoRoomPage";
+import VideoMeetingsPage from "./pages/VideoMeetingsPage";
 import CampaignPage from "./pages/CampaignPage";
 import MedicareResourcesPage from "./pages/MedicareResourcesPage";
 import StayUpToDatePage from "./pages/StayUpToDatePage";
@@ -171,6 +172,16 @@ function AppRoutes() {
       <Route
         path="/video-room/:meetingId"
         element={<VideoRoomPage />}
+      />
+
+      {/* Video Meetings management - protected */}
+      <Route
+        path="/video-meetings"
+        element={
+          <ProtectedRoute>
+            <VideoMeetingsPage />
+          </ProtectedRoute>
+        }
       />
 
       {/* Campaign Landing Pages */}

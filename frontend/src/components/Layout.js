@@ -53,7 +53,12 @@ import {
   PhoneCall,
   ExternalLink,
   Newspaper,
-  ShieldCheck
+  ShieldCheck,
+  Video,
+  BarChart3,
+  Megaphone,
+  Key,
+  CalendarCheck
 } from 'lucide-react';
 import axios from 'axios';
 import SlideOutDialer from './SlideOutDialer';
@@ -83,8 +88,20 @@ const doctorsNavItem = { to: '/doctors', icon: Stethoscope, label: 'Doctors' };
 // Live Chat - visible to admin, sales_manager, super_admin, store_owner
 const chatNavItem = { to: '/admin-settings?tab=chat', icon: MessageCircle, label: 'Live Chat' };
 
-// Insurance Verification - visible when Availity or Waystar feature is enabled
+// Insurance Verification - visible when Availity, Waystar or OfficeAlly feature is enabled
 const insuranceNavItem = { to: '/insurance-verification', icon: ShieldCheck, label: 'Insurance Verify' };
+
+// Telehealth - visible when video_conferencing feature is enabled
+const videoMeetingsNavItem = { to: '/video-meetings', icon: Video, label: 'Telehealth' };
+
+// Analytics - visible when analytics_dashboard feature is enabled (admin only)
+const analyticsNavItem = { to: '/analytics', icon: BarChart3, label: 'Analytics' };
+
+// Marketing Campaigns - visible when marketing_campaigns feature is enabled (admin only)
+const campaignsNavItem = { to: '/admin-settings?tab=marketing-campaigns', icon: Megaphone, label: 'Campaigns' };
+
+// Lead Intake Hub - visible when lead_intake_hub feature is enabled (admin only)
+const leadIntakeNavItem = { to: '/admin-settings?tab=lead-intake', icon: Key, label: 'Lead Intake' };
 
 const adminNavItems = [];
 
@@ -115,6 +132,10 @@ export const Layout = ({ children }) => {
   const analyticsEnabled = isFeatureEnabled('analytics_dashboard');
   const availityEnabled = isFeatureEnabled('availity_integration');
   const waystarEnabled = isFeatureEnabled('waystar_integration');
+  const officeAllyEnabled = isFeatureEnabled('officeally_integration');
+  const videoConferencingEnabled = isFeatureEnabled('video_conferencing');
+  const marketingCampaignsEnabled = isFeatureEnabled('marketing_campaigns');
+  const leadIntakeEnabled = isFeatureEnabled('lead_intake_hub');
 
   // Play notification sound
   const playNotificationSound = useCallback(() => {
@@ -352,8 +373,24 @@ export const Layout = ({ children }) => {
               {doctorsDirectoryEnabled && (
                 <NavItem item={doctorsNavItem} />
               )}
-              {/* Insurance Verification - visible when Availity or Waystar is enabled */}
-              {(availityEnabled || waystarEnabled) && (
+              {/* Telehealth / Video Conferencing - visible when feature is enabled */}
+              {videoConferencingEnabled && (
+                <NavItem item={videoMeetingsNavItem} />
+              )}
+              {/* Analytics - visible when feature is enabled (admin only) */}
+              {analyticsEnabled && isAdmin && (
+                <NavItem item={analyticsNavItem} />
+              )}
+              {/* Marketing Campaigns - visible when feature is enabled (admin only) */}
+              {marketingCampaignsEnabled && isAdmin && (
+                <NavItem item={campaignsNavItem} />
+              )}
+              {/* Lead Intake Hub - visible when feature is enabled (admin only) */}
+              {leadIntakeEnabled && isAdmin && (
+                <NavItem item={leadIntakeNavItem} />
+              )}
+              {/* Insurance Verification - visible when Availity, Waystar or OfficeAlly is enabled */}
+              {(availityEnabled || waystarEnabled || officeAllyEnabled) && (
                 <NavItem item={insuranceNavItem} data-testid="nav-insurance-verify" />
               )}
             </div>
