@@ -13835,6 +13835,8 @@ async def generate_location_page_on_demand(loc_name: str, loc_type: str, state_n
             "Vision Aids":                 {"icon": "eye",             "gradient": "from-emerald-500 to-emerald-600","subtitle": "Magnifiers, video aids"},
             "Hearing Aids":                {"icon": "ear",             "gradient": "from-yellow-500 to-amber-500","subtitle": "Behind-ear, in-ear hearing aids"},
             "Speech & Communication":      {"icon": "mic",             "gradient": "from-blue-400 to-blue-500",   "subtitle": "Speech devices, communication aids"},
+            "Mastectomy Supplies":         {"icon": "heart",           "gradient": "from-pink-500 to-rose-500",   "subtitle": "Breast forms, post-mastectomy bras, lymphedema"},
+            "Compression Therapy":         {"icon": "layers",          "gradient": "from-cyan-600 to-teal-600",   "subtitle": "Compression stockings, sleeves, pneumatic pumps"},
         }
         
         category_cards = []
