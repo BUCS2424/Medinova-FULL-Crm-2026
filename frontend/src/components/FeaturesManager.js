@@ -440,7 +440,7 @@ export default function FeaturesManager() {
   }, {});
 
   // Stats
-  const enabledCount = Object.values(features).filter(v => v).length;
+  const enabledCount = FEATURE_DEFINITIONS.filter(f => features[f.id] ?? f.defaultEnabled).length;
   const totalCount = FEATURE_DEFINITIONS.length;
 
   if (loading) {
@@ -534,7 +534,7 @@ export default function FeaturesManager() {
                 {CATEGORIES[category]?.label || category}
               </Badge>
               <span className="text-sm font-normal text-muted-foreground">
-                ({categoryFeatures.filter(f => features[f.id]).length}/{categoryFeatures.length} enabled)
+                ({categoryFeatures.filter(f => features[f.id] ?? f.defaultEnabled).length}/{categoryFeatures.length} enabled)
               </span>
             </CardTitle>
           </CardHeader>

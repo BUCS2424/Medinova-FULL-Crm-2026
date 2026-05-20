@@ -50,7 +50,13 @@
   - Added "Delete All Pages" bulk-delete in PagesTab.jsx
   - Added Mastectomy Supplies + Compression Therapy categories (20 total categories, 225 products)
 
-- [x] **Native WebRTC Telehealth Module (2026-05-20)**:
+- [x] **Feature Flag Sidebar Wiring (2026-05-20)**:
+  - Previously unwired flags now gated in Layout.js: `analytics_dashboard` → Analytics nav, `video_conferencing` → Telehealth nav, `marketing_campaigns` → Campaigns nav, `lead_intake_hub` → Lead Intake nav
+  - `officeally_integration` added to Insurance Verify nav condition (alongside availity + waystar)
+  - Created `VideoMeetingsPage.js` at `/video-meetings`: lists meetings, create/end controls, copy patient/host join links
+  - Route `/video-meetings` added to App.js (protected)
+  - Fixed FeaturesManager enabled counter to respect `defaultEnabled` values (not just DB-stored overrides)
+  - Fixed NavItem `data-testid` generation from single `.replace()` to regex `.replace(/\s+/g, '-')`
   - Removed Telnyx Video API — replaced with native `RTCPeerConnection` + FastAPI WebSocket signaling
   - 2-way video call, screen share, role-based URLs (?role=host / ?role=patient)
   - Camera/mic preview lobby, waiting indicator, in-meeting controls

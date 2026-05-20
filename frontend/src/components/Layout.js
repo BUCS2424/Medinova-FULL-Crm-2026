@@ -274,7 +274,7 @@ export const Layout = ({ children }) => {
               }
               style={{ padding: '20px 8px' }}
               onClick={() => setSidebarOpen(false)}
-              data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
+              data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
             >
               <item.icon className="w-5 h-5" />
             </NavLink>
