@@ -17275,30 +17275,77 @@ async def get_cms_dataset_stats(
 _cms_news_cache: dict = {"data": None, "ts": 0.0}
 _CMS_NEWS_CACHE_TTL = 3600  # 1 hour
 
+# Noise patterns to filter out (low-value admin notices)
+_NOISE_PATTERNS = [
+    "agency information collection activities",
+    "quarterly listing of program issuances",
+    "privacy act of 1974",
+    "sunshine act",
+    "federal advisory committee",
+    "announcement of",
+    "meeting-",
+]
+
+# Priority tier per document type (higher = shown first)
+_DOC_PRIORITY = {"rule": 3, "proposed rule": 2, "notice": 1}
+
+# DME-focused search queries for targeted pulls
+_DME_SEARCH_TERMS = [
+    "DMEPOS durable medical equipment prosthetics orthotics supplies Medicare",
+    "prior authorization face-to-face written order medical necessity",
+    "competitive bidding DMEPOS supplier accreditation Medicare",
+    "Medicare Part B fee schedule reimbursement DME oxygen wheelchair",
+    "billing coding HCPCS claim submission overpayment audit DME",
+]
+
 
 def _auto_tag(title: str, abstract: str) -> list:
     text = (title + " " + (abstract or "")).lower()
     tags = []
-    if "dmepos" in text or "durable medical equipment" in text or "prosthetics" in text:
+    if any(k in text for k in ["dmepos", "durable medical equipment", "prosthetics", "orthotics", "orthotist", "prosthetist"]):
         tags.append("DMEPOS")
-    if "prior authorization" in text or "prior auth" in text:
+    if any(k in text for k in ["prior authorization", "prior auth", "preauthorization", "prior approval"]):
         tags.append("Prior Auth")
-    if "payment" in text or "reimbursement" in text or "fee schedule" in text:
-        tags.append("Payment")
-    if "home health" in text:
+    if any(k in text for k in ["face-to-face", "face to face", "f2f", "written order", "physician order"]):
+        tags.append("Face-to-Face")
+    if any(k in text for k in ["fee schedule", "payment rate", "payment amount", "conversion factor"]):
+        tags.append("Fee Schedule")
+    if any(k in text for k in ["competitive bidding", "cbic", "competitive acquisition", "bid program"]):
+        tags.append("Competitive Bidding")
+    if any(k in text for k in ["oxygen", "respiratory", "cpap", "nebulizer", "ventilator"]):
+        tags.append("Oxygen")
+    if any(k in text for k in ["wheelchair", "power mobility", "scooter", "mobility device", "power wheelchair", "power operated"]):
+        tags.append("Wheelchair")
+    if any(k in text for k in ["home health", "home care", "homebound"]):
         tags.append("Home Health")
-    if "compliance" in text or "fraud" in text or "overpayment" in text:
-        tags.append("Compliance")
-    if "hospice" in text:
+    if any(k in text for k in ["hcpcs", "billing code", "claim submission", "remittance", "coordination of benefits"]):
+        tags.append("Billing/Coding")
+    if any(k in text for k in ["audit", "overpayment", "fraud", "waste", "abuse", "rac audit", "recovery audit", "extrapolation"]):
+        tags.append("Audit/Fraud")
+    if any(k in text for k in ["local coverage determination", "lcd", "national coverage determination", "ncd", "coverage policy"]):
+        tags.append("Coverage Policy")
+    if any(k in text for k in ["accreditation", "surety bond", "enrollment", "supplier standards"]):
+        tags.append("Accreditation")
+    if any(k in text for k in ["hospice"]):
         tags.append("Hospice")
-    if "medicaid" in text and "medicare" not in text:
+    if any(k in text for k in ["reimbursement", "payment"] ) and "Fee Schedule" not in tags:
+        tags.append("Payment")
+    if any(k in text for k in ["home health"]) and "Home Health" not in tags:
+        pass  # already handled
+    if any(k in text for k in ["medicaid"]) and "medicare" not in text:
         tags.append("Medicaid")
-    return list(dict.fromkeys(tags))[:3]
+    # dedupe, prioritize most specific, max 4
+    return list(dict.fromkeys(tags))[:4]
+
+
+def _is_noise(title: str) -> bool:
+    t = title.lower()
+    return any(pattern in t for pattern in _NOISE_PATTERNS)
 
 
 @api_router.get("/cms-news/feed")
 async def get_cms_news_feed(refresh: bool = False, current_user: dict = Depends(get_current_user)):
-    """Latest CMS regulatory and compliance updates via Federal Register API."""
+    """Latest high-quality CMS regulatory and compliance updates via Federal Register API."""
     now = datetime.now(timezone.utc).timestamp()
     if not refresh and _cms_news_cache["data"] and (now - _cms_news_cache["ts"]) < _CMS_NEWS_CACHE_TTL:
         return _cms_news_cache["data"]
@@ -17306,18 +17353,20 @@ async def get_cms_news_feed(refresh: bool = False, current_user: dict = Depends(
     items = []
     seen_ids: set = set()
 
-    async def _fetch_fr(extra_params: dict) -> list:
-        base_params = {
+    async def _fetch_fr(search_term: str = None, per_page: int = 30) -> list:
+        params: dict = {
             "conditions[agencies][]": "centers-for-medicare-medicaid-services",
-            "per_page": "40",
+            "per_page": str(per_page),
             "order": "newest",
         }
-        base_params.update(extra_params)
+        if search_term:
+            params["conditions[term]"] = search_term
+        # Exclude pure notice types from general pull (keep for targeted searches)
         try:
             async with httpx.AsyncClient(timeout=15.0) as client:
                 r = await client.get(
                     "https://www.federalregister.gov/api/v1/documents.json",
-                    params=base_params,
+                    params=params,
                 )
                 if r.status_code == 200:
                     return r.json().get("results", [])
@@ -17325,44 +17374,69 @@ async def get_cms_news_feed(refresh: bool = False, current_user: dict = Depends(
             logging.warning(f"Federal Register API error: {e}")
         return []
 
-    def _map_doc(doc: dict, forced_tags: list = None) -> dict | None:
+    def _map_doc(doc: dict) -> dict | None:
         doc_id = doc.get("document_number", "")
+        title = doc.get("title", "") or ""
         if not doc_id or doc_id in seen_ids:
             return None
+        # Filter out low-value noise
+        if _is_noise(title):
+            return None
         seen_ids.add(doc_id)
-        title = doc.get("title", "")
-        abstract = doc.get("abstract", "")
-        tags = forced_tags[:] if forced_tags else []
-        tags += _auto_tag(title, abstract)
-        tags = list(dict.fromkeys(tags))[:3]
+        abstract = doc.get("abstract", "") or ""
+        tags = _auto_tag(title, abstract)
+        pub_date = doc.get("publication_date", "")
+        # Mark articles published within last 14 days as NEW
+        is_new = False
+        try:
+            from datetime import date, timedelta
+            pub = date.fromisoformat(pub_date)
+            is_new = (date.today() - pub).days <= 14
+        except Exception:
+            pass
+        priority = _DOC_PRIORITY.get((doc.get("type") or "").lower(), 0)
         return {
             "id": doc_id,
             "title": title,
             "abstract": abstract,
             "type": doc.get("type", "Document"),
-            "published_at": doc.get("publication_date"),
+            "published_at": pub_date,
             "effective_on": doc.get("effective_on"),
             "url": doc.get("html_url"),
             "pdf_url": doc.get("pdf_url"),
             "source": "Federal Register",
             "tags": tags,
+            "is_new": is_new,
+            "priority": priority,
         }
 
-    # Sequential fetch: general CMS docs + DMEPOS-specific
-    general_docs = await _fetch_fr({})
-    dmepos_docs = await _fetch_fr({"conditions[term]": "DMEPOS durable medical equipment Medicare"})
+    # 1. General recent CMS docs (Rules + Proposed Rules only — highest signal)
+    general_docs = await _fetch_fr(None, 50)
 
+    # 2-6. DME-targeted searches (25 each)
+    targeted_batches = []
+    for term in _DME_SEARCH_TERMS:
+        batch = await _fetch_fr(term, 25)
+        targeted_batches.append(batch)
+
+    # Process general first so DME searches fill gaps
     for doc in general_docs:
         item = _map_doc(doc)
         if item:
             items.append(item)
-    for doc in dmepos_docs:
-        item = _map_doc(doc, ["DMEPOS"])
-        if item:
-            items.append(item)
+    for batch in targeted_batches:
+        for doc in batch:
+            item = _map_doc(doc)
+            if item:
+                items.append(item)
 
-    items.sort(key=lambda x: x.get("published_at") or "", reverse=True)
-    items = items[:80]
+    # Sort: Final Rules first (newest), Proposed Rules (newest), Notices (newest), Others last
+    items.sort(key=lambda x: (-(x.get("priority") or 0), -(1 if x.get("is_new") else 0), -(x.get("published_at") or "").__lt__("z") or 0, x.get("published_at") or ""), reverse=False)
+    # Simpler stable sort:
+    items.sort(key=lambda x: x.get("published_at") or "", reverse=True)     # newest first within tier
+    items.sort(key=lambda x: x.get("priority") or 0, reverse=True)          # Final Rules first overall
+
+    items = items[:100]
 
     result = {
         "items": items,
