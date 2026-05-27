@@ -7,7 +7,7 @@ import requests
 import os
 import uuid
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://webrtc-telehealth.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://dynamic-plugins.preview.emergentagent.com')
 
 # Test credentials
 ADMIN_EMAIL = "mel@a2gdesigns.com"

@@ -17448,6 +17448,214 @@ async def get_cms_news_feed(refresh: bool = False, current_user: dict = Depends(
     return result
 
 
+
+# ========================================
+# COMPONENT INSTALLER / PLUGIN SYSTEM
+# ========================================
+_PLUGIN_BASE = "/app"
+
+
+def _plugin_full_path(relative_path: str) -> str:
+    """Resolve plugin-relative path to absolute filesystem path."""
+    return os.path.join(_PLUGIN_BASE, relative_path.lstrip("/"))
+
+
+async def _op_create(path: str, content: str, overwrite: bool) -> dict:
+    full = _plugin_full_path(path)
+    if not overwrite and os.path.exists(full):
+        return {"path": path, "action": "create", "status": "skipped", "message": "File already exists (use 'overwrite' action to replace)"}
+    os.makedirs(os.path.dirname(full), exist_ok=True)
+    with open(full, "w", encoding="utf-8") as fh:
+        fh.write(content)
+    return {"path": path, "action": "create", "status": "success"}
+
+
+async def _op_patch(path: str, patches: list) -> dict:
+    full = _plugin_full_path(path)
+    if not os.path.exists(full):
+        return {"path": path, "action": "patch", "status": "error", "message": "Target file not found"}
+    with open(full, "r", encoding="utf-8") as fh:
+        original = fh.read()
+    content = original
+    patch_log = []
+    for p in patches:
+        find = p.get("find", "")
+        replace = p.get("replace", "")
+        if find in content:
+            content = content.replace(find, replace, 1)
+            patch_log.append(f"Applied: '{find[:50]}...'")
+        else:
+            patch_log.append(f"NOT FOUND: '{find[:50]}...'")
+    if content != original:
+        with open(full, "w", encoding="utf-8") as fh:
+            fh.write(content)
+    return {"path": path, "action": "patch", "status": "success", "log": patch_log, "_original": original}
+
+
+async def _op_append(path: str, content: str) -> dict:
+    full = _plugin_full_path(path)
+    if not os.path.exists(full):
+        return {"path": path, "action": "append", "status": "error", "message": "Target file not found"}
+    with open(full, "a", encoding="utf-8") as fh:
+        fh.write(content)
+    return {"path": path, "action": "append", "status": "success"}
+
+
+@api_router.get("/plugins")
+async def list_plugins(current_user: dict = Depends(get_current_user)):
+    """List all installed plugins."""
+    plugins = await _db.plugins_registry.find({}, {"_id": 0, "file_backups": 0}).sort("installed_at", -1).to_list(None)
+    return {"plugins": plugins}
+
+
+@api_router.post("/plugins/preview")
+async def preview_plugin(payload: dict, current_user: dict = Depends(get_current_user)):
+    """Parse a plugin bundle JSON and return a preview (no changes applied)."""
+    bundle = payload.get("bundle") if "bundle" in payload else payload
+    plugin_id = bundle.get("id")
+    if not plugin_id:
+        raise HTTPException(status_code=400, detail="Plugin bundle must have an 'id' field")
+
+    existing = await _db.plugins_registry.find_one({"id": plugin_id}, {"_id": 0, "version": 1, "installed_at": 1})
+
+    files_preview = []
+    for f in bundle.get("files", []):
+        fpath = f.get("path", "")
+        full = _plugin_full_path(fpath)
+        exists = os.path.exists(full)
+        action = f.get("action", "")
+        files_preview.append({
+            "path": fpath,
+            "action": action,
+            "exists": exists,
+            "patches": len(f.get("patches", [])) if action == "patch" else None,
+            "size_bytes": len((f.get("content") or "").encode()) if action in ("create", "overwrite", "append") else None,
+        })
+
+    return {
+        "valid": True,
+        "id": plugin_id,
+        "name": bundle.get("name", plugin_id),
+        "version": bundle.get("version", "1.0.0"),
+        "description": bundle.get("description", ""),
+        "author": bundle.get("author", "MediNova"),
+        "tags": bundle.get("tags", []),
+        "created_at": bundle.get("created_at"),
+        "changelog": bundle.get("changelog", ""),
+        "notes": bundle.get("notes", ""),
+        "already_installed": existing is not None,
+        "installed_version": existing.get("version") if existing else None,
+        "installed_at": existing.get("installed_at") if existing else None,
+        "files": files_preview,
+        "pip_packages": bundle.get("pip_packages", []),
+        "npm_packages": bundle.get("npm_packages", []),
+        "env_vars": bundle.get("env_vars", []),
+        "restart_backend": any("backend" in f.get("path", "") or "requirements" in f.get("path", "") for f in bundle.get("files", [])),
+        "restart_frontend": any("frontend" in f.get("path", "") for f in bundle.get("files", [])),
+    }
+
+
+@api_router.post("/plugins/install")
+async def install_plugin(payload: dict, current_user: dict = Depends(get_current_user)):
+    """Apply a plugin bundle to the filesystem and record it in the database."""
+    _require_role(current_user, ["super_admin", "admin"])
+    bundle = payload.get("bundle") if "bundle" in payload else payload
+    plugin_id = bundle.get("id")
+    if not plugin_id:
+        raise HTTPException(status_code=400, detail="Plugin bundle must have an 'id' field")
+
+    step_results = []
+    file_backups = []
+
+    for file_op in bundle.get("files", []):
+        action = file_op.get("action", "")
+        path = file_op.get("path", "")
+        try:
+            if action in ("create", "overwrite"):
+                result = await _op_create(path, file_op.get("content", ""), overwrite=(action == "overwrite"))
+            elif action == "patch":
+                result = await _op_patch(path, file_op.get("patches", []))
+                if result.get("status") == "success" and "_original" in result:
+                    file_backups.append({"path": path, "content": result.pop("_original")})
+            elif action == "append":
+                result = await _op_append(path, file_op.get("content", ""))
+            else:
+                result = {"path": path, "action": action, "status": "skipped", "message": f"Unknown action '{action}'"}
+        except Exception as exc:
+            result = {"path": path, "action": action, "status": "error", "message": str(exc)}
+        step_results.append(result)
+
+    success_count = sum(1 for r in step_results if r.get("status") == "success")
+    error_count = sum(1 for r in step_results if r.get("status") == "error")
+
+    plugin_record = {
+        "id": plugin_id,
+        "name": bundle.get("name", plugin_id),
+        "version": bundle.get("version", "1.0.0"),
+        "description": bundle.get("description", ""),
+        "author": bundle.get("author", ""),
+        "tags": bundle.get("tags", []),
+        "feature_key": bundle.get("feature_key"),
+        "installed_at": datetime.now(timezone.utc).isoformat(),
+        "installed_by": current_user.get("email", ""),
+        "status": "error" if error_count > 0 else "installed",
+        "file_backups": file_backups,
+        "files_created": [r["path"] for r in step_results if r.get("status") == "success" and r.get("action") in ("create", "overwrite")],
+        "pip_packages": bundle.get("pip_packages", []),
+        "npm_packages": bundle.get("npm_packages", []),
+        "env_vars": bundle.get("env_vars", []),
+        "notes": bundle.get("notes", ""),
+        "changelog": bundle.get("changelog", ""),
+    }
+    await _db.plugins_registry.replace_one({"id": plugin_id}, plugin_record, upsert=True)
+
+    return {
+        "plugin_id": plugin_id,
+        "status": "error" if error_count else "success",
+        "steps": step_results,
+        "files_applied": success_count,
+        "errors": error_count,
+        "restart_backend": any("backend" in r.get("path", "") or "requirements" in r.get("path", "") for r in step_results if r.get("status") == "success"),
+        "reload_frontend": any("frontend" in r.get("path", "") for r in step_results if r.get("status") == "success"),
+    }
+
+
+@api_router.delete("/plugins/{plugin_id}")
+async def uninstall_plugin(plugin_id: str, current_user: dict = Depends(get_current_user)):
+    """Roll back a plugin by restoring file backups and deleting created files."""
+    _require_role(current_user, ["super_admin", "admin"])
+    plugin = await _db.plugins_registry.find_one({"id": plugin_id}, {"_id": 0})
+    if not plugin:
+        raise HTTPException(status_code=404, detail="Plugin not found")
+
+    rollback = []
+
+    for backup in plugin.get("file_backups", []):
+        try:
+            with open(_plugin_full_path(backup["path"]), "w", encoding="utf-8") as fh:
+                fh.write(backup["content"])
+            rollback.append({"path": backup["path"], "action": "restored"})
+        except Exception as exc:
+            rollback.append({"path": backup["path"], "action": "error", "message": str(exc)})
+
+    backed_up_paths = {b["path"] for b in plugin.get("file_backups", [])}
+    for path in plugin.get("files_created", []):
+        if path not in backed_up_paths:
+            try:
+                full = _plugin_full_path(path)
+                if os.path.exists(full):
+                    os.remove(full)
+                rollback.append({"path": path, "action": "deleted"})
+            except Exception as exc:
+                rollback.append({"path": path, "action": "error", "message": str(exc)})
+
+    await _db.plugins_registry.delete_one({"id": plugin_id})
+    return {"plugin_id": plugin_id, "status": "uninstalled", "rollback_steps": rollback}
+
+
+# ========================================
+# CMS COMPLIANCE NEWS SEARCH
+# ========================================
 @api_router.get("/cms-news/search")
 async def search_cms_news(q: str, current_user: dict = Depends(get_current_user)):
     """Live keyword search against Federal Register for CMS documents."""
