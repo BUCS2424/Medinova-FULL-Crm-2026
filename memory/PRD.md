@@ -6,7 +6,7 @@
 **Project Name**: MediNova Medical Supplies CRM (rebranded from DME PROS)
 **Source**: https://github.com/BUCS2424/New-Core-Lead-vender-DME-r-us
 **Setup Date**: 2026-03-13
-**Last Updated**: 2026-05-19 (Location page product fix + product catalog seeding)
+**Last Updated**: 2026-05-27 (Plugin Installer system completed)
 
 ## Architecture
 - **Backend**: FastAPI (Python) on port 8001
@@ -270,6 +270,20 @@
   - Article modal on click: type badge, doc #, title, Published/Effective dates, tags, full summary text, "Read Full Article" external link, PDF download button
   - Footer link to Federal Register CMS page
 
+- [x] **Internal Knowledge Base (2026-05-27)**:
+  - Feature-toggled sidebar nav item (gated by `knowledge_base` feature flag)
+  - Static knowledge base data in `/app/frontend/src/data/kb_articles.js`
+  - `KnowledgeBasePage.js` with category navigation, article search, and full article viewer
+
+- [x] **Plugin Installer System (2026-05-27)**:
+  - `POST /api/plugins/preview` — dry-run preview of a plugin bundle, returns file operations, packages, env vars, restart requirements
+  - `POST /api/plugins/install` — installs JSON plugin bundle (create/overwrite/patch/append file actions), stores record in `plugins_registry` MongoDB collection
+  - `GET /api/plugins` — lists all installed plugins
+  - `DELETE /api/plugins/{id}` — rolls back plugin (restores file backups), removes from registry
+  - Frontend `ComponentInstaller.js` — drag/drop or paste JSON bundle, preview panel, install result panel, installed plugins list with expand/rollback
+  - Wired into Dev Settings sidebar as "Plugin Installer" tab (between Database and API Tools)
+  - 100% test pass rate (18/18 backend, 12/12 frontend E2E)
+
 ## Prioritized Backlog
 - P0: User acceptance check of new landing page visual design (2026-05-16 overhaul)
 - P1: Wire Availity & Waystar live API sync (schemas exist, APIs currently mocked)
@@ -278,10 +292,14 @@
 - P1: Add server-side rate limiting specific to /api/public/leads spam bursts
 - P1: User acceptance check for print/fax lead workflow in real sales process
 - P1: User acceptance check for doctor tab workflow and NPI search import quality
+- P1: Configure Telnyx fax API keys in prod to enable actual outgoing fax delivery
 - P2: Refactor server.py (17k+ lines) into modular route files
 - P2: Refactor VideoRoomPage.js (~960 lines) into useWebRTC custom hook
 - P2: PDF export option alongside browser print for leads
 - P2: Add more data sources to Stay Up To Date page (CMS Marketplace API)
+- P2: KB admin editor — create/edit custom articles per section stored in DB
+- P2: Article feedback (Was this helpful? Yes/No) for Knowledge Base
+- P2: Compliance deadline countdown calendar (extract effective dates from CMS Final Rules)
 
 ## Login Credentials
 - **Email**: mel@a2gdesigns.com

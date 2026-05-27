@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -309,7 +309,7 @@ export default function ComponentInstaller() {
     } catch { setPlugins([]); } finally { setLoadingPlugins(false); }
   }, []);
 
-  useState(() => { loadPlugins(); });
+  useEffect(() => { loadPlugins(); }, [loadPlugins]);
 
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
