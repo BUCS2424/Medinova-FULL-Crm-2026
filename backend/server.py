@@ -17504,7 +17504,7 @@ async def _op_append(path: str, content: str) -> dict:
 @api_router.get("/plugins")
 async def list_plugins(current_user: dict = Depends(get_current_user)):
     """List all installed plugins."""
-    plugins = await _db.plugins_registry.find({}, {"_id": 0, "file_backups": 0}).sort("installed_at", -1).to_list(None)
+    plugins = await db.plugins_registry.find({}, {"_id": 0, "file_backups": 0}).sort("installed_at", -1).to_list(None)
     return {"plugins": plugins}
 
 
@@ -17516,7 +17516,7 @@ async def preview_plugin(payload: dict, current_user: dict = Depends(get_current
     if not plugin_id:
         raise HTTPException(status_code=400, detail="Plugin bundle must have an 'id' field")
 
-    existing = await _db.plugins_registry.find_one({"id": plugin_id}, {"_id": 0, "version": 1, "installed_at": 1})
+    existing = await db.plugins_registry.find_one({"id": plugin_id}, {"_id": 0, "version": 1, "installed_at": 1})
 
     files_preview = []
     for f in bundle.get("files", []):
@@ -17558,7 +17558,7 @@ async def preview_plugin(payload: dict, current_user: dict = Depends(get_current
 @api_router.post("/plugins/install")
 async def install_plugin(payload: dict, current_user: dict = Depends(get_current_user)):
     """Apply a plugin bundle to the filesystem and record it in the database."""
-    _require_role(current_user, ["super_admin", "admin"])
+    require_admin(current_user)
     bundle = payload.get("bundle") if "bundle" in payload else payload
     plugin_id = bundle.get("id")
     if not plugin_id:
@@ -17607,7 +17607,7 @@ async def install_plugin(payload: dict, current_user: dict = Depends(get_current
         "notes": bundle.get("notes", ""),
         "changelog": bundle.get("changelog", ""),
     }
-    await _db.plugins_registry.replace_one({"id": plugin_id}, plugin_record, upsert=True)
+    await db.plugins_registry.replace_one({"id": plugin_id}, plugin_record, upsert=True)
 
     return {
         "plugin_id": plugin_id,
@@ -17623,8 +17623,8 @@ async def install_plugin(payload: dict, current_user: dict = Depends(get_current
 @api_router.delete("/plugins/{plugin_id}")
 async def uninstall_plugin(plugin_id: str, current_user: dict = Depends(get_current_user)):
     """Roll back a plugin by restoring file backups and deleting created files."""
-    _require_role(current_user, ["super_admin", "admin"])
-    plugin = await _db.plugins_registry.find_one({"id": plugin_id}, {"_id": 0})
+    require_admin(current_user)
+    plugin = await db.plugins_registry.find_one({"id": plugin_id}, {"_id": 0})
     if not plugin:
         raise HTTPException(status_code=404, detail="Plugin not found")
 
@@ -17649,7 +17649,7 @@ async def uninstall_plugin(plugin_id: str, current_user: dict = Depends(get_curr
             except Exception as exc:
                 rollback.append({"path": path, "action": "error", "message": str(exc)})
 
-    await _db.plugins_registry.delete_one({"id": plugin_id})
+    await db.plugins_registry.delete_one({"id": plugin_id})
     return {"plugin_id": plugin_id, "status": "uninstalled", "rollback_steps": rollback}
 
 

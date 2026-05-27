@@ -25,6 +25,7 @@ import NewsletterManager from '../components/NewsletterManager';
 import DirectorySubmissionManager from '../components/DirectorySubmissionManager';
 import ChatDashboard from '../components/ChatDashboard';
 import LocationGenerator from '../components/LocationGenerator';
+import ComponentInstaller from '../components/ComponentInstaller';
 import {
   FileCode, 
   MapPin, 
@@ -67,7 +68,8 @@ import {
   Key,
   AlertTriangle,
   CheckCircle,
-  Star
+  Star,
+  Blocks
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -95,6 +97,7 @@ const devMenuItems = [
   { id: 'products', icon: Package, label: 'Products', description: 'Manage product catalog' },
   { id: 'fax', icon: Phone, label: 'Fax', description: 'HIPAA-compliant faxing via Telnyx' },
   { id: 'database', icon: Database, label: 'Database', description: 'Export & import data' },
+  { id: 'plugins', icon: Blocks, label: 'Plugin Installer', description: 'Install & manage feature bundles' },
   { id: 'api-tools', icon: Webhook, label: 'API Tools', description: 'Coming soon', disabled: true },
   { id: 'logs', icon: FileText, label: 'System Logs', description: 'Coming soon', disabled: true },
 ];
@@ -2591,6 +2594,11 @@ export default function DevSettingsPage() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Plugin Installer */}
+      {activeDevTool === 'plugins' && (
+        <ComponentInstaller />
       )}
 
       {/* Preview Modal */}
